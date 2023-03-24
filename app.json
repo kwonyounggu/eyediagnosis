@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "EyeDisease",
-    "slug": "EyeDisease",
+    "name": "EyeDiagnosis",
+    "slug": "eyediagnosis",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,9 +15,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.webmonster.eyedisease"
     },
     "android": {
+      "package": "com.webmonster.eyedisease",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -25,6 +28,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c0147cee-32ef-4dc2-93a3-65c3a50169db"
+      }
+    },
+    "owner": "webmonster"
   }
 }
