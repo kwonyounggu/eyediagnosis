@@ -9,6 +9,9 @@
 9.              name>eas build --platform android
 
 
+github
+token name: eyediagnosis
+personal access token: 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
 TO do
 1. put animation while loading chatgpt under processing
 2. save and list out on browser tab
