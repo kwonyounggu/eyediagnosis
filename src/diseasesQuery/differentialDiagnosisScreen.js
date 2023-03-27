@@ -1,7 +1,7 @@
 import * as React from 'react';
 //import {useCallback, useEffect, useRef, useState} from "react";
-import {useChatGpt} from "react-native-chatgpt";
-
+//import {useChatGpt} from "react-native-chatgpt";
+import { useChatGpt } from '../chatGpt';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {ActivityIndicator, IconButton, Colors, Button, Snackbar, Tooltip} from 'react-native-paper';
 

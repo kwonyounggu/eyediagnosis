@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import { ChatGptProvider } from 'react-native-chatgpt';
+//import { ChatGptProvider } from 'react-native-chatgpt';
+import {ChatGptProvider} from '../../chatGpt'
 import { Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 

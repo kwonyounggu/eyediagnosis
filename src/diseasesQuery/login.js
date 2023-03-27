@@ -1,6 +1,7 @@
 import { Image, StyleSheet, View } from 'react-native';
 import { Button, Headline } from 'react-native-paper';
-import { useChatGpt } from 'react-native-chatgpt';
+//import { useChatGpt } from 'react-native-chatgpt';
+import { useChatGpt } from '../chatGpt';
 
 const styles = StyleSheet.create
 (

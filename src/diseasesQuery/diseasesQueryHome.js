@@ -1,5 +1,6 @@
 import React from 'react';
-import { useChatGpt } from 'react-native-chatgpt';
+//import { useChatGpt } from 'react-native-chatgpt';
+import { useChatGpt } from '../chatGpt';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Login from './login';
 //import Chat from './chat';

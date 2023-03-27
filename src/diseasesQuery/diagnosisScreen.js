@@ -1,5 +1,7 @@
 import * as React from 'react';
+
 //import { useChatGpt } from 'react-native-chatgpt';
+import { useChatGpt } from '../chatGpt';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import 
 { 
@@ -21,10 +23,21 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DifferentialDiagnosisScreen from './differentialDiagnosisScreen';
 import { AppConsumer } from '../commonComponents/appProvider';
 
+import * as SecureStore from 'expo-secure-store';
+
+import jwt_decode from 'jwt-decode';
+
+
 //Screen names
 const diagnosisName = 'Eye Diagnosis';
 const differentialDiagnosisName = 'Differential Diagnosis';
 
+const TOKEN_ACCESS_KEY = 'react_native_chatgpt_access_token';
+
+async function getTokenFromDisk() 
+{
+  return SecureStore.getItemAsync(TOKEN_ACCESS_KEY);
+}
 
 function createQueryString (params) 
 {
@@ -62,6 +75,23 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
     const [medicalHistory, setMedicalHistory] = React.useState('');
 
     const [isValid, setIsValid] = React.useState(true);
+    
+    const [accessToken, setAccessToken] = React.useState('');
+    
+    React.useEffect
+    (
+		() => 
+	    {
+		    (
+				async () => 
+				{
+			      const accessToken = await getTokenFromDisk();
+			      setAccessToken(accessToken || '');
+			      console.log("decoded: ", jwt_decode(accessToken.replace('Bearer ','')));
+		    	}
+		    )();
+	  	}, []
+	 );
 
     const resetInputs = () =>
     {
@@ -71,6 +101,7 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
         setSigns('');
         setSymptoms(''); 
     }
+    
     const handleSubmit = () =>
     {
        /* console.log("age: ", age);
@@ -223,12 +254,22 @@ const Stack = createNativeStackNavigator();
 const DiagnosisScreen = (props) =>
 {
     //console.log("DiagnosisScreen, props: ", props);
+    const {flush} = useChatGpt();
     return (
         <AppConsumer>
         { 
             (appCtx) =>
             <Stack.Navigator initialRouteName={diagnosisName}>
-                <Stack.Screen name={diagnosisName} component={EyeDiagnosisInputScreen} />
+                <Stack.Screen 
+                	name={diagnosisName} 
+                	component={EyeDiagnosisInputScreen} 
+                	options=
+                    {
+                        {
+                            headerRight: ()=><IconButton icon='logout' color='#000' size={30} onPress={flush}/>
+                        }
+                    }
+                />
                 <Stack.Screen 
                     name={differentialDiagnosisName} 
                     options=

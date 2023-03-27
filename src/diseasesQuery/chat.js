@@ -7,7 +7,8 @@ import React from "react";
 import {useCallback, useEffect, useRef, useState} from "react";
 import {GiftedChat, IMessage} from "react-native-gifted-chat";
 import {useChatGpt} from "react-native-chatgpt";
-import {Snackbar} from "react-native-paper";
+import { useChatGpt } from "../chatGpt";
+//import {Snackbar} from "react-native-paper";
 import {Dimensions, StyleSheet, View} from "react-native";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 
