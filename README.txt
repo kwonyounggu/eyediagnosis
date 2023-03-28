@@ -5,13 +5,14 @@
 5. your project name>sudo npm install -g eas-cli
 6.              name>eas login
 7.              name>eas init --id kddkdk-dkdk-given from expo
-8.              name>eas build:configure
+8.              name>eas build:configure:
 9.              name>eas build --platform android
 
 
 github
 token name: eyediagnosis
 personal access token: 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
+Mar 25 token: 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:
 TO do
 1. put animation while loading chatgpt under processing
 2. save and list out on browser tab
