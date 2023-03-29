@@ -5,8 +5,8 @@ import { useChatGpt } from '../chatGpt';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {ActivityIndicator, IconButton, Colors, Button, Snackbar, Tooltip} from 'react-native-paper';
 
-import { AppConsumer } from '../commonComponents/appProvider';
-import storage from '../commonComponents/storage';
+//import { AppConsumer } from '../commonComponents/appProvider';
+//import storage from '../commonComponents/storage';
 
 
 const DifferentialDiagnosisScreen = ({appCtx, route, navigation}) =>

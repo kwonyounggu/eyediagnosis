@@ -1,43 +1,83 @@
-import {enablePromise, openDatabase, SQLiteDatabase} from 'react-native-sqlite-storage';
-import { DiagnosedRecord } from './recordTypes';
+//import {enablePromise, openDatabase, SQLiteDatabase} from 'react-native-sqlite-storage';
+
+import * as SQLite from 'expo-sqlite';
+
 
 /**
  * Notice that this is referenced from https://blog.logrocket.com/using-sqlite-with-react-native/
  */
+const chatGptDbName = 'chatGptDatabase.db';
 
 const chatGptUserTable = 'chatGptUserTable';
 const chatGptQueryTable = 'chatGptQueryTable';
 
-//Since we are using promise-based APIs in the library
-enablePromise(true);
 
-export const getDBConnection = async () => 
+//what is the return value if failed?
+export const getDBConnection = () => 
 {
-	//Add the db connection method
-  	return openDatabase
-  		   (
-				{
-					 name: 'chatgpt-data.db', 
-					 location: 'default'
-				},
-				()=>{},
-				(error) =>
-				{
-					console.error("ERROR (creating db failure): " + error);
-				}
-		   );
+  	return SQLite.openDatabase(chatGptDbName);
 };
 
-export const createChatGptUserTable = async (db: SQLiteDatabase) => 
+
+export const createChatGptUserTable = (db) => 
 {
   // create table if not exists
   const query = 
   "CREATE TABLE IF NOT EXISTS " + chatGptUserTable + " " +
   "(userId INTEGER PRIMARY KEY AUTOINCREMENT, userEmail VARCHAR(255));";
  
-  await db.executeSql(query);
+  db.transaction
+  (
+	  (tx) => {tx.executeSql(query)}
+  );
 };
 
+export const getUserTableRecords = (db) =>
+{
+	let records = undefined;
+	const query = "select * from " + chatGptUserTable;
+	
+	db.transaction
+	(
+		(tx) => 
+		{
+			tx.executeSql
+			(
+				query, 
+				null, 
+				(_, resultSet) => records = resultSet.rows._array,
+				(_, error) => console.error(error)
+				
+			)
+		}
+	);
+	
+	return records;
+}
+
+export const insertIntoUserTable = (db, email) =>
+{
+	let record = undefined;
+	const query = "insert into " + chatGptUserTable + " values (?)";
+	
+	db.transaction
+	(
+		(tx) => 
+		{
+			tx.executeSql
+			(
+				query, 
+				[email], 
+				(txObj, resultSet) => record = {userId: resultSet.insertId, userEmail: email},
+				(txObj, error) => console.error(error)
+				
+			)
+		}
+	);
+	
+	return record;
+}
+/*
 export const createChatGptQueryTable = async (db: SQLiteDatabase) => 
 {
   // create table if not exists
@@ -55,7 +95,7 @@ export const createChatGptQueryTable = async (db: SQLiteDatabase) =>
 
   await db.executeSql(query);
 };
-
+*/
 /*
 export const createChatGptQueryTable = async (db: SQLiteDatabase) => 
 {
@@ -76,6 +116,7 @@ export const createChatGptQueryTable = async (db: SQLiteDatabase) =>
   await db.executeSql(query);
 };
 */
+/*
 //We can use rowid, which comes with SQLite, as the primary key. 
 export const getDiagnosedRecords = async (db: SQLiteDatabase): Promise<DiagnosedRecord[]> => 
 {
@@ -102,7 +143,7 @@ export const getDiagnosedRecords = async (db: SQLiteDatabase): Promise<Diagnosed
     throw Error('Failed to get diagnosedRecords !!!');
   }
 };
-
+*/
 /*
 export const saveDiagnosedRecords = async (db: SQLiteDatabase, diagnosedRecords: DiagnosedRecord[]) => 
 {
@@ -113,7 +154,7 @@ export const saveDiagnosedRecords = async (db: SQLiteDatabase, diagnosedRecords:
   return db.executeSql(insertQuery);
 };
 */
-
+/*
 export const insertDiagnosedRecord = async (db: SQLiteDatabase, diagnosedRecord: DiagnosedRecord) => 
 {
   const insertQuery =
@@ -128,6 +169,7 @@ export const insertDiagnosedRecord = async (db: SQLiteDatabase, diagnosedRecord:
 
   return db.executeSql(insertQuery);
 };
+*/
 /*
 export const insertDiagnosedRecord = async (db: SQLiteDatabase, diagnosedRecord: DiagnosedRecord) => 
 {

@@ -1,5 +1,6 @@
 import React, { createContext } from 'react';
 import storage from './storage';
+import { getDBConnection } from '../database/dbService';
 
 const AppContext = React.createContext();
 const AppConsumer = AppContext.Consumer;
@@ -35,6 +36,7 @@ class AppProvider extends React.Component
     this.state = 
     {
         inputText: '',
+        chatGptDb: getDBConnection(),
         chatGptUserQueryIds: chatGptUserQueryIds,
         nextChatGptUserQueryId: chatGptUserQueryIds.length > 0 ? (parseInt(chatGptUserQueryIds.slice(-1)) + 1) : 10000
     };
@@ -64,4 +66,4 @@ class AppProvider extends React.Component
     );
   }
 }
-export { AppConsumer, AppProvider };
+export { AppContext, AppConsumer, AppProvider };
