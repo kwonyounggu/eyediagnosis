@@ -5,13 +5,15 @@ import { useChatGpt } from '../chatGpt';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {ActivityIndicator, IconButton, Colors, Button, Snackbar, Tooltip} from 'react-native-paper';
 
+import ChatGptUser from '../database/models/chatGptUser';
+import ChatGptQuery from '../database/models/chatGptQuery';
 //import { AppConsumer } from '../commonComponents/appProvider';
 //import storage from '../commonComponents/storage';
 
 
-const DifferentialDiagnosisScreen = ({appCtx, route, navigation}) =>
+const DifferentialDiagnosisScreen = ({route, navigation}) =>
 {
-    console.log("DifferentialDiagnosisScreen: ", appCtx);
+    //console.log("DifferentialDiagnosisScreen: ", appCtx);
     const [queryResult, setQueryResult] = React.useState('');
     const [errorMessage, setErrorMessage] = React.useState('');
     const [loading, setLoading] = React.useState(true);
@@ -31,10 +33,10 @@ const DifferentialDiagnosisScreen = ({appCtx, route, navigation}) =>
         console.log("saving ..., disable button");
         setSaving(true);
 
-        const {nextChatGptUserQueryId} = appCtx.state;
-        const {onUpdateChatGptUserQueryIds, onIncreaseLastChatGptUserQueryId} = appCtx.actions;
+        //const {nextChatGptUserQueryId} = appCtx.state;
+        //const {onUpdateChatGptUserQueryIds, onIncreaseLastChatGptUserQueryId} = appCtx.actions;
         
-        console.log("nextChatGptUserId: ", appCtx.state.nextChatGptUserQueryId);
+        //console.log("nextChatGptUserId: ", appCtx.state.nextChatGptUserQueryId);
         //1. save with a key=chatGptUser, id=nextChatGptUserQueryId
         //2. put currentId into appCtx.actions.onUpdateChatGptUserQueryIds(nextChatGptUserQueryId)
         //3. increase nextChatGptUserQueryId by appCtx.cations.onIncreaseLastChatGptUserQueryId(nextChatGptUserQueryId)

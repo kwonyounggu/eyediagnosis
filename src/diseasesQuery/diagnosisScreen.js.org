@@ -24,7 +24,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DifferentialDiagnosisScreen from './differentialDiagnosisScreen';
 import ListSavedDataScreen from './listSavedDataScreen';
 
-import { AppConsumer, AppContext } from '../contexts/appProvider';
+import { AppConsumer } from '../contexts/appProvider';
 
 import * as SecureStore from 'expo-secure-store';
 
@@ -37,7 +37,6 @@ const differentialDiagnosisName = 'Differential Diagnosis';
 const listSavedDataName = 'List of Saved Data';
 
 const TOKEN_ACCESS_KEY = 'react_native_chatgpt_access_token';
-const TOKEN_EMAIL_PROPERTY = "https://api.openai.com/profile";
 
 async function getTokenFromDisk() 
 {
@@ -68,10 +67,11 @@ function createQueryString (params)
 const EyeDiagnosisInputScreen = ({navigation}) =>
 {
     //const {flush, login} = useChatGpt();
+    //console.log("EyeDiagnosisInputScreen, flush: ", login.name);
     
-    //The following function is to update user information globally
-    const {onUpdateChatGptUser} = React.useContext(AppContext).actions;
-    
+    const {colors, igation:isV3} = useTheme();
+    const TextComponent = isV3 ? Text : Paragraph;
+
     const [age, setAge] = React.useState('');
     const [gender, setGender] = React.useState('female');
     const [signs, setSigns] = React.useState('');
@@ -80,6 +80,7 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
 
     const [isValid, setIsValid] = React.useState(true);
     
+    const [accessToken, setAccessToken] = React.useState('');
     
     React.useEffect
     (
@@ -89,21 +90,8 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
 				async () => 
 				{
 			      const accessToken = await getTokenFromDisk();
-			      let user = jwt_decode(accessToken.replace('Bearer ',''));
-
-			      console.log(user[TOKEN_EMAIL_PROPERTY].email);
-			      onUpdateChatGptUser
-			      (
-					  {
-						  email: user[TOKEN_EMAIL_PROPERTY].email,
-						  iat: user.iat,
-						  exp: user.exp
-					  }
-				  );
-				  
-				  console.log("")
-				  //Insert or update the user infomation in the db table if it is not already in
-
+			      setAccessToken(accessToken || '');
+			      console.log("decoded: ", jwt_decode(accessToken.replace('Bearer ','')));
 		    	}
 		    )();
 	  	}, []
@@ -273,37 +261,26 @@ const DiagnosisScreen = (props) =>
     const {flush} = useChatGpt();
     const [popupVisible, setPopupVisible] = React.useState(false);
     return (
-        
+        <AppConsumer>
+        { 
+            (appCtx) =>
             <Stack.Navigator initialRouteName={diagnosisName}>
                 <Stack.Screen 
                 	name={diagnosisName} 
                 	component={EyeDiagnosisInputScreen} 
                 	options=
                     {
-						({navigation}) =>
-						(
-	                        {
-	                            headerRight: ()=>
-	                            	<Menu visible={popupVisible}
-	                            		  onDismiss={()=>setPopupVisible(false)}
-	                            		  anchor={<IconButton style={{margin: 0, padding: 0}} icon='dots-vertical' color='#000' size={30} onPress={()=>setPopupVisible(true)}/>}
-	                            	>
-	                            		  <Menu.Item leadingIcon='logout' title='Log out' onPress={flush} />
-	                            		  <Menu.Item leadingIcon='database-sync-outline' 
-	                            		  			 title='List Data' 
-	                            		  			 onPress=
-	                            		  			 {
-														   () =>
-														   {
-															   setPopupVisible(false); 
-															   return navigation.navigate(listSavedDataName);
-														   }
-													 } 
-										/>
-	                            	</Menu>
-	                            		           
-	                        }
-                        )
+                        {
+                            headerRight: ()=>
+                            	<Menu visible={popupVisible}
+                            		  onDismiss={()=>setPopupVisible(false)}
+                            		  anchor={<IconButton style={{margin: 0, padding: 0}} icon='dots-vertical' color='#000' size={30} onPress={()=>setPopupVisible(true)}/>}
+                            	>
+                            		  <Menu.Item leadingIcon='logout' title='Log out' onPress={flush} />
+                            		  <Menu.Item leadingIcon='database-sync-outline' title='List Data' onPress={()=>console.log(props)} />
+                            	</Menu>
+                            		           
+                        }
                     }
                 />
                 <Stack.Screen 
@@ -316,7 +293,7 @@ const DiagnosisScreen = (props) =>
                     }
                     > 
                     {
-                        (props) => <DifferentialDiagnosisScreen {...props} />
+                        (props) => <DifferentialDiagnosisScreen {...props} appCtx={appCtx} />
                     }
                 </Stack.Screen>   
                 <Stack.Screen 
@@ -324,19 +301,47 @@ const DiagnosisScreen = (props) =>
                     options=
                     {
                         {
-                            headerRight: ()=><IconButton icon='quora' color='#000' size={30}/>
+                            headerRight: ()=><IconButton icon='archive' color='#000' size={30}/>
                         }
                     }
                     > 
                     {
-                        (props) => <ListSavedDataScreen {...props} />
+                        (props) => <ListSavedDataScreen {...props} appCtx={appCtx} />
                     }
                 </Stack.Screen>     
             </Stack.Navigator>
-
+        }
+        </AppConsumer>
     );
 };
 
+/*
+const DiagnosisScreen = (props) =>
+{
+    //console.log("DiagnosisScreen, props: ", props);
+    return (
+        <AppConsumer>
+        { 
+            (appCtx) =>
+            <Stack.Navigator initialRouteName={diagnosisName}>
+                <Stack.Screen name={diagnosisName} component={EyeDiagnosisInputScreen} />
+                <Stack.Screen 
+                    name={differentialDiagnosisName} 
+                    component={DifferentialDiagnosisScreen}
+                    initialParams={{gContext: gContext}}
+                    options=
+                    {
+                        {
+                            headerRight: ()=><IconButton icon='archive' color='#000' size={30}/>
+                        }
+                    }
+                    />        
+            </Stack.Navigator>
+        }
+        </AppConsumer>
+    );
+};
+*/
 const styles = StyleSheet.create
 (
     {

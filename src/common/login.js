@@ -33,7 +33,7 @@ const Login = () =>
         <View style={styles.container}>
             <Image style={styles.image} source={require("../../assets/images/chatgpt_logo.jpeg")} />
             <Headline style={{fontWeight: 'bold', alignSelf: 'center', marginBottom: 128}}>
-                Welcome to ChatGPT
+                Welcome to Eye Diagnosis
             </Headline>
             <Button
                 contentStyle={{ height: 56 }}

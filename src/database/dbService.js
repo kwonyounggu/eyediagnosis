@@ -28,7 +28,16 @@ export const createChatGptUserTable = (db) =>
  
   db.transaction
   (
-	  (tx) => {tx.executeSql(query)}
+	  (tx) => 
+	  {
+		  tx.executeSql
+		  (
+			  query,
+			  null,
+			  (_, success) => console.info(success),
+			  (_, error) => console.error(error)
+		  )
+	  }
   );
 };
 
@@ -68,8 +77,8 @@ export const insertIntoUserTable = (db, email) =>
 			(
 				query, 
 				[email], 
-				(txObj, resultSet) => record = {userId: resultSet.insertId, userEmail: email},
-				(txObj, error) => console.error(error)
+				(_, resultSet) => record = {userId: resultSet.insertId, userEmail: email},
+				(_, error) => console.error(error)
 				
 			)
 		}

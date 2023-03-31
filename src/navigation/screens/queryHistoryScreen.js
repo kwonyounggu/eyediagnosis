@@ -1,6 +1,6 @@
 import * as React from "react";
 import { View, Text } from "react-native";
-import { AppContext } from "../../commonComponents/appProvider";
+import { AppContext } from "../../contexts/appProvider";
 
 //import { getDBConnection, createChatGptUserTable } from "../../database/db-service";
 
