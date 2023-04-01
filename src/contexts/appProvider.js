@@ -13,7 +13,6 @@ class AppProvider extends React.Component
     super(props);
     this.state = 
     {
-        inputText: '',
         chatGptUser: {}
     };
   }
@@ -30,7 +29,7 @@ class AppProvider extends React.Component
 		{
 			//user={email: "kwon.younggu@gamil.com", iat: 1679877172, exp: 1681086772}
 			console.log("user: ", user);
-			this.setState({chatGptUsr: user})
+			this.setState({chatGptUser: user})
 		}	 
 		
   };

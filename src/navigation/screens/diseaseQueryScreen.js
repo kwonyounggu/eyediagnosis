@@ -12,8 +12,8 @@ import Login from '../../common/login';
 //import Chat from './chat';
 import DiagnosisScreen from '../../diseasesQuery/diagnosisScreen';
 
-import ChatGptUser from '../../database/models/chatGptUser';
-import ChatGptQuery from '../../database/models/chatGptQuery';
+//import ChatGptUser from '../../database/models/chatGptUser';
+//import ChatGptQuery from '../../database/models/chatGptQuery';
 
 const styles = StyleSheet.create
 (
@@ -61,8 +61,8 @@ export default function DiseaseQueryScreen({navigation})
     //authenticated
     //create a database and two tables (chatGptUser, chatGptQuery)
     //Tables won't be created if exists
-    ChatGptUser.createTable();
-    ChatGptQuery.createTable();
+    //ChatGptUser.createTable();
+    //ChatGptQuery.createTable();
     
     return <DiagnosisScreen />
 }

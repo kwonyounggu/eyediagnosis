@@ -17,19 +17,18 @@ import
     TextInput, 
     useTheme 
 } from 'react-native-paper'; 
-//import { Slider } from '@react-native-community/slider';
 
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import DifferentialDiagnosisScreen from './differentialDiagnosisScreen';
 import ListSavedDataScreen from './listSavedDataScreen';
 
-import { AppConsumer, AppContext } from '../contexts/appProvider';
+import {AppContext} from '../contexts/appProvider';
+import chatGptUserTable from '../database/sqlite/chatGptUser';
 
 import * as SecureStore from 'expo-secure-store';
 
 import jwt_decode from 'jwt-decode';
-
 
 //Screen names
 const diagnosisName = 'Eye Diagnosis';
@@ -62,7 +61,7 @@ function createQueryString (params)
     queryString += " In addition, please summarize each disease according to eyewiki.aao.org and" +
                    " include its direct href link address at the bottom of the whole page separately altogether."
 
-    return {queryString, queryStringDisplayable};
+    return {queryString, queryStringDisplayable, patient: params};
 }
 
 const EyeDiagnosisInputScreen = ({navigation}) =>
@@ -89,21 +88,39 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
 				async () => 
 				{
 			      const accessToken = await getTokenFromDisk();
-			      let user = jwt_decode(accessToken.replace('Bearer ',''));
+			      let decodedToken = jwt_decode(accessToken.replace('Bearer ',''));
 
-			      console.log(user[TOKEN_EMAIL_PROPERTY].email);
-			      onUpdateChatGptUser
-			      (
-					  {
-						  email: user[TOKEN_EMAIL_PROPERTY].email,
-						  iat: user.iat,
-						  exp: user.exp
-					  }
-				  );
+			      //console.log(decodedToken[TOKEN_EMAIL_PROPERTY].email);
+			      
+			      const user =
+			      {
+					  email: decodedToken[TOKEN_EMAIL_PROPERTY].email,
+					  iat: decodedToken.iat,
+					  exp: decodedToken.exp
+				  };
 				  
-				  console.log("")
-				  //Insert or update the user infomation in the db table if it is not already in
-
+				  //console.log("Login User: ", user);
+				  
+				  chatGptUserTable.findByEmail(user.email)
+				  				  .then
+				  				  (
+										(record)=>
+										{
+											//console.log("INFO: findByEmail("+user.email+"),  ", record);
+											if (Object.keys(record).length === 0) //new user insertion
+											{
+												chatGptUserTable.insert(user).then ((i)=>console.log(i)).catch(e=>console.error(e));
+											}
+											else if (!(user.iat === record.iat && user.exp === record.exp))//Update only iat and exp
+											{
+												chatGptUserTable.update(user).then ((i)=>console.log(i)).catch(e=>console.error(e));
+											}
+										}
+								  )
+				  				  .catch(e=>console.error(e));
+			      //State change globally
+			      onUpdateChatGptUser(user);
+			     
 		    	}
 		    )();
 	  	}, []

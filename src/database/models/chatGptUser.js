@@ -23,7 +23,7 @@ export default class ChatGptUser extends BaseModel
 	{
 		return {
 					id: {type: types.INTEGER, primary_key: true, autoincrement: true},
-					email: {type: types.TEXT, not_null: true},
+					email: {type: types.TEXT, unique: true},
 					iat: {type: types.INTEGER},
 					exp: {type: types.INTEGER}
 		       }
@@ -37,6 +37,35 @@ export default class ChatGptUser extends BaseModel
 	        .catch(error => JSON.stringify(error));
 
         
+	}
+	//See https://www.sqlitetutorial.net/sqlite-replace-statement/
+	static insertOrUpdate(user)
+	{
+		//const sql = 'insert or replace into ' + chatGptUserTable + ' values(?, ?, ?, ?)';
+		//const params = []
+		//console.log("insertOrUpdate: ", getARecordByEmail(user.email));
+		
+		//const sql = 'insert or ignore into ' + chatGptUserTable + ' values(default, ?, ?, ?); ' +
+		//		    'update ' + chatGptUserTable + 'set iat=?, exp=? where email=?;';
+		//const params = [user.email, user.iat, user.exp, user.iat, user.exp, user.email];
+		
+		console.log("user: ", user);
+		
+		const sql = 'insert into ' + chatGptUserTable + ' (email, iat, exp) values(?, ?, ?) on conflict(email) do ' +
+					'update set iat=?, exp=?';
+		const params =[user.email, user.iat, user.exp, user.iat, user.exp];
+		
+		return this.repository.databaseLayer.executeSql(sql, params)
+	    									.then(({ rows }) => {console.log(rows.length); return rows;})
+	    									.catch(error => JSON.stringify(error));
+	}
+	static getARecordByEmail(email) 
+	{
+	    const sql = 'select * from ' + chatGptUserTable + ' where email = ?';
+	    const params = [email]
+	    return this.repository.databaseLayer.executeSql(sql, params)
+	    									.then(({ rows }) => rows)
+	    									.catch(error => JSON.stringify(error));
 	}
 	static getAllCatatanById(id, user_id) 
 	{

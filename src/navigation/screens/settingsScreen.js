@@ -2,8 +2,8 @@ import * as React from "react";
 import { TouchableOpacity } from "react-native";
 import { List, Divider, Checkbox, Avatar, Switch, Button } from 'react-native-paper';
 
-import ChatGptUser from '../../database/models/chatGptUser';
-import ChatGptQuery from '../../database/models/chatGptQuery';
+import chatGptUserTable from '../../database/sqlite/chatGptUser';
+//import ChatGptQuery from '../../database/models/chatGptQuery';
 
 export default function SettingsScreen({navigation})
 {
@@ -11,8 +11,14 @@ export default function SettingsScreen({navigation})
 	(
 		async () =>
 		{
-			await ChatGptUser.dropTable();		
-			await ChatGptQuery.dropTable();
+			//don't drop table but remove all the records because it can be problematic
+			//otherwise after dropping the tables, app needs to be reloaded.
+			//chatGptUserTable.dropTable().then(info=>console.log("INFO: chatGptUserTable is dropped", info))
+			//							.catch(e=>console.log(e));
+			
+			
+			//await ChatGptUser.dropTable();		
+			//await ChatGptQuery.dropTable();
 			
 		}, []	
 	);

@@ -1,25 +1,22 @@
 import * as React from 'react';
-//import {useCallback, useEffect, useRef, useState} from "react";
-//import {useChatGpt} from "react-native-chatgpt";
-import { useChatGpt } from '../chatGpt';
+
+import {useChatGpt} from '../chatGpt';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {ActivityIndicator, IconButton, Colors, Button, Snackbar, Tooltip} from 'react-native-paper';
 
-import ChatGptUser from '../database/models/chatGptUser';
-import ChatGptQuery from '../database/models/chatGptQuery';
-//import { AppConsumer } from '../commonComponents/appProvider';
-//import storage from '../commonComponents/storage';
+import {AppContext} from '../contexts/appProvider';
 
 
 const DifferentialDiagnosisScreen = ({route, navigation}) =>
 {
-    //console.log("DifferentialDiagnosisScreen: ", appCtx);
+    const {chatGptUser} = React.useContext(AppContext).state;
+    
     const [queryResult, setQueryResult] = React.useState('');
     const [errorMessage, setErrorMessage] = React.useState('');
     const [loading, setLoading] = React.useState(true);
     const [saving, setSaving] = React.useState(false);
     const [queryDone, setQueryDone] = React.useState(true);
-    const {flush, sendMessage} = useChatGpt();
+    const {sendMessage} = useChatGpt();
     
     const messageId = React.useRef('');
     const conversationId = React.useRef('');
@@ -30,7 +27,8 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
     {
         //console.log("save, data: ", data);
         //stop all screen change while doing this
-        console.log("saving ..., disable button");
+        console.log("saving for user: ", chatGptUser, " disable button");
+        console.log("patient info: ", route.params.patient);
         setSaving(true);
 
         //const {nextChatGptUserQueryId} = appCtx.state;
@@ -110,7 +108,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                                             size={30} 
                                             AccessibilityLabel='Save'
                                             disabled={!queryDone}
-                                            onPress={flush}
+                                            onPress={save}
                                         />
                 }
             );
