@@ -33,6 +33,11 @@ const insert = (patient) =>
 				(tx) => 
 			    {
 					  const params = Object.values(patient);
+					  
+					  //Note that the contents of params may contain [ or ] then it could be problem without
+					  //inserting and without error
+					  
+					  //console.log("[here]:", params);
 					  //[patient.age, patient.gender, patient.medicalHistory, patient.symptoms, patient.signs, patient.chatGptResponse, patient.userId]
 				      tx.executeSql
 				      (
@@ -74,6 +79,52 @@ const findByEmail = (email) =>
 				          if (rows.length > 0) resolve(rows._array[0]);
 				          else resolve({}); //no record but no error
 				        },
+				        (_, error) => reject(error)
+				      );
+			    }
+			);
+	  	}
+  	);	
+};
+
+const getAll = () =>
+{
+	return new Promise
+	(
+		(resolve, reject) => 
+		{
+		    db.transaction
+		    (
+				(tx) => 
+			    {
+				      tx.executeSql
+				      (
+						 "select * from " + chatGptQueryTable + ";",
+				        [],
+				        (_, {rows}) => resolve(rows._array),
+				        (_, error) => reject(error)
+				      );
+			    }
+			);
+	  	}
+  	);	
+};
+
+const getNumberOfRows = () =>
+{
+	return new Promise
+	(
+		(resolve, reject) => 
+		{
+		    db.transaction
+		    (
+				(tx) => 
+			    {
+				      tx.executeSql
+				      (
+						 "select count(*) as numRows from " + chatGptQueryTable + ";",
+				        [],
+				        (_, {rows:{_array}}) => resolve(_array[0].numRows),
 				        (_, error) => reject(error)
 				      );
 			    }
@@ -137,4 +188,4 @@ const dropTable = () =>
   	);	
 };
 
-export default {insert, findByEmail, dropTable, update};
+export default {insert, findByEmail, dropTable, update, getAll, getNumberOfRows};

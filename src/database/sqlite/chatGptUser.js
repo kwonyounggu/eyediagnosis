@@ -73,6 +73,29 @@ const findByEmail = (email) =>
   	);	
 };
 
+const getAll = () =>
+{
+	return new Promise
+	(
+		(resolve, reject) => 
+		{
+		    db.transaction
+		    (
+				(tx) => 
+			    {
+				      tx.executeSql
+				      (
+						 "select * from " + chatGptUserTable + ";",
+				        [],
+				        (_, {rows}) => resolve(rows._array),
+				        (_, error) => reject(error)
+				      );
+			    }
+			);
+	  	}
+  	);	
+};
+
 const update = (user) =>
 {
 	return new Promise
@@ -126,4 +149,4 @@ const dropTable = () =>
   	);	
 };
 
-export default {insert, findByEmail, dropTable, update};
+export default {insert, findByEmail, dropTable, update, getAll};

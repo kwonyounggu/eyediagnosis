@@ -5,7 +5,8 @@ import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {ActivityIndicator, IconButton, Colors, Button, Snackbar, Tooltip} from 'react-native-paper';
 
 import {AppContext} from '../contexts/appProvider';
-
+import chatGptUserTable from '../database/sqlite/chatGptUser';
+import chatGptQueryTable from '../database/sqlite/chatGptQuery';
 
 const DifferentialDiagnosisScreen = ({route, navigation}) =>
 {
@@ -29,18 +30,39 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
         //stop all screen change while doing this
         console.log("saving for user: ", chatGptUser, " disable button");
         console.log("patient info: ", route.params.patient);
+        const {age, gender, medicalHistory, symptoms, signs} = route.params.patient;
         setSaving(true);
-
-        //const {nextChatGptUserQueryId} = appCtx.state;
-        //const {onUpdateChatGptUserQueryIds, onIncreaseLastChatGptUserQueryId} = appCtx.actions;
         
-        //console.log("nextChatGptUserId: ", appCtx.state.nextChatGptUserQueryId);
-        //1. save with a key=chatGptUser, id=nextChatGptUserQueryId
-        //2. put currentId into appCtx.actions.onUpdateChatGptUserQueryIds(nextChatGptUserQueryId)
-        //3. increase nextChatGptUserQueryId by appCtx.cations.onIncreaseLastChatGptUserQueryId(nextChatGptUserQueryId)
-        //flush;
-        //...
-        //setSaving(false);
+        /**
+		 * 	var date = new Date("Sun May 11,2014");
+			var dateString = new Date(date.getTime() - (date.getTimezoneOffset() * 60000 ))
+                    .toISOString()
+                    .split("T")[0];
+		 */
+        chatGptUserTable.findByEmail(chatGptUser.email)
+        			    .then
+        			    (
+							(o)=>
+							{
+								patientData =
+								{
+									age,
+									gender: gender.charAt(0),
+									medicalHistory: medicalHistory.toString(),
+									symptoms: symptoms.toString(),
+									signs: signs.toString(),
+									chatGptResponse: queryResult,
+									queryDate: new Date().toISOString().split('T')[0],
+									userId: o.id
+								}
+								chatGptQueryTable.insert(patientData)
+												 .then(o=>console.log(o))
+												 .catch(e=>console.error(e));
+							}
+						)
+						.catch (e=>console.error(e));
+
+        setSaving(false);
         console.log("saving is done. enable button")
     }
     React.useEffect

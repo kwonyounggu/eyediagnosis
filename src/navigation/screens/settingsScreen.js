@@ -3,7 +3,7 @@ import { TouchableOpacity } from "react-native";
 import { List, Divider, Checkbox, Avatar, Switch, Button } from 'react-native-paper';
 
 import chatGptUserTable from '../../database/sqlite/chatGptUser';
-//import ChatGptQuery from '../../database/models/chatGptQuery';
+import chatGptQueryTable from '../../database/sqlite/chatGptQuery';
 
 export default function SettingsScreen({navigation})
 {
@@ -16,9 +16,16 @@ export default function SettingsScreen({navigation})
 			//chatGptUserTable.dropTable().then(info=>console.log("INFO: chatGptUserTable is dropped", info))
 			//							.catch(e=>console.log(e));
 			
-			
-			//await ChatGptUser.dropTable();		
-			//await ChatGptQuery.dropTable();
+			//for testing to see records from both tables
+			chatGptUserTable.getAll()
+						    .then((r) => console.log(r))
+						    .catch((e) => console.error(e));
+			chatGptQueryTable.getAll()
+						    .then((r) => console.log(r))
+						    .catch((e) => console.error(e));
+			chatGptQueryTable.getNumberOfRows()
+						    .then((r) => console.log(r))
+						    .catch((e) => console.error(e));
 			
 		}, []	
 	);
