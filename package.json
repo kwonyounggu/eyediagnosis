@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/vector-icons": "^13.0.0",
     "@react-native-async-storage/async-storage": "1.17.11",
     "@react-native-community/slider": "^4.4.2",
     "@react-navigation/bottom-tabs": "^6.5.7",
@@ -27,6 +28,7 @@
     "expo-sqlite-orm": "^1.6.0",
     "expo-status-bar": "~1.4.4",
     "jwt-decode": "^3.1.2",
+    "lodash": "^4.17.21",
     "react": "18.2.0",
     "react-native": "0.71.4",
     "react-native-chatgpt": "^0.9.0",

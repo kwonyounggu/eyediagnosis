@@ -58,11 +58,6 @@ export default function DiseaseQueryScreen({navigation})
         );
     }
     
-    //authenticated
-    //create a database and two tables (chatGptUser, chatGptQuery)
-    //Tables won't be created if exists
-    //ChatGptUser.createTable();
-    //ChatGptQuery.createTable();
-    
+    //authenticated 
     return <DiagnosisScreen />
 }

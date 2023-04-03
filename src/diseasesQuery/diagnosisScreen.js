@@ -5,23 +5,21 @@ import { useChatGpt } from '../chatGpt';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import 
 { 
-    Colors, 
     IconButton, 
     Button, 
-    RadioButton, 
-    Paragraph, 
+    RadioButton,
     List, 
     Menu,
     HelperText, 
     Text, 
-    TextInput, 
-    useTheme 
+    TextInput
 } from 'react-native-paper'; 
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import DifferentialDiagnosisScreen from './differentialDiagnosisScreen';
-import ListSavedDataScreen from './listSavedDataScreen';
+import ListDataScreen from './listDataScreen';
+import DisplayDetailedQueryDataScreen from './displayDetailedQueryDataScreen';
 
 import {AppContext} from '../contexts/appProvider';
 import chatGptUserTable from '../database/sqlite/chatGptUser';
@@ -34,6 +32,7 @@ import jwt_decode from 'jwt-decode';
 const diagnosisName = 'Eye Diagnosis';
 const differentialDiagnosisName = 'Differential Diagnosis';
 const listSavedDataName = 'List of Saved Data';
+export const displayDetailedQueryDataName = 'Detailed Data';
 
 const TOKEN_ACCESS_KEY = 'react_native_chatgpt_access_token';
 const TOKEN_EMAIL_PROPERTY = "https://api.openai.com/profile";
@@ -292,6 +291,7 @@ const DiagnosisScreen = (props) =>
     return (
         
             <Stack.Navigator initialRouteName={diagnosisName}>
+              <Stack.Group>
                 <Stack.Screen 
                 	name={diagnosisName} 
                 	component={EyeDiagnosisInputScreen} 
@@ -335,7 +335,9 @@ const DiagnosisScreen = (props) =>
                     {
                         (props) => <DifferentialDiagnosisScreen {...props} />
                     }
-                </Stack.Screen>   
+                </Stack.Screen> 
+              </Stack.Group>
+              <Stack.Group>  
                 <Stack.Screen 
                     name={listSavedDataName} 
                     options=
@@ -346,9 +348,13 @@ const DiagnosisScreen = (props) =>
                     }
                     > 
                     {
-                        (props) => <ListSavedDataScreen {...props} />
+                        (props) => <ListDataScreen {...props} />
                     }
-                </Stack.Screen>     
+                </Stack.Screen>  
+               </Stack.Group>
+               <Stack.Group screenOptions={{presentation: 'modal'}}>
+                <Stack.Screen name={displayDetailedQueryDataName} component={DisplayDetailedQueryDataScreen} /> 
+               </Stack.Group>
             </Stack.Navigator>
 
     );
