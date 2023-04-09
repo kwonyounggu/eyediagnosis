@@ -18,10 +18,94 @@ export default function ListDataScreen({navigation})
 {
   const {chatGptUser} = React.useContext(AppContext).state;
   const [ columns, setColumns ] = useState(["Age","Sex","MedHist","Symptoms","Signs"]);
-  const [ direction, setDirection ] = useState(null);
-  const [ selectedColumn, setSelectedColumn ] = useState(null);
-  const [ chatGptData, setChatGptData ] = useState([]);
-
+  const [ direction, setDirection ] = useState(null)
+  const [ selectedColumn, setSelectedColumn ] = useState(null)
+  const [ pets, setPets ] = useState([
+    {
+		Age: 3,
+      	Gender: "M",
+        MedHist: "A Dog, Headache, Pain, Vomitting, Blurry",
+        Symptoms: "Headache, A Dog, Headache, Pain, Vomitting, Blurry",
+        Signs: "VA 20/30, A Dog, Headache, Pain, Vomitting, Blurry"
+    },
+    {
+		Age: 4,
+      	Gender: "F",
+        MedHist: "B Dog",
+        Symptoms: "Headache",
+        Signs: "VA 20/30"
+    },
+    {
+		Age: 5,
+      	Gender: "M",
+        MedHist: "C Dog",
+        Symptoms: "Headache",
+        Signs: "VA 20/30"
+    },
+    {
+		Age: 6,
+      	Gender: "M",
+        MedHist: "D Dog",
+        Symptoms: "Headache",
+        Signs: "VA 20/30"
+    },
+    {
+		Age: 6,
+      	Gender: "M",
+        MedHist: "E Dog",
+        Symptoms: "Headache",
+        Signs: "VA 20/30"
+    },
+    {
+		Age: 7,
+      	Gender: "M",
+        MedHist: "F Dog",
+        Symptoms: "Headache",
+        Signs: "VA 20/30"
+    },
+    {
+		Age: 8,
+      	Gender: "M",
+        MedHist: "G Dog",
+        Symptoms: "Headache",
+        Signs: "VA 20/30"
+    },
+    {
+		Age: 9,
+      	Gender: "M",
+        MedHist: "H Dog",
+        Symptoms: "Headache",
+        Signs: "High Blood Pressure"
+    },
+    {
+		Age: 10,
+      	Gender: "M",
+        MedHist: "I Dog",
+        Symptoms: "Pain",
+        Signs: "VA 20/40"
+    },
+    {
+		Age: 11,
+      	Gender: "M",
+        MedHist: "J Dog",
+        Symptoms: "Nausea",
+        Signs: "VA 20/30"
+    },
+    {
+		Age: 12,
+      	Gender: "M",
+        MedHist: "K Dog",
+        Symptoms: "Headache",
+        Signs: "VA 20/30"
+    },
+    {
+		Age: 13,
+      	Gender: "M",
+        MedHist: "L Dog",
+        Symptoms: "Fatigue",
+        Signs: "VA 20/30"
+    }
+  ])
 
    React.useEffect
    (
@@ -33,7 +117,7 @@ export default function ListDataScreen({navigation})
 								(o)=>
 								{
 									chatGptQueryTable.getById(o.id)
-												    .then((resultSet) => setChatGptData(resultSet))
+												    .then((r) => console.log(r))
 												    .catch((e) => console.error(e));
 								}
 							)
@@ -44,10 +128,10 @@ export default function ListDataScreen({navigation})
   const sortTable = (column) => 
   {
     const newDirection = direction === "desc" ? "asc" : "desc" 
-    const sortedData = _.orderBy(chatGptData, [column],[newDirection])
+    const sortedData = _.orderBy(pets, [column],[newDirection])
     setSelectedColumn(column)
     setDirection(newDirection)
-    setChatGptData(sortedData)
+    setPets(sortedData)
   }
   
   const stylesColumnHeader = (index) =>
@@ -98,7 +182,7 @@ export default function ListDataScreen({navigation})
   return (
     <View style={styles.container}>
       <FlatList 
-        data={chatGptData}
+        data={pets}
         style={{width:"95%"}}
         keyExtractor={(item, index) => index+""}
         ListHeaderComponent={tableHeader}
@@ -110,11 +194,11 @@ export default function ListDataScreen({navigation})
 	          return (
 			  <TouchableWithoutFeedback onPress={()=>onSelectRow(item)}>
 	            <View style={{...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white"}}>
-	              <Text style={{...styles.columnRowTxt, width: '10%', fontWeight:"bold"}}>{item.age}</Text>
-	              <Text style={{...styles.columnRowTxt, width: '10%'}}>{item.gender}</Text>
-	              <Text style={{...styles.columnRowTxt, width: '27%'}} ellipsizeMode='tail' numberOfLines={2}>{item.medicalHistory}</Text>
-	              <Text style={{...styles.columnRowTxt, width: '27%'}} ellipsizeMode='tail' numberOfLines={2}>{item.symptoms}</Text>
-	              <Text style={{...styles.columnRowTxt, width: '26%'}} ellipsizeMode='tail' numberOfLines={2}>{item.signs}</Text>
+	              <Text style={{...styles.columnRowTxt, width: '10%', fontWeight:"bold"}}>{item.Age}</Text>
+	              <Text style={{...styles.columnRowTxt, width: '10%'}}>{item.Gender}</Text>
+	              <Text style={{...styles.columnRowTxt, width: '27%'}} ellipsizeMode='tail' numberOfLines={2}>{item.MedHist}</Text>
+	              <Text style={{...styles.columnRowTxt, width: '27%'}} ellipsizeMode='tail' numberOfLines={2}>{item.Symptoms}</Text>
+	              <Text style={{...styles.columnRowTxt, width: '26%'}} ellipsizeMode='tail' numberOfLines={2}>{item.Signs}</Text>
 	            </View>
 	          </TouchableWithoutFeedback>
 	          )

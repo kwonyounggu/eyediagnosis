@@ -110,6 +110,29 @@ const getAll = () =>
   	);	
 };
 
+const getById = (userId) =>
+{
+	return new Promise
+	(
+		(resolve, reject) => 
+		{
+		    db.transaction
+		    (
+				(tx) => 
+			    {
+				      tx.executeSql
+				      (
+						 "select * from " + chatGptQueryTable + " where userId=?;",
+				        [userId],
+				        (_, {rows}) => resolve(rows._array),
+				        (_, error) => reject(error)
+				      );
+			    }
+			);
+	  	}
+  	);	
+};
+
 const getNumberOfRows = () =>
 {
 	return new Promise
@@ -188,4 +211,4 @@ const dropTable = () =>
   	);	
 };
 
-export default {insert, findByEmail, dropTable, update, getAll, getNumberOfRows};
+export default {insert, getById, dropTable, update, getAll, getNumberOfRows};

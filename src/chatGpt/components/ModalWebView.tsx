@@ -23,7 +23,7 @@ import { WebView as RNWebView } from 'react-native-webview';
 import { CHAT_PAGE, LOGIN_PAGE, USER_AGENT } from '../constants';
 import { ChatGptError, ChatGptResponse, WebViewEvents } from '../types';
 import useWebViewAnimation from '../hooks/useWebViewAnimation';
-import parseStreamedGptResponse from '../utils/parseStreamedGptResponse';
+//import parseStreamedGptResponse from '../utils/parseStreamedGptResponse';
 import { getStatusText } from '../utils/httpCodes';
 
 interface PassedProps {
@@ -44,6 +44,41 @@ type Props = PassedProps & PublicProps;
 
 export interface ModalWebViewMethods {
   open: () => void;
+}
+
+function escapeRegExp(string: string) 
+{
+  // The $& at the end means the whole matched string
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * @see https://stackoverflow.com/a/1144788/4642844
+ * @param str the original string
+ * @param find the string to replace
+ * @param replace the replacement string
+ */
+function replaceAll(str: string, find: string, replace: string) 
+{
+  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
+function parseStreamedResponse(data: string) 
+{
+  const chunks = data.split('data: ');
+  const sanitizedChunks = chunks.map((c) => replaceAll(c, '\n', ''))
+    							.filter((c) => !!c && c !== '[DONE]');
+  if (!sanitizedChunks.length) return null;
+
+
+  const response = JSON.parse(sanitizedChunks[sanitizedChunks.length - 1]);
+
+  return {
+		    message: response.message.content.parts[0],
+		    messageId: response.message.id,
+		    conversationId: response.conversation_id,
+		    isDone: response.message?.end_turn === true
+		 };
 }
 
 const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
@@ -164,8 +199,10 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
 				{
 	              try 
 	              {
+					  //console.log("event.nativeEvent.data: ", event.nativeEvent.data);
+					  //console.log("JSON.parse(event.nativeEvent.data): ", JSON.parse(event.nativeEvent.data) as WebViewEvents);
 	                const { payload, type } = JSON.parse(event.nativeEvent.data) as WebViewEvents;
-	                console.log("payload: ", payload, ", type: ", type);
+	                //console.log("payload: ", payload, ", type: ", type);
 	                if (type === 'REQUEST_INTERCEPTED_CONFIG') 
 	                {
 	                  if (Object.keys(payload)) 
@@ -185,7 +222,7 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
 	                }
 	                if (type === 'RAW_ACCUMULATED_RESPONSE') 
 	                {
-	                  const result = parseStreamedGptResponse(payload);
+	                  const result = parseStreamedResponse(payload);
 	                  if (result) 
 	                  {
 	                    onAccumulatedResponse(result);

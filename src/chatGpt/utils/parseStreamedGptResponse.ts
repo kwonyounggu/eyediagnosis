@@ -26,18 +26,21 @@ function replaceAll(str: string, find: string, replace: string) {
  */
 export default function parseStreamedGptResponse(data: string) {
   const chunks = data.split('data: ');
-  const sanitizedChunks = chunks
-    .map((c) => replaceAll(c, '\n', ''))
-    .filter((c) => !!c && c !== '[DONE]');
-  if (!sanitizedChunks.length) {
+  const sanitizedChunks = chunks.map((c) => replaceAll(c, '\n', ''))
+    							.filter((c) => !!c && c !== '[DONE]');
+  if (!sanitizedChunks.length) 
+  {
     return null;
   }
   // @ts-ignore
+  //isDone: response.message?.end_turn === true
   const response = JSON.parse(sanitizedChunks[sanitizedChunks.length - 1]);
+  
+  console.log("parseStreamedGptResponse in parseStreamedGptResonse.js data: \n", data);
   return {
-    message: response.message.content.parts[0],
-    messageId: response.message.id,
-    conversationId: response.conversation_id,
-    isDone: response.message?.end_turn === true,
-  };
+		    message: response.message.content.parts[0],
+		    messageId: response.message.id,
+		    conversationId: response.conversation_id,
+		    isDone: response.message?.end_turn === true
+		 };
 }

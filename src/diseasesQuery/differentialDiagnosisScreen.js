@@ -28,8 +28,8 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
     {
         //console.log("save, data: ", data);
         //stop all screen change while doing this
-        console.log("saving for user: ", chatGptUser, " disable button");
-        console.log("patient info: ", route.params.patient);
+        //console.log("saving for user: ", chatGptUser, " disable button");
+        //console.log("patient info: ", route.params.patient);
         const {age, gender, medicalHistory, symptoms, signs} = route.params.patient;
         setSaving(true);
         
