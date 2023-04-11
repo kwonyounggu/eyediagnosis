@@ -1,5 +1,9 @@
 import * as SQLite from 'expo-sqlite'
-import { chatGptDbName } from '../constants';
-const db = SQLite.openDatabase(chatGptDbName)
+import { localDbName, chatGptDbName } from '../constants';
+//console.log("localDbName: ", localDbName);
+
+const db = SQLite.openDatabase(chatGptDbName);
+
+//console.log("db: ", db);
 
 export default db;

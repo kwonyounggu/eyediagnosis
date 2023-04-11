@@ -47,11 +47,11 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
 								patientData =
 								{
 									age,
-									gender: gender.charAt(0),
+									gender: gender.charAt(0).toUpperCase(),
 									medicalHistory: medicalHistory.toString(),
 									symptoms: symptoms.toString(),
 									signs: signs.toString(),
-									chatGptResponse: queryResult,
+									chatGptResponse: queryResult.trim(),
 									queryDate: new Date().toISOString().split('T')[0],
 									userId: o.id
 								}

@@ -1,17 +1,20 @@
+//https://stackoverflow.com/questions/52910469/how-can-we-insert-an-image-in-sqlite-databasetable
+//However, it's not really recommended to store images but to rather store the path to the image and then retrieve the file when you want to display/use the image.
+
 import db from './SQLiteDatabase';
-import { chatGptUserTable } from '../constants';
+import {chatGptImageTable, chatGptQueryTable} from '../constants';
 
 
 db.transaction
 (
 	(tx) =>
 	{
-		const sql = "CREATE TABLE IF NOT EXISTS " + chatGptUserTable + " " +
+		const sql = "CREATE TABLE IF NOT EXISTS " + chatGptImageTable + " " +
 	  				"(" +
 	  				"    id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-	  				"    email VARCHAR(255) NOT NULL UNIQUE, " +
-	  				"    iat INTEGER, " +
-	  				"    exp INTEGER" +
+	  				"    imageFilePath VARCHAR(255) NOT NULL UNIQUE, " +
+	  				"    queryId INTEGER, " +
+	  				" 	 FOREIGN KEY(queryId) REFERENCES " + chatGptQueryTable +" (id)" +
 	  				")";
 	    tx.executeSql(sql);
 	}
@@ -29,7 +32,7 @@ const insert = (user) =>
 			    {
 				      tx.executeSql
 				      (
-				        "INSERT INTO " + chatGptUserTable + " (email, iat, exp) values (?, ?, ?);",
+				        "INSERT INTO " + chatGptImageTable + " (email, iat, exp) values (?, ?, ?);",
 				        [user.email, user.iat, user.exp],
 				        //-----------------------
 				        (_, { rowsAffected, insertId }) => 
@@ -58,7 +61,7 @@ const findByEmail = (email) =>
 			    {
 				      tx.executeSql
 				      (
-						 "select * from " + chatGptUserTable + " where email=?;",
+						 "select * from " + chatGptImageTable + " where email=?;",
 				        [email],
 				        //-----------------------
 				        (_, { rows }) => 
@@ -86,7 +89,7 @@ const getAll = () =>
 			    {
 				      tx.executeSql
 				      (
-						 "select * from " + chatGptUserTable + ";",
+						 "select * from " + chatGptImageTable + ";",
 				        [],
 				        (_, {rows}) => resolve(rows._array),
 				        (_, error) => reject(error)
@@ -109,7 +112,7 @@ const update = (user) =>
 			    {
 				      tx.executeSql
 				      (
-						 "update " + chatGptUserTable + " set iat=?, exp=? where email=?;",
+						 "update " + chatGptImageTable + " set iat=?, exp=? where email=?;",
 				        [user.iat, user.exp, user.email],
 				        //-----------------------
 				        (_, {rowsAffected}) => 
@@ -138,7 +141,7 @@ const dropTable = () =>
 			    {
 				      tx.executeSql
 				      (
-						 "DROP TABLE " + chatGptUserTable + ";",
+						 "DROP TABLE " + chatGptImageTable + ";",
 				        [],
 				        //-----------------------
 				        (_, { rows }) => resolve(rows._array),

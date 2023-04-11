@@ -1,6 +1,7 @@
 import db from './SQLiteDatabase';
 import { chatGptQueryTable, chatGptUserTable } from '../constants';
 
+
 db.transaction
 (
 	(tx) =>
@@ -15,7 +16,7 @@ db.transaction
 					  " 	 signs TEXT, " +
 					  " 	 chatGptResponse TEXT, " +
 					  " 	 queryDate DATE, " +
-					  " 	 userId INTEGER, " +
+					  " 	 userId INTEGER NOT NULL " +
 					  " 	 FOREIGN KEY(userId) REFERENCES " + chatGptUserTable +" (id)" +
 					  ");";			
 	    tx.executeSql(sql);
@@ -32,12 +33,18 @@ const insert = (patient) =>
 		    (
 				(tx) => 
 			    {
-					  const params = Object.values(patient);
+					  /**
+					   * Note that the following statement doesn't work properly all the time
+					   * const params = Object.values(patient);
+					   */
 					  
-					  //Note that the contents of params may contain [ or ] then it could be problem without
-					  //inserting and without error
+					  /**
+					   * Note that the contents of params may contain [ or ] then it could be problem without
+					   * inserting and without error
+					   */
 					  
-					  //console.log("[here]:", params);
+					  const params = [patient.age, patient.gender, patient.medicalHistory, patient.symptoms, patient.signs, patient.chatGptResponse, patient.userId];
+					  console.log("[here before insert into chatGptQueryTable]:\n", params);
 					  //[patient.age, patient.gender, patient.medicalHistory, patient.symptoms, patient.signs, patient.chatGptResponse, patient.userId]
 				      tx.executeSql
 				      (

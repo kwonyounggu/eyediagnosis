@@ -6,6 +6,7 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 {
 	//console.log("detailed data: ", route.params);
 	const {age, gender, medicalHistory, symptoms, signs, chatGptResponse, queryDate} = route.params;
+	console.log("diagnosis: \n", chatGptResponse);
 	return(
 		<ScrollView style={{padding: 10}}>
 			<Card mode='outlined'>
