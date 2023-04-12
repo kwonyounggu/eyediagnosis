@@ -2,7 +2,8 @@ import * as React from 'react';
 
 import {useChatGpt} from '../chatGpt';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import {ActivityIndicator, IconButton, Colors, Button, Snackbar, Tooltip} from 'react-native-paper';
+import {ActivityIndicator, IconButton, Snackbar} from 'react-native-paper';
+import { ABC } from '../common/utils';
 
 import {AppContext} from '../contexts/appProvider';
 import chatGptUserTable from '../database/sqlite/chatGptUser';
@@ -39,6 +40,10 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                     .toISOString()
                     .split("T")[0];
 		 */
+		//console.log("query data: ", queryResult.substring(100));
+		//console.log("bin data: ", ABC.toBinary(queryResult.trim()));
+		let responseData = ABC.toBinary(queryResult.trim());
+		console.log("binary data: ", responseData);
         chatGptUserTable.findByEmail(chatGptUser.email)
         			    .then
         			    (
@@ -51,7 +56,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
 									medicalHistory: medicalHistory.toString(),
 									symptoms: symptoms.toString(),
 									signs: signs.toString(),
-									chatGptResponse: queryResult.trim(),
+									chatGptResponse: responseData,
 									queryDate: new Date().toISOString().split('T')[0],
 									userId: o.id
 								}

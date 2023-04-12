@@ -16,7 +16,7 @@ db.transaction
 	  				"    queryId INTEGER, " +
 	  				" 	 FOREIGN KEY(queryId) REFERENCES " + chatGptQueryTable +" (id)" +
 	  				")";
-	    tx.executeSql(sql);
+	    tx.executeSql(sql,[],(_, result)=>console.log(result), (_, err)=>console.error(err));
 	}
 );
 

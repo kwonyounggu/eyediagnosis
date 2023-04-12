@@ -13,7 +13,7 @@ db.transaction
 	  				"    iat INTEGER, " +
 	  				"    exp INTEGER" +
 	  				")";
-	    tx.executeSql(sql);
+	    tx.executeSql(sql,[],(_, result)=>console.log(result), (_, err)=>console.error(err));
 	}
 );
 

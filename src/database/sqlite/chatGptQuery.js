@@ -16,10 +16,10 @@ db.transaction
 					  " 	 signs TEXT, " +
 					  " 	 chatGptResponse TEXT, " +
 					  " 	 queryDate DATE, " +
-					  " 	 userId INTEGER NOT NULL " +
+					  " 	 userId INTEGER NOT NULL, " +
 					  " 	 FOREIGN KEY(userId) REFERENCES " + chatGptUserTable +" (id)" +
-					  ");";			
-	    tx.executeSql(sql);
+					  ");";	
+		tx.executeSql(sql,[],(_, result)=>console.log(result), (_, err)=>console.error(err));
 	}
 );
 
@@ -43,7 +43,8 @@ const insert = (patient) =>
 					   * inserting and without error
 					   */
 					  
-					  const params = [patient.age, patient.gender, patient.medicalHistory, patient.symptoms, patient.signs, patient.chatGptResponse, patient.userId];
+					  const params = Object.values(patient);
+					  //const params = [patient.age, patient.gender, patient.medicalHistory, patient.symptoms, patient.signs, patient.chatGptResponse, patient.userId];
 					  console.log("[here before insert into chatGptQueryTable]:\n", params);
 					  //[patient.age, patient.gender, patient.medicalHistory, patient.symptoms, patient.signs, patient.chatGptResponse, patient.userId]
 				      tx.executeSql

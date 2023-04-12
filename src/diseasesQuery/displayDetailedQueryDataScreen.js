@@ -1,12 +1,13 @@
 import * as React from 'react';
 import {View, Text, ScrollView} from 'react-native';
 import {Card, Title, Paragraph} from 'react-native-paper';
+import { ABC } from '../common/utils';
 
 export default function DisplayDetailedQueryDataScreen({route, navigation})
 {
 	//console.log("detailed data: ", route.params);
 	const {age, gender, medicalHistory, symptoms, signs, chatGptResponse, queryDate} = route.params;
-	console.log("diagnosis: \n", chatGptResponse);
+	//console.log("diagnosis: \n", chatGptResponse);
 	return(
 		<ScrollView style={{padding: 10}}>
 			<Card mode='outlined'>
@@ -35,7 +36,7 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 			<Card mode='outlined' style={{marginTop: 10}}>
 				<Card.Title title="Diagnosis"/>
 				<Card.Content>
-					<Paragraph>{chatGptResponse}</Paragraph>	
+					<Paragraph>{ABC.toAscii(chatGptResponse)}</Paragraph>	
 				</Card.Content>
 			</Card>
 		</ScrollView>

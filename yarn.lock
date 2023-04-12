@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@amoutonbrady/lz-string@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.npmjs.org/@amoutonbrady/lz-string/-/lz-string-0.1.0.tgz"
+  integrity sha512-WsUuFexe01PUHKD8SUdiV3OQmauZWKyoo/7bJx3pj1l5SxLSe5//l1nQcU3DJlYL4JnhA8SqImT0/1xgUt6k5g==
+
 "@ampproject/remapping@^2.2.0":
   version "2.2.0"
   resolved "https://registry.npmjs.org/@ampproject/remapping/-/remapping-2.2.0.tgz"
