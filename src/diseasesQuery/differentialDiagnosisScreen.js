@@ -2,12 +2,15 @@ import * as React from 'react';
 
 import {useChatGpt} from '../chatGpt';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import {ActivityIndicator, IconButton, Snackbar} from 'react-native-paper';
+import {ActivityIndicator, IconButton, Snackbar, FAB} from 'react-native-paper';
 import { ABC } from '../common/utils';
+import {clone} from 'lodash';
 
 import {AppContext} from '../contexts/appProvider';
-import chatGptUserTable from '../database/sqlite/chatGptUser';
+//import chatGptUserTable from '../database/sqlite/chatGptUser';
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
+
+//import { queryData } from '../common/testData';
 
 const DifferentialDiagnosisScreen = ({route, navigation}) =>
 {
@@ -17,22 +20,16 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
     const [errorMessage, setErrorMessage] = React.useState('');
     const [loading, setLoading] = React.useState(true);
     const [saving, setSaving] = React.useState(false);
-    const [queryDone, setQueryDone] = React.useState(true);
+    const [queryDone, setQueryDone] = React.useState(false);
     const {sendMessage} = useChatGpt();
     
     const messageId = React.useRef('');
     const conversationId = React.useRef('');
 
-    //const [contextData, setContextData] = React.useState();
-
-    const save = () =>
+    const save = async () =>
     {
-        //console.log("save, data: ", data);
-        //stop all screen change while doing this
-        //console.log("saving for user: ", chatGptUser, " disable button");
-        //console.log("patient info: ", route.params.patient);
-        const {age, gender, medicalHistory, symptoms, signs} = route.params.patient;
         setSaving(true);
+        const {age, gender, medicalHistory, symptoms, signs} = route.params.patient;
         
         /**
 		 * 	var date = new Date("Sun May 11,2014");
@@ -40,36 +37,32 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                     .toISOString()
                     .split("T")[0];
 		 */
-		//console.log("query data: ", queryResult.substring(100));
-		//console.log("bin data: ", ABC.toBinary(queryResult.trim()));
-		let responseData = ABC.toBinary(queryResult.trim());
-		console.log("binary data: ", responseData);
-        chatGptUserTable.findByEmail(chatGptUser.email)
-        			    .then
-        			    (
-							(o)=>
-							{
-								patientData =
-								{
-									age,
-									gender: gender.charAt(0).toUpperCase(),
-									medicalHistory: medicalHistory.toString(),
-									symptoms: symptoms.toString(),
-									signs: signs.toString(),
-									chatGptResponse: responseData,
-									queryDate: new Date().toISOString().split('T')[0],
-									userId: o.id
-								}
-								chatGptQueryTable.insert(patientData)
-												 .then(o=>console.log(o))
-												 .catch(e=>console.error(e));
-							}
-						)
-						.catch (e=>console.error(e));
 
-        setSaving(false);
-        console.log("saving is done. enable button")
+        const diagnosisResult = ABC.toBinary(clone(queryResult.trim()));
+        console.log("diagnosisResult.length: ", diagnosisResult.length);
+        const patientData =
+		{
+			age: age,
+			gender: gender.charAt(0).toUpperCase(),
+			medicalHistory: medicalHistory.toString(),
+			symptoms: symptoms.toString(),
+			signs: signs.toString(),
+			chatGptResponse: diagnosisResult,
+			queryDate: new Date().toISOString().split('T')[0]
+		}
+		
+		if (patientData.chatGptResponse.length > 0)
+			chatGptQueryTable.insert(patientData, chatGptUser.email)
+							 .then(o=>setQueryDone(false))
+							 .catch(e=>console.error(e))
+							 .finally(()=>setSaving(false));
+		else 
+		{
+			console.error ("Diagnosis data is missing");
+			setSaving(false);
+		}
     }
+    
     React.useEffect
     (
         () =>
@@ -119,7 +112,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
         },
         [] //empty array, the function is only executed once when this component first mounts.
     ); //useEffect
-
+    /*
     React.useEffect
     (
         () =>
@@ -129,19 +122,18 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
             navigation.setOptions
             (
                 {
-                    headerRight: () => <IconButton 
+                    headerRight: () => queryDone && <IconButton 
                                             icon='archive' 
                                             color='#000' 
-                                            size={30} 
+                                            size={25} 
                                             AccessibilityLabel='Save'
-                                            disabled={!queryDone}
                                             onPress={save}
                                         />
                 }
             );
         },
         [navigation]
-    );
+    );*/
     return (
         <View style={{flex: 1}}>
             <ScrollView>
@@ -164,6 +156,12 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                                 <ActivityIndicator size='large' />
                             </View>
             }  
+            <FAB style={styles.fab}
+			     small
+			     icon="archive"
+			     onPress={save}
+			     visible={queryDone}
+			/>
         </View>
     );
 };
@@ -182,7 +180,15 @@ const styles = StyleSheet.create
             bottom: 0,
             alignItems: 'center',
             justifyContent: 'center'
-        }
+        },
+        
+        fab: 
+        {
+		    position: 'absolute',
+		    margin: 5,
+		    right: 0,
+		    bottom: 0
+		}
     }
   );
 

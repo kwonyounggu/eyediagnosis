@@ -19,17 +19,18 @@ export default function SettingsScreen({navigation})
 			//otherwise after dropping the tables, app needs to be reloaded.
 			
 			
-			
+			/*
 			chatGptUserTable.dropTable().then(info=>console.log("INFO: chatGptUserTable is dropped", info))
 										.catch(e=>console.log(e));
 			chatGptQueryTable.dropTable().then(info=>console.log("INFO: chatGptQueryTable is dropped", info))
 										.catch(e=>console.log(e));
 			chatGptImageTable.dropTable().then(info=>console.log("INFO: chatGptImageTable is dropped", info))
 										.catch(e=>console.log(e));
-			
+
+			*/
 			//db._db.close();//delete database
 			
-			/*
+			
 			
 			//for testing to see records from both tables
 			chatGptUserTable.getAll()
@@ -41,7 +42,7 @@ export default function SettingsScreen({navigation})
 			chatGptQueryTable.getNumberOfRows()
 						    .then((r) => console.log(r))
 						    .catch((e) => console.error(e));
-						    */
+						    
 			
 		}, []	
 	);

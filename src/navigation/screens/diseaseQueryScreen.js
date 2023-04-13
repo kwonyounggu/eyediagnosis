@@ -38,7 +38,7 @@ export default function DiseaseQueryScreen({navigation})
     
     //status: 'initializing' | 'logged-out' | 'getting_auth_token' | 'authenticated';
     const {status, flush, login} = useChatGpt();
-    console.log("useChatGpt() in DiseasesQueryHome, status: ", status, ", flush: ", flush, ", login: ", login);
+    //console.log("useChatGpt() in DiseasesQueryHome, status: ", status, ", flush: ", flush, ", login: ", login);
     
     if (status === 'initializing') return null;
     if (status === 'logged-out' || status === 'getting_auth_token')

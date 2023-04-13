@@ -23,8 +23,9 @@ db.transaction
 	}
 );
 
-const insert = (patient) =>
+const insert = (patient, email) =>
 {
+	//console.log("patient.chatGptResponse.length: ", patient.chatGptResponse.length);
 	return new Promise
 	(
 		(resolve, reject) => 
@@ -33,21 +34,34 @@ const insert = (patient) =>
 		    (
 				(tx) => 
 			    {
-					  /**
-					   * Note that the following statement doesn't work properly all the time
-					   * const params = Object.values(patient);
-					   */
-					  
-					  /**
-					   * Note that the contents of params may contain [ or ] then it could be problem without
-					   * inserting and without error
-					   */
+
 					  
 					  const params = Object.values(patient);
-					  //const params = [patient.age, patient.gender, patient.medicalHistory, patient.symptoms, patient.signs, patient.chatGptResponse, patient.userId];
-					  console.log("[here before insert into chatGptQueryTable]:\n", params);
-					  //[patient.age, patient.gender, patient.medicalHistory, patient.symptoms, patient.signs, patient.chatGptResponse, patient.userId]
-				      tx.executeSql
+					  //console.log("[here before insert into chatGptQueryTable]:\n", params);
+					  /*if (!params[5].length) 
+					  {
+						  console.error("Diagnosis data: ", params);
+						  reject("Error copying diagnosis data before saving");
+					  }*/
+					  const sql = 
+					  "insert into " + chatGptQueryTable + 
+					  " (age, gender, medicalHistory, symptoms, signs, chatGptResponse, queryDate, userId) values" +
+					  " (?, ?, ?, ?, ?, ?, ?, (select id from " + chatGptUserTable + " where email = '" + email + "'));";
+					  
+					 
+					  tx.executeSql
+				      (
+				        sql,
+				        params,
+				        (_, {rowsAffected, insertId}) => 
+				        {
+				          if (rowsAffected > 0) resolve(insertId);
+				          else reject("Error inserting a patient info: " + JSON.stringify(patient));
+				        },
+				        (_, error) => reject(error)
+				      );
+					  /*
+					  tx.executeSql
 				      (
 				        "INSERT INTO " + chatGptQueryTable + 
 				        " (age, gender, medicalHistory, symptoms, signs, chatGptResponse, queryDate, userId) values" +
@@ -60,6 +74,7 @@ const insert = (patient) =>
 				        },
 				        (_, error) => reject(error)
 				      );
+				      */
 			    }
 			);
 	  	}

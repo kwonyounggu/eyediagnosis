@@ -328,7 +328,7 @@ const DiagnosisScreen = (props) =>
                     options=
                     {
                         {
-                            headerRight: ()=><IconButton icon='archive' color='#000' size={30}/>
+                            //headerRight: ()=><IconButton icon='archive' color='#000' size={30}/>
                         }
                     }
                     > 

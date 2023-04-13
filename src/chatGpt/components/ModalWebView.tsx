@@ -25,8 +25,10 @@ import { ChatGptError, ChatGptResponse, WebViewEvents } from '../types';
 import useWebViewAnimation from '../hooks/useWebViewAnimation';
 //import parseStreamedGptResponse from '../utils/parseStreamedGptResponse';
 import { getStatusText } from '../utils/httpCodes';
+import {isEmpty} from 'lodash';
 
-interface PassedProps {
+interface PassedProps 
+{
   accessToken: string;
   onLoginCompleted: () => void;
   onAccessTokenChange: (newAccessToken: string) => void;
@@ -34,7 +36,8 @@ interface PassedProps {
   onStreamError: (error: ChatGptError) => void;
 }
 
-export interface PublicProps {
+export interface PublicProps 
+{
   containerStyles?: StyleProp<ViewStyle>;
   backdropStyles?: StyleProp<ViewStyle>;
   renderCustomCloseIcon?: (closeModal: () => void) => ReactNode;
@@ -42,7 +45,8 @@ export interface PublicProps {
 
 type Props = PassedProps & PublicProps;
 
-export interface ModalWebViewMethods {
+export interface ModalWebViewMethods 
+{
   open: () => void;
 }
 
@@ -95,28 +99,38 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
     },
     ref
   ) => {
+	  
+	const lastResult = React.useRef({message: '', messageId: '', conversationId: '', isDone: false}); //added on Apr 12 2023
     const appState = useAppState();
-    const [status, setStatus] = useState<'hidden' | 'animating' | 'visible'>(
-      'hidden'
+    const [status, setStatus] = useState<'hidden' | 'animating' | 'visible'>('hidden');
+
+    const { animatedStyles, animateWebView } = useWebViewAnimation
+    (
+		{
+      		onAnimationStart: () => setStatus('animating'),
+      		onAnimationEnd: (mode) => setStatus(mode === 'show' ? 'visible' : 'hidden'),
+    	}
     );
 
-    const { animatedStyles, animateWebView } = useWebViewAnimation({
-      onAnimationStart: () => setStatus('animating'),
-      onAnimationEnd: (mode) =>
-        setStatus(mode === 'show' ? 'visible' : 'hidden'),
-    });
-
-    const onWebviewRefChange = useCallback((webviewRef: RNWebView) => {
-      if (webviewRef) {
+    const onWebviewRefChange = useCallback((webviewRef: RNWebView) => 
+    {
+      if (webviewRef) 
+      {
         init(webviewRef);
       }
     }, []);
 
-    useImperativeHandle(ref, () => ({
-      open: () => {
-        animateWebView('show');
-      },
-    }));
+    useImperativeHandle(ref, 
+	    () => 
+	    (
+			{
+	      		open: () => 
+	      		{
+	        		animateWebView('show');
+	      		},
+	    	}
+	    )
+	 );
 
     useEffect(() => {
       if (status === 'visible') {
@@ -223,9 +237,21 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
 	                if (type === 'RAW_ACCUMULATED_RESPONSE') 
 	                {
 	                  const result = parseStreamedResponse(payload);
-	                  if (result) 
+	                  if (result === null && payload.includes("[DONE]"))
 	                  {
-	                    onAccumulatedResponse(result);
+						  console.log("payload: ", payload);
+						  if (!lastResult.current.isDone)
+						  {
+							  console.log("setting isDone to true ...");
+							  lastResult.current.isDone = true;
+							  onAccumulatedResponse(lastResult.current);
+						  }
+					  }
+	                  else if (result) 
+	                  {
+						  //if (result.isDone) console.log("isDone is true.\nMessage:\n", result.message);
+						  lastResult.current = result;
+	                      onAccumulatedResponse(result);
 	                  }
 	                }
 	                if (type === 'CHAT_GPT_FULL_CAPACITY' && status === 'visible') 
