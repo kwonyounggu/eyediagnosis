@@ -133,6 +133,53 @@ const getAll = () =>
   	);	
 };
 
+//Select id, age, gender, medicalHistory, symptoms, signs
+const getByUserId = (userId) =>
+{
+	return new Promise
+	(
+		(resolve, reject) => 
+		{
+		    db.transaction
+		    (
+				(tx) => 
+			    {
+				      tx.executeSql
+				      (
+						 "select id, age, gender, medicalHistory, symptoms, signs from " + chatGptQueryTable + " where userId=? order by age;",
+				        [userId],
+				        (_, {rows}) => resolve(rows._array),
+				        (_, error) => reject(error)
+				      );
+			    }
+			);
+	  	}
+  	);	
+};
+
+const getChatGptResponseById = (id) =>
+{
+	return new Promise
+	(
+		(resolve, reject) => 
+		{
+		    db.transaction
+		    (
+				(tx) => 
+			    {
+				      tx.executeSql
+				      (
+						 "select chatGptResponse, queryDate from " + chatGptQueryTable + " where id=?;",
+				        [id],
+				        (_, {rows}) => resolve(rows._array[0]),
+				        (_, error) => reject(error)
+				      );
+			    }
+			);
+	  	}
+  	);	
+};
+
 const getById = (userId) =>
 {
 	return new Promise
@@ -224,7 +271,6 @@ const dropTable = () =>
 				      (
 						 "DROP TABLE " + chatGptQueryTable + ";",
 				        [],
-				        //-----------------------
 				        (_, { rows }) => resolve(rows._array),
 				        (_, error) => reject(error)
 				      );
@@ -234,4 +280,4 @@ const dropTable = () =>
   	);	
 };
 
-export default {insert, getById, dropTable, update, getAll, getNumberOfRows};
+export default {insert, getById, getByUserId, getChatGptResponseById, dropTable, update, getAll, getNumberOfRows};

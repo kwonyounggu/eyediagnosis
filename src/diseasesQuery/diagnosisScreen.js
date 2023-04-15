@@ -288,6 +288,7 @@ const DiagnosisScreen = (props) =>
     //console.log("DiagnosisScreen, props: ", props);
     const {flush} = useChatGpt();
     const [popupVisible, setPopupVisible] = React.useState(false);
+    
     return (
         
             <Stack.Navigator initialRouteName={diagnosisName}>
@@ -327,12 +328,15 @@ const DiagnosisScreen = (props) =>
                     name={differentialDiagnosisName} 
                     options=
                     {
-                        {
-                            //headerRight: ()=><IconButton icon='archive' color='#000' size={30}/>
-                        }
+						({navigation}) =>
+                        (
+							{
+                       		}
+                        )
                     }
                     > 
                     {
+						//https://aboutreact.com/react-native-image-icon-inside-navigation-bar/#:~:text=js-,%2F%2F%203%20Ways%20to%20Add%20Image%20Icon%20Inside%20Navigation%20Bar,navigation%7D)%20%3D%3E%20%7B%20React.
                         (props) => <DifferentialDiagnosisScreen {...props} />
                     }
                 </Stack.Screen> 

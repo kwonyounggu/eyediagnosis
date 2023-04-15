@@ -32,7 +32,7 @@ export default function ListDataScreen({navigation})
 	        			    (
 								(o)=>
 								{
-									chatGptQueryTable.getById(o.id)
+									chatGptQueryTable.getByUserId(o.id)
 												    .then((resultSet) => {console.log("LEN: ", resultSet.length);setChatGptData(resultSet);})
 												    .catch((e) => console.error(e));
 								}

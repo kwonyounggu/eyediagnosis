@@ -1,8 +1,9 @@
 import * as React from 'react';
 
 import {useChatGpt} from '../chatGpt';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {ActivityIndicator, IconButton, Snackbar, FAB} from 'react-native-paper';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { ABC } from '../common/utils';
 import {clone} from 'lodash';
 
@@ -20,48 +21,55 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
     const [errorMessage, setErrorMessage] = React.useState('');
     const [loading, setLoading] = React.useState(true);
     const [saving, setSaving] = React.useState(false);
+    const [onSave, setOnSave] = React.useState(false);
+    const [saved, setSaved] = React.useState(false);
     const [queryDone, setQueryDone] = React.useState(false);
     const {sendMessage} = useChatGpt();
     
     const messageId = React.useRef('');
     const conversationId = React.useRef('');
 
-    const save = async () =>
-    {
-        setSaving(true);
-        const {age, gender, medicalHistory, symptoms, signs} = route.params.patient;
-        
-        /**
-		 * 	var date = new Date("Sun May 11,2014");
-			var dateString = new Date(date.getTime() - (date.getTimezoneOffset() * 60000 ))
-                    .toISOString()
-                    .split("T")[0];
-		 */
-
-        const diagnosisResult = ABC.toBinary(clone(queryResult.trim()));
-        console.log("diagnosisResult.length: ", diagnosisResult.length);
-        const patientData =
-		{
-			age: age,
-			gender: gender.charAt(0).toUpperCase(),
-			medicalHistory: medicalHistory.toString(),
-			symptoms: symptoms.toString(),
-			signs: signs.toString(),
-			chatGptResponse: diagnosisResult,
-			queryDate: new Date().toISOString().split('T')[0]
-		}
-		
-		if (patientData.chatGptResponse.length > 0)
-			chatGptQueryTable.insert(patientData, chatGptUser.email)
-							 .then(o=>setQueryDone(false))
-							 .catch(e=>console.error(e))
-							 .finally(()=>setSaving(false));
-		else 
-		{
-			console.error ("Diagnosis data is missing");
-			setSaving(false);
-		}
-    }
+	React.useEffect
+	(
+	    () =>
+	    {
+			if (!onSave) { console.log("INFO: onSave is false!"); return;}
+	        setSaving(true);
+	        const {age, gender, medicalHistory, symptoms, signs} = route.params.patient;
+	        
+	        /**
+			 * 	var date = new Date("Sun May 11,2014");
+				var dateString = new Date(date.getTime() - (date.getTimezoneOffset() * 60000 ))
+	                    .toISOString()
+	                    .split("T")[0];
+			 */
+	
+	        const diagnosisResult = ABC.toBinary(clone(queryResult.trim()));
+	        console.log("diagnosisResult.length: ", diagnosisResult.length);
+	        const patientData =
+			{
+				age: age,
+				gender: gender.charAt(0).toUpperCase(),
+				medicalHistory: medicalHistory.toString(),
+				symptoms: symptoms.toString(),
+				signs: signs.toString(),
+				chatGptResponse: diagnosisResult,
+				queryDate: new Date().toISOString().split('T')[0]
+			}
+			
+			if (patientData.chatGptResponse.length > 0)
+				chatGptQueryTable.insert(patientData, chatGptUser.email)
+								 .then(o=>setSaved(true))
+								 .catch(e=>console.error(e))
+								 .finally(()=>setSaving(false));
+			else 
+			{
+				console.error ("Diagnosis data is missing");
+				setSaving(false);
+			}
+	    },
+	    [onSave]
+	 );
     
     React.useEffect
     (
@@ -112,8 +120,8 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
         },
         [] //empty array, the function is only executed once when this component first mounts.
     ); //useEffect
-    /*
-    React.useEffect
+    
+    React.useLayoutEffect
     (
         () =>
         {
@@ -122,18 +130,20 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
             navigation.setOptions
             (
                 {
-                    headerRight: () => queryDone && <IconButton 
+                    headerRight: () => <IconButton 
                                             icon='archive' 
                                             color='#000' 
                                             size={25} 
-                                            AccessibilityLabel='Save'
-                                            onPress={save}
+                                            disabled={loading || saved}
+                                            onPress={()=>onSave ? console.log("INFO: already saved.") : setOnSave(true)}
                                         />
                 }
             );
         },
         [navigation]
-    );*/
+    );
+    
+
     return (
         <View style={{flex: 1}}>
             <ScrollView>
@@ -144,24 +154,27 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                 }
             </ScrollView>
             <Snackbar 
-                    visible={!!errorMessage}
-                    onDismiss={()=>setErrorMessage('')}
+                    visible={!!errorMessage || saved}
+                    onDismiss={()=> !saved && setErrorMessage('')}
                     duration={4000}
-                    style={{backgroundColor: 'red'}}
+                    style={saved? {backgroundColor: 'black'} : {backgroundColor: 'red'}}
             >
-                {errorMessage}
+            {
+				saved ? "It is saved" : errorMessage
+			}    
             </Snackbar> 
             {
                 saving &&   <View style={styles.saving}>
                                 <ActivityIndicator size='large' />
                             </View>
             }  
+            {/*
             <FAB style={styles.fab}
 			     small
 			     icon="archive"
-			     onPress={save}
-			     visible={queryDone}
-			/>
+			     onPress={()=>{}}
+			     visible={queryDone || loading}
+			/>*/}
         </View>
     );
 };
@@ -183,9 +196,10 @@ const styles = StyleSheet.create
         },
         
         fab: 
-        {
+        {  
+			borderRadius: 25,
 		    position: 'absolute',
-		    margin: 5,
+		    margin: 0,
 		    right: 0,
 		    bottom: 0
 		}

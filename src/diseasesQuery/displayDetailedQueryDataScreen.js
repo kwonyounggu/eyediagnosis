@@ -1,12 +1,40 @@
 import * as React from 'react';
-import {View, Text, ScrollView} from 'react-native';
-import {Card, Title, Paragraph} from 'react-native-paper';
+import {Text, ScrollView} from 'react-native';
+import {ActivityIndicator, Card, Paragraph} from 'react-native-paper';
 import { ABC } from '../common/utils';
+import chatGptQueryTable from '../database/sqlite/chatGptQuery';
 
 export default function DisplayDetailedQueryDataScreen({route, navigation})
 {
 	//console.log("detailed data: ", route.params);
-	const {age, gender, medicalHistory, symptoms, signs, chatGptResponse, queryDate} = route.params;
+	const {id, age, gender, medicalHistory, symptoms, signs} = route.params;
+	const [chatGptResponse, setChatGptResponse] = React.useState('');
+	const [queryDate, setQueryDate] = React.useState('');
+	const [loading, setLoading] = React.useState(true);
+	
+	//https://flaviocopes.com/javascript-iife/
+	React.useEffect
+	(
+	    () =>
+	    {
+			(
+				async () =>
+				{
+					if (loading) chatGptQueryTable.getChatGptResponseById(id)
+										 .then
+										 (	(o)=>
+										 	{
+												 setChatGptResponse(o.chatGptResponse);
+												 setQueryDate(o.queryDate);
+											}
+										 )
+										 .catch(e=>console.error(e))
+										 .finally(()=>setLoading(false));
+				}
+			)();
+	    },
+	    []
+	 );
 	//console.log("diagnosis: \n", chatGptResponse);
 	return(
 		<ScrollView style={{padding: 10}}>
@@ -36,7 +64,10 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 			<Card mode='outlined' style={{marginTop: 10}}>
 				<Card.Title title="Diagnosis"/>
 				<Card.Content>
+				{
+					loading ? <ActivityIndicator size='large' /> :
 					<Paragraph>{ABC.toAscii(chatGptResponse)}</Paragraph>	
+				}
 				</Card.Content>
 			</Card>
 		</ScrollView>
