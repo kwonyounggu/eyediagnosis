@@ -45,3 +45,6 @@ Error: Error code 1: no such table:
  WARN  Possible Unhandled Promise Rejection (id: 5):
 Error: Error code 1: no such column: id
 
+/*** see this for how to run a react native app without expo ***/
+https://aboutreact.com/react-native-image-icon-inside-navigation-bar/#:~:text=js-,%2F%2F%203%20Ways%20to%20Add%20Image%20Icon%20Inside%20Navigation%20Bar,navigation%7D)%20%3D%3E%20%7B%20React.
+

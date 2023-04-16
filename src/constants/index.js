@@ -6,3 +6,5 @@ export const OPENAI_API_KEY = 'sk-PzegcSgQ1XPn6OgE4niDT3BlbkFJtrRiVwlaLjJOEv63Vp
 
 //https://platform.openai.com/account/org-settings
 export const OrganizationID = 'org-vMqT7ThQSSckruiQq45mbFbP';
+
+export const SQL_QUERY_LIMIT = 10;

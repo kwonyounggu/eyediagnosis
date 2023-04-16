@@ -95,30 +95,40 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
 			      {
 					  email: decodedToken[TOKEN_EMAIL_PROPERTY].email,
 					  iat: decodedToken.iat,
-					  exp: decodedToken.exp
+					  exp: decodedToken.exp,
+					  id: undefined
 				  };
 				  
-				  //console.log("Login User: ", user);
+				  
 				  
 				  chatGptUserTable.findByEmail(user.email)
 				  				  .then
 				  				  (
 										(record)=>
 										{
-											//console.log("INFO: findByEmail("+user.email+"),  ", record);
-											if (Object.keys(record).length === 0) //new user insertion
+											console.log("INFO: findByEmail("+user.email+"),  ", record);
+											if (Object.keys(record).length === 0) //not registered
 											{
-												chatGptUserTable.insert(user).then ((i)=>console.log(i)).catch(e=>console.error(e));
+												chatGptUserTable.insert(user).then ((id)=>user.id = id).catch(e=>console.error(e));
 											}
 											else if (!(user.iat === record.iat && user.exp === record.exp))//Update only iat and exp
 											{
-												chatGptUserTable.update(user).then ((i)=>console.log(i)).catch(e=>console.error(e));
+												chatGptUserTable.update(user).then ((i)=>user.id = record.id).catch(e=>console.error(e));
 											}
+											else user.id = record.id;
 										}
 								  )
-				  				  .catch(e=>console.error(e));
-			      //State change globally
-			      onUpdateChatGptUser(user);
+				  				  .catch(e=>console.error(e))
+				  				  .finally
+				  				  (
+										() =>
+										{
+											console.log("Login User: ", user);
+										    //State change globally
+										    onUpdateChatGptUser(user);
+										}
+								  );
+				  
 			     
 		    	}
 		    )();

@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState} from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from "lodash";
 
+import chatGptUserTable from '../database/sqlite/chatGptUser';
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
-import { SQL_QUERY_LIMIT } from '../constants';
 
 import {AppContext} from '../contexts/appProvider';
 
@@ -22,32 +22,25 @@ export default function ListDataScreen({navigation})
   const [ selectedColumn, setSelectedColumn ] = useState(null);
   const [ chatGptData, setChatGptData ] = useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [offset, setOffset] = useState(0);
-  
-  const [maxRecords, setMaxRecords] = useState(-1);
-  
-  React.useEffect
-  (
+
+   React.useEffect
+   (
 		() => 
 	    {
-			chatGptQueryTable.getNumberOfRows()
-						     .then((max) => setMaxRecords(max))
-						     .catch((e) => console.error(e));
+			chatGptUserTable.findByEmail(chatGptUser.email)
+	        			    .then
+	        			    (
+								(o)=>
+								{
+									chatGptQueryTable.getByUserId(o.id)
+												    .then((resultSet) => {console.log("LEN: ", resultSet.length);setChatGptData(resultSet);})
+												    .catch((e) => console.error(e));
+								}
+							)
+							.catch (e=>console.error(e));
 			
 	  	}, []
-  );
-  
-  React.useEffect
-  (
-		() => 
-	    {
-			chatGptQueryTable.getLimitedByUserId(chatGptUser.id, SQL_QUERY_LIMIT, offset)
-						     .then((resultSet) => offset ? setChatGptData([...chatGptData, ...resultSet]) : setChatGptData(resultSet))
-						     .catch((e) => console.error(e));
-			
-	  	}, [offset]
-  );
+   );
   const sortTable = (column) => 
   {
     const newDirection = direction === "desc" ? "asc" : "desc" 
@@ -96,24 +89,12 @@ export default function ListDataScreen({navigation})
     }
     </View>
   )
-  const getMoreData = () =>
-  {
-	  //console.log("get More data with offset: " + offset, " maxRecords: ", maxRecords, " currently retrieved len: ", chatGptData.length);
-	  if (chatGptData.length < maxRecords) {console.log("more data with offset: " + offset, " maxRecords: ", maxRecords, " currently retrieved len: ", chatGptData.length); setOffset(offset + 1);}
-  }
+
   const onSelectRow = (item) =>
   {
 	  //console.log('selected item: ', item);
 	  navigation.navigate('Detailed Data', item);
   }
-  const renderFooter = () =>
-  (
-	<View>
-		{ chatGptData.length >= maxRecords ? <Text style={{textAlign: 'center'}}>No More Data</Text> :
-											 loading && <ActivityIndicator />
-		}
-	</View>  
-  );
   return (
     <View style={styles.container}>
       <FlatList 
@@ -121,10 +102,7 @@ export default function ListDataScreen({navigation})
         style={{width:"95%"}}
         keyExtractor={(item, index) => index+""}
         ListHeaderComponent={tableHeader}
-        ListFooterComponent={renderFooter}
         stickyHeaderIndices={[0]}
-        onEndReachedThreshold={0}
-        onEndReached={getMoreData}
         renderItem=
         {
 			({item, index})=> 

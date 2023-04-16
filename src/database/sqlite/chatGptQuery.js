@@ -157,6 +157,30 @@ const getByUserId = (userId) =>
   	);	
 };
 
+//Select id, age, gender, medicalHistory, symptoms, signs
+const getLimitedByUserId = (userId, limit, offset) =>
+{	console.log("getLimitedByUserId (", userId, ", ", limit, ", ", offset*limit);
+	return new Promise
+	(
+		(resolve, reject) => 
+		{
+		    db.transaction
+		    (
+				(tx) => 
+			    {
+				      tx.executeSql
+				      (
+						 "select id, age, gender, medicalHistory, symptoms, signs from " + chatGptQueryTable + " where userId=? order by age limit ? offset ?;",
+				        [userId, limit, offset*limit],
+				        (_, {rows}) => resolve(rows._array),
+				        (_, error) => reject(error)
+				      );
+			    }
+			);
+	  	}
+  	);	
+};
+
 const getChatGptResponseById = (id) =>
 {
 	return new Promise
@@ -280,4 +304,4 @@ const dropTable = () =>
   	);	
 };
 
-export default {insert, getById, getByUserId, getChatGptResponseById, dropTable, update, getAll, getNumberOfRows};
+export default {insert, getById, getByUserId, getLimitedByUserId, getChatGptResponseById, dropTable, update, getAll, getNumberOfRows};
