@@ -27,6 +27,8 @@ export default function ListDataScreen({navigation})
   
   const [maxRecords, setMaxRecords] = useState(-1);
   
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  
   React.useEffect
   (
 		() => 
@@ -101,8 +103,9 @@ export default function ListDataScreen({navigation})
 	  //console.log("get More data with offset: " + offset, " maxRecords: ", maxRecords, " currently retrieved len: ", chatGptData.length);
 	  if (chatGptData.length < maxRecords) {console.log("more data with offset: " + offset, " maxRecords: ", maxRecords, " currently retrieved len: ", chatGptData.length); setOffset(offset + 1);}
   }
-  const onSelectRow = (item) =>
+  const onSelectRow = (item, index) =>
   {
+	  setSelectedIndex(index);
 	  //console.log('selected item: ', item);
 	  navigation.navigate('Detailed Data', item);
   }
@@ -131,7 +134,7 @@ export default function ListDataScreen({navigation})
 	        {
 	          return (
 			  <TouchableWithoutFeedback onPress={()=>onSelectRow(item)}>
-	            <View style={{...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white"}}>
+	            <View style={{...styles.tableRow, backgroundColor: index===selectedIndex ? 'blue': (index % 2 == 1 ? "#F0FBFC" : "white")}}>
 	              <Text style={{...styles.columnRowTxt, width: '10%', fontWeight:"bold"}}>{item.age}</Text>
 	              <Text style={{...styles.columnRowTxt, width: '10%'}}>{item.gender}</Text>
 	              <Text style={{...styles.columnRowTxt, width: '27%'}} ellipsizeMode='tail' numberOfLines={2}>{item.medicalHistory}</Text>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Text, ScrollView} from 'react-native';
-import {ActivityIndicator, Card, Paragraph} from 'react-native-paper';
+import {ActivityIndicator, Card, Paragraph, IconButton} from 'react-native-paper';
 import { ABC } from '../common/utils';
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
 
@@ -35,6 +35,42 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 	    },
 	    []
 	 );
+	 
+	const deleteItem = () =>
+	{
+		setLoading(true);//while deleting database table row
+		chatGptQueryTable.deleteById(id)
+						 .then
+						 (
+							(rowsAffected) =>
+							{
+								console.log("INFO: the number of rows deleted is ", rowsAffected);
+								navigation.navigate();
+							} 
+						 )
+	}
+	React.useLayoutEffect
+    (
+        () =>
+        {
+            // Use `setOptions` to update the button that we previously specified
+            // Now the button includes an `onPress` handler to update 
+            navigation.setOptions
+            (
+                {
+                    headerRight: () => <IconButton 
+                                            icon='delete' 
+                                            color='#000' 
+                                            size={25} 
+                                            disabled={loading}
+                                            onPress={()=>console.log("INFO: delete the row.")}
+                                        />
+                }
+            );
+        },
+        [navigation]
+    );
+    
 	//console.log("diagnosis: \n", chatGptResponse);
 	return(
 		<ScrollView style={{padding: 10}}>

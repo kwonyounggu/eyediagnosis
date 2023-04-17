@@ -250,6 +250,29 @@ const getNumberOfRows = () =>
   	);	
 };
 
+const deleteById = (id) =>
+{
+	return new Promise
+	(
+		(resolve, reject) => 
+		{
+		    db.transaction
+		    (
+				(tx) => 
+			    {
+				      tx.executeSql
+				      (
+						 "delete from " + chatGptQueryTable + " where id=?;",
+				        [id],
+				        (_, {rowsAffected}) => resolve(rowsAffected),
+				        (_, error) => reject(error)
+				      );
+			    }
+			);
+	  	}
+  	);	
+};
+
 //change or discard
 const update = (user) =>
 {
@@ -304,4 +327,4 @@ const dropTable = () =>
   	);	
 };
 
-export default {insert, getById, getByUserId, getLimitedByUserId, getChatGptResponseById, dropTable, update, getAll, getNumberOfRows};
+export default {deleteById, insert, getById, getByUserId, getLimitedByUserId, getChatGptResponseById, dropTable, update, getAll, getNumberOfRows};
