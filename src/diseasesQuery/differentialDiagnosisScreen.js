@@ -3,7 +3,7 @@ import * as React from 'react';
 import {useChatGpt} from '../chatGpt';
 import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {ActivityIndicator, IconButton, Snackbar, FAB} from 'react-native-paper';
-import Ionicons from '@expo/vector-icons/Ionicons';
+
 import { ABC } from '../common/utils';
 import {clone} from 'lodash';
 

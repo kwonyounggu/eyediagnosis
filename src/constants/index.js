@@ -8,3 +8,9 @@ export const OPENAI_API_KEY = 'sk-PzegcSgQ1XPn6OgE4niDT3BlbkFJtrRiVwlaLjJOEv63Vp
 export const OrganizationID = 'org-vMqT7ThQSSckruiQq45mbFbP';
 
 export const SQL_QUERY_LIMIT = 10;
+
+
+export const diagnosisName = 'Eye Diagnosis';
+export const differentialDiagnosisName = 'Differential Diagnosis';
+export const listSavedDataName = 'List of Saved Data';
+export const displayDetailedQueryDataName = 'Detailed Data';

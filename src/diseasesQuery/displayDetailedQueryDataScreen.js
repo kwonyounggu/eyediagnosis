@@ -3,6 +3,7 @@ import {Text, ScrollView} from 'react-native';
 import {ActivityIndicator, Card, Paragraph, IconButton} from 'react-native-paper';
 import { ABC } from '../common/utils';
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
+import {listSavedDataName} from '../constants';
 
 export default function DisplayDetailedQueryDataScreen({route, navigation})
 {
@@ -45,7 +46,7 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 							(rowsAffected) =>
 							{
 								console.log("INFO: the number of rows deleted is ", rowsAffected);
-								navigation.navigate();
+								navigation.navigate(listSavedDataName, {deleteId: id});
 							} 
 						 )
 	}
@@ -62,8 +63,8 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
                                             icon='delete' 
                                             color='#000' 
                                             size={25} 
-                                            disabled={loading}
-                                            onPress={()=>console.log("INFO: delete the row.")}
+                                            disabled={false}
+                                            onPress={deleteItem}
                                         />
                 }
             );

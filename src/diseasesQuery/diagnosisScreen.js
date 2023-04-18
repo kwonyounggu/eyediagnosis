@@ -29,10 +29,13 @@ import * as SecureStore from 'expo-secure-store';
 import jwt_decode from 'jwt-decode';
 
 //Screen names
+/*
 const diagnosisName = 'Eye Diagnosis';
 const differentialDiagnosisName = 'Differential Diagnosis';
 const listSavedDataName = 'List of Saved Data';
 export const displayDetailedQueryDataName = 'Detailed Data';
+*/
+import { diagnosisName, differentialDiagnosisName, listSavedDataName, displayDetailedQueryDataName } from '../constants';
 
 const TOKEN_ACCESS_KEY = 'react_native_chatgpt_access_token';
 const TOKEN_EMAIL_PROPERTY = "https://api.openai.com/profile";

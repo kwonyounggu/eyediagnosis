@@ -8,13 +8,14 @@ import chatGptQueryTable from '../database/sqlite/chatGptQuery';
 import { SQL_QUERY_LIMIT } from '../constants';
 
 import {AppContext} from '../contexts/appProvider';
+import { displayDetailedQueryDataName } from '../constants';
 
 //The following is commented in due to the cycling import, so use common constant file to share
 //import {displayDetailedQueryDataName} from './diagnosisScreen';
 
 
 
-export default function ListDataScreen({navigation}) 
+export default function ListDataScreen({navigation, route}) 
 {
   const {chatGptUser} = React.useContext(AppContext).state;
   const [ columns, setColumns ] = useState(["Age","Sex","MedHist","Symptoms","Signs"]);
@@ -28,7 +29,7 @@ export default function ListDataScreen({navigation})
   const [maxRecords, setMaxRecords] = useState(-1);
   
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  
+ 
   React.useEffect
   (
 		() => 
@@ -39,7 +40,15 @@ export default function ListDataScreen({navigation})
 			
 	  	}, []
   );
-  
+  React.useEffect
+  (
+		() => 
+	    {
+			console.log("INFO: deleteId = ", route.params?.deleteId)
+			setChatGptData(chatGptData.filter((item)=>item.id !== route.params?.deleteId));
+			
+	  	}, [route.params?.deleteId]
+  );
   React.useEffect
   (
 		() => 
@@ -106,8 +115,8 @@ export default function ListDataScreen({navigation})
   const onSelectRow = (item, index) =>
   {
 	  setSelectedIndex(index);
-	  //console.log('selected item: ', item);
-	  navigation.navigate('Detailed Data', item);
+	  console.log('selected item: ', item);
+	  //navigation.navigate(displayDetailedQueryDataName, item);
   }
   const renderFooter = () =>
   (
@@ -121,6 +130,7 @@ export default function ListDataScreen({navigation})
     <View style={styles.container}>
       <FlatList 
         data={chatGptData}
+        extraData={selectedIndex}
         style={{width:"95%"}}
         keyExtractor={(item, index) => index+""}
         ListHeaderComponent={tableHeader}
