@@ -46,6 +46,7 @@ export default function ListDataScreen({navigation, route})
 	    {
 			console.log("INFO: deleteId = ", route.params?.deleteId)
 			setChatGptData(chatGptData.filter((item)=>item.id !== route.params?.deleteId));
+			setSelectedIndex(-1);
 			
 	  	}, [route.params?.deleteId]
   );
@@ -115,8 +116,8 @@ export default function ListDataScreen({navigation, route})
   const onSelectRow = (item, index) =>
   {
 	  setSelectedIndex(index);
-	  console.log('selected item: ', item);
-	  //navigation.navigate(displayDetailedQueryDataName, item);
+	  //console.log('selected item: ', item);
+	  navigation.navigate(displayDetailedQueryDataName, item);
   }
   const renderFooter = () =>
   (
@@ -132,7 +133,7 @@ export default function ListDataScreen({navigation, route})
         data={chatGptData}
         extraData={selectedIndex}
         style={{width:"95%"}}
-        keyExtractor={(item, index) => index+""}
+        keyExtractor={(item, index) => index + ""}
         ListHeaderComponent={tableHeader}
         ListFooterComponent={renderFooter}
         stickyHeaderIndices={[0]}
@@ -143,8 +144,8 @@ export default function ListDataScreen({navigation, route})
 			({item, index})=> 
 	        {
 	          return (
-			  <TouchableWithoutFeedback onPress={()=>onSelectRow(item)}>
-	            <View style={{...styles.tableRow, backgroundColor: index===selectedIndex ? 'blue': (index % 2 == 1 ? "#F0FBFC" : "white")}}>
+			  <TouchableWithoutFeedback onPress={()=>onSelectRow(item, index)}>
+	            <View style={{...styles.tableRow, backgroundColor: (index===selectedIndex ? '#1B98E099': (index % 2 == 1 ? "#F0FBFC" : "white"))}}>
 	              <Text style={{...styles.columnRowTxt, width: '10%', fontWeight:"bold"}}>{item.age}</Text>
 	              <Text style={{...styles.columnRowTxt, width: '10%'}}>{item.gender}</Text>
 	              <Text style={{...styles.columnRowTxt, width: '27%'}} ellipsizeMode='tail' numberOfLines={2}>{item.medicalHistory}</Text>
