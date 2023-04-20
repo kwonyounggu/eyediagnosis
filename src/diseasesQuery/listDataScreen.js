@@ -47,6 +47,7 @@ export default function ListDataScreen({navigation, route})
 			console.log("INFO: deleteId = ", route.params?.deleteId)
 			setChatGptData(chatGptData.filter((item)=>item.id !== route.params?.deleteId));
 			setSelectedIndex(-1);
+			setMaxRecords(maxRecords -1);
 			
 	  	}, [route.params?.deleteId]
   );
@@ -54,8 +55,19 @@ export default function ListDataScreen({navigation, route})
   (
 		() => 
 	    {
+			if (loading)
 			chatGptQueryTable.getLimitedByUserId(chatGptUser.id, SQL_QUERY_LIMIT, offset)
-						     .then((resultSet) => offset ? setChatGptData([...chatGptData, ...resultSet]) : setChatGptData(resultSet))
+						     .then
+						     (
+								 (resultSet) => 
+							     {
+									 setLoading(false);
+									 if (resultSet.length > 0)
+									 {
+										 offset ? setChatGptData([...chatGptData, ...resultSet]) : setChatGptData(resultSet);
+									 }
+								 }
+							 )
 						     .catch((e) => console.error(e));
 			
 	  	}, [offset]
@@ -111,7 +123,12 @@ export default function ListDataScreen({navigation, route})
   const getMoreData = () =>
   {
 	  //console.log("get More data with offset: " + offset, " maxRecords: ", maxRecords, " currently retrieved len: ", chatGptData.length);
-	  if (chatGptData.length < maxRecords) {console.log("more data with offset: " + offset, " maxRecords: ", maxRecords, " currently retrieved len: ", chatGptData.length); setOffset(offset + 1);}
+	  if (chatGptData.length < maxRecords && !loading) 
+	  {
+		  console.log("more data with offset: " + offset, " maxRecords: ", maxRecords, " currently retrieved len: ", chatGptData.length); 
+		  setLoading(true); 
+		  setOffset(offset + 1);
+	  }
   }
   const onSelectRow = (item, index) =>
   {
@@ -142,7 +159,7 @@ export default function ListDataScreen({navigation, route})
         renderItem=
         {
 			({item, index})=> 
-	        {
+	        { //console.log("index: ", index);
 	          return (
 			  <TouchableWithoutFeedback onPress={()=>onSelectRow(item, index)}>
 	            <View style={{...styles.tableRow, backgroundColor: (index===selectedIndex ? '#1B98E099': (index % 2 == 1 ? "#F0FBFC" : "white"))}}>

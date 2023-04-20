@@ -172,7 +172,7 @@ const getLimitedByUserId = (userId, limit, offset) =>
 				      (
 						 "select id, age, gender, medicalHistory, symptoms, signs from " + chatGptQueryTable + " where userId=? order by age limit ? offset ?;",
 				        [userId, limit, offset*limit],
-				        (_, {rows}) => resolve(rows._array),
+				        (_, {rows}) =>{ console.log("INFO: number of records retrieved=", rows.length); resolve(rows._array)},
 				        (_, error) => reject(error)
 				      );
 			    }

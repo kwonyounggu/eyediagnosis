@@ -8,7 +8,7 @@ import { ABC } from '../common/utils';
 import {clone} from 'lodash';
 
 import {AppContext} from '../contexts/appProvider';
-//import chatGptUserTable from '../database/sqlite/chatGptUser';
+
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
 
 //import { queryData } from '../common/testData';

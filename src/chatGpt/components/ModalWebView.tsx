@@ -25,7 +25,6 @@ import { ChatGptError, ChatGptResponse, WebViewEvents } from '../types';
 import useWebViewAnimation from '../hooks/useWebViewAnimation';
 //import parseStreamedGptResponse from '../utils/parseStreamedGptResponse';
 import { getStatusText } from '../utils/httpCodes';
-import {isEmpty} from 'lodash';
 
 interface PassedProps 
 {
@@ -100,7 +99,7 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
     ref
   ) => {
 	  
-	const lastResult = React.useRef({message: '', messageId: '', conversationId: '', isDone: false}); //added on Apr 12 2023
+	//const lastResult = React.useRef({message: '', messageId: '', conversationId: '', isDone: false}); //added on Apr 12 2023
     const appState = useAppState();
     const [status, setStatus] = useState<'hidden' | 'animating' | 'visible'>('hidden');
 
@@ -236,8 +235,9 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
 	                }
 	                if (type === 'RAW_ACCUMULATED_RESPONSE') 
 	                {
+						//if (payload.includes('"end_turn": true')) console.log("+++++++ end_turn: true in payload = ", payload);
 	                  const result = parseStreamedResponse(payload);
-	                  if (result === null && payload.includes("[DONE]"))
+	                  /*if (result === null && payload.includes("[DONE]"))
 	                  {
 						  console.log("payload: ", payload);
 						  if (!lastResult.current.isDone)
@@ -247,10 +247,12 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
 							  onAccumulatedResponse(lastResult.current);
 						  }
 					  }
-	                  else if (result) 
+	                  else */
+	                  
+	                  if (result) 
 	                  {
 						  //if (result.isDone) console.log("isDone is true.\nMessage:\n", result.message);
-						  lastResult.current = result;
+						  //lastResult.current = result;
 	                      onAccumulatedResponse(result);
 	                  }
 	                }
