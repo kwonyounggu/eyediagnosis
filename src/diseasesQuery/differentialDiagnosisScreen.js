@@ -134,7 +134,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                                             icon='archive' 
                                             color='#000' 
                                             size={25} 
-                                            disabled={loading || saved}
+                                            disabled={false}
                                             onPress={()=>onSave ? console.log("INFO: already saved.") : setOnSave(true)}
                                         />
                 }

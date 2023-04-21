@@ -168,39 +168,39 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
     return (
       <>
         <Animated.View
-          style={[
-            styles.container,
-            animatedStyles.webview,
-            { display: status === 'hidden' ? 'none' : 'flex' },
-            containerStyles,
-          ]}
+          style=
+          {
+			[styles.container, animatedStyles.webview, { display: status === 'hidden' ? 'none' : 'flex' }, containerStyles]
+		  }
         >
           <RNWebView
             injectedJavaScript={createGlobalFunctionsInWebviewContext()}
             ref={onWebviewRefChange}
-            onLoad={async (event) => {
-              const { url, loading } = event.nativeEvent;
-              if (
-                url.startsWith(LOGIN_PAGE) &&
-                status === 'visible' &&
-                !loading
-              ) {
-                removeThemeSwitcher();
-              }
-            }}
+            onLoad=
+            {
+				async (event) => 
+	            {
+	              const { url, loading } = event.nativeEvent;
+	              if (url.startsWith(LOGIN_PAGE) && status === 'visible' && !loading) 
+	              {
+	                removeThemeSwitcher();
+	              }
+	            }
+	        }
             style={styles.webview}
             source={{ uri: LOGIN_PAGE }}
-            onNavigationStateChange={(event) => {
-              if (
-                event.url.startsWith(CHAT_PAGE) &&
-                event.loading &&
-                status === 'visible'
-              ) {
-                // We have successfully logged in. We can hide the webview now.
-                onLoginCompleted();
-                animateWebView('hide');
-              }
-            }}
+            onNavigationStateChange=
+            {
+				(event) => 
+				{
+		              if (event.url.startsWith(CHAT_PAGE) && event.loading && status === 'visible') 
+		              {
+		                // We have successfully logged in. We can hide the webview now.
+		                onLoginCompleted();
+		                animateWebView('hide');
+		              }
+            	}
+            }
             userAgent={USER_AGENT}
             sharedCookiesEnabled
             onContentProcessDidTerminate={() => {

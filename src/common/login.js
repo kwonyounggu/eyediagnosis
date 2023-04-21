@@ -27,7 +27,7 @@ const styles = StyleSheet.create
 const Login = () =>
 {
     const {login} = useChatGpt();
-    console.log("login of useChatGpt() in Navigator: ", login);
+    //console.log("login of useChatGpt() in Navigator: ", login);
 
     return (
         <View style={styles.container}>
