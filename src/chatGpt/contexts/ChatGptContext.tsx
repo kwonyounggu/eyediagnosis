@@ -1,16 +1,19 @@
-import React, {
+import React, 
+{
   createContext,
   PropsWithChildren,
   useContext,
-  useMemo,
+  useMemo
 } from 'react';
-import type {
+import type 
+{
   ChatGptResponse,
   SendMessageOptions,
-  StreamMessageParams,
+  StreamMessageParams
 } from '../types';
 
-interface ChatGptContextInterface {
+interface ChatGptContextInterface 
+{
   status:
     | 'initializing'
     | 'getting_auth_token'
@@ -25,38 +28,46 @@ interface ChatGptContextInterface {
   sendMessage(args: StreamMessageParams): void;
 }
 
-const ChatGptContext = createContext<ChatGptContextInterface>(
-  undefined as unknown as ChatGptContextInterface
-);
+const ChatGptContext = createContext<ChatGptContextInterface>(undefined as unknown as ChatGptContextInterface);
 
-export const ChatGptProvider = ({
-  status,
-  login,
-  flush,
-  sendMessage,
-  children,
-}: PropsWithChildren<ChatGptContextInterface>) => {
-  const contextValue = useMemo(
-    () => ({
-      status,
-      login,
-      sendMessage,
-      flush,
-    }),
-    [status, login, sendMessage, flush]
-  );
+export const ChatGptProvider = 
+(
+	{
+	  status,
+	  login,
+	  flush,
+	  sendMessage,
+	  children,
+	}: PropsWithChildren<ChatGptContextInterface>
+) => 
+{
+	  const contextValue = useMemo
+	  (
+	    () => 
+	    (
+			{
+			      status,
+			      login,
+			      sendMessage,
+			      flush
+	    	}
+	    ),
+	    [status, login, sendMessage, flush]
+	  );
 
-  return (
-    <ChatGptContext.Provider value={contextValue}>
-      {children}
-    </ChatGptContext.Provider>
-  );
+	  return (
+	    <ChatGptContext.Provider value={contextValue}>
+	      {children}
+	    </ChatGptContext.Provider>
+	  );
 };
 
-export const useChatGpt = () => {
-  const context = useContext(ChatGptContext);
-  if (!context) {
-    throw new Error('useChatGpt must be used within a ChatGptProvider');
-  }
-  return context;
+export const useChatGpt = () => 
+{
+	  const context = useContext(ChatGptContext);
+	  if (!context) 
+	  {
+	    throw new Error('useChatGpt must be used within a ChatGptProvider');
+	  }
+	  return context;
 };

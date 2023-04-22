@@ -19,47 +19,63 @@ interface TimeoutProps {
   streamedRequestTimeout?: number;
 }
 
-export default function ChatGpt({
-  containerStyles,
-  backdropStyles,
-  renderCustomCloseIcon,
-  requestTimeout = REQUEST_DEFAULT_TIMEOUT,
-  streamedRequestTimeout = STREAMED_REQUEST_DEFAULT_TIMEOUT,
-  children,
-}: PropsWithChildren<PublicProps & TimeoutProps>) {
+export default function ChatGpt
+(
+	{
+	  containerStyles,
+	  backdropStyles,
+	  renderCustomCloseIcon,
+	  requestTimeout = REQUEST_DEFAULT_TIMEOUT,
+	  streamedRequestTimeout = STREAMED_REQUEST_DEFAULT_TIMEOUT,
+	  children,
+	}: PropsWithChildren<PublicProps & TimeoutProps>
+) 
+{
   const modalRef = useRef<ModalWebViewMethods>(null);
   const callbackRef = useRef<(arg: ChatGptResponse) => void>(() => null);
   const errorCallbackRef = useRef<(arg: ChatGptError) => void>(() => null);
   const [isWaitingForJWT, setIsWaitingForJWT] = useState(false);
   const { isLoaded, setAccessToken, accessToken } = usePersistAccessToken();
 
-  const status = (() => {
-    if (!isLoaded) return 'initializing';
+  const status = 
+  (
+	  () => 
+	  {
+		    if (!isLoaded) return 'initializing';
+		
+		    if (isWaitingForJWT) return 'getting_auth_token';
+		
+		    if (!accessToken && !isWaitingForJWT) return 'logged-out';
+		
+		    return 'authenticated';
+  	  }
+   )();
 
-    if (isWaitingForJWT) return 'getting_auth_token';
+  const login = useCallback
+  (
+	  () => 
+	  {
+    		modalRef?.current?.open();
+  	  }, []
+  );
 
-    if (!accessToken && !isWaitingForJWT) return 'logged-out';
+  const flush = useCallback
+  (
+	  () => 
+	  {
+	    setAccessToken('');
+	    // eslint-disable-next-line react-hooks/exhaustive-deps
+	  }, []
+  );
 
-    return 'authenticated';
-  })();
-
-  const login = useCallback(() => {
-    modalRef?.current?.open();
-  }, []);
-
-  const flush = useCallback(() => {
-    setAccessToken('');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function sendMessage(
+  function sendMessage
+  (
     message: string,
     options?: SendMessageOptions
   ): Promise<ChatGptResponse>;
   function sendMessage(args: StreamMessageParams): void;
-  function sendMessage(
-    ...args: [StreamMessageParams] | [string, SendMessageOptions?]
-  ) {
+  function sendMessage(...args: [StreamMessageParams] | [string, SendMessageOptions?]) 
+  {
     if (typeof args[0] === 'string') {
       const message = args[0];
       const options = args[1];
@@ -110,10 +126,14 @@ export default function ChatGpt({
         ref={modalRef}
         accessToken={accessToken}
         onLoginCompleted={() => setIsWaitingForJWT(true)}
-        onAccessTokenChange={(token) => {
-          setIsWaitingForJWT(false);
-          setAccessToken(token);
-        }}
+        onAccessTokenChange=
+        {
+			(token) => 
+			{
+	          setIsWaitingForJWT(false);
+	          setAccessToken(token);
+	        }
+	    }
         onAccumulatedResponse={(result) => callbackRef.current?.(result)}
         onStreamError={(error) => errorCallbackRef.current?.(error)}
         containerStyles={containerStyles}
