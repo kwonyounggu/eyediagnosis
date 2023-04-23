@@ -1,0 +1,9 @@
+1. differentialDiagnosisScreen.js
+   - onSave
+2. Account for the app user
+3. Sharing 
+   - chatting
+   - forum
+   - saved data
+4. Home page
+5. Age, Gender, MedHst, Symptoms, Signs + Image(s) for chatGptQuery

@@ -1,7 +1,8 @@
 import { Platform } from 'react-native';
 
 export const HOST_URL = 'https://chat.openai.com';
-export const CHAT_PAGE = `${HOST_URL}/chat`;
+export const CHAT_PAGE = `${HOST_URL}`;
+//export const CHAT_PAGE = `${HOST_URL}/chat`; '* This url has been changed to https://chat.openai.com and it is not asking another login page. April 22 2023*/
 export const LOGIN_PAGE = `${HOST_URL}/auth/login`;
 export const PROMPT_ENDPOINT = `${HOST_URL}/backend-api/conversation`;
 export const LOGIN_SUCCESS_PAGE = `${HOST_URL}/api/auth/callback`;

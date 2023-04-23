@@ -119,49 +119,68 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
       }
     }, []);
 
-    useImperativeHandle(ref, 
+    useImperativeHandle
+    (
+		ref, 
 	    () => 
 	    (
 			{
 	      		open: () => 
-	      		{
+	      		{	//console.log("TEMP INFO: open() is called");
 	        		animateWebView('show');
 	      		},
 	    	}
 	    )
 	 );
 
-    useEffect(() => {
-      if (status === 'visible') {
-        // Check if the page shown is ChatGPT is at full capacity.
-        // If it is, we can reload the page at intervals to check if it's available again.
-        checkFullCapacity();
-      }
-    }, [status]);
+    useEffect
+	(
+		() => 
+	    { //console.log("TEMP INFO: useEffect for status: ", status);
+	      if (status === 'visible') 
+	      {
+	        // Check if the page shown is ChatGPT is at full capacity.
+	        // If it is, we can reload the page at intervals to check if it's available again.
+	        checkFullCapacity();
+	      }
+	    }, [status]
+	);
 
     const getCurrentStatus = () => status;
 
-    useEffect(() => {
-      const currentStatus = getCurrentStatus();
-      if (appState === 'active' && currentStatus === 'hidden') {
-        // Proactively reload the webview when the app is foregrounded
-        // to refresh the CloudFare session cookies.
-        reloadWebView();
-      }
+    useEffect
+    (
+		() => 
+		{ 
+	      const currentStatus = getCurrentStatus();
+	      //console.log("TEMP INFO: useEffect for appState: ", appState, " currentStatus: ", currentStatus);
+	      if (appState === 'active' && currentStatus === 'hidden') 
+	      {
+	        // Proactively reload the webview when the app is foregrounded
+	        // to refresh the CloudFare session cookies.
+	        reloadWebView();
+	      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [appState]);
+    	}, [appState]
+    );
 
-    useBackHandler(() => {
-      if (status !== 'hidden') {
-        // Handle it
-        closeModal();
-        return true;
-      }
-      // Let the default thing happen
-      return false;
-    });
+    useBackHandler
+    (
+		() => 
+		{ console.log("TEMP INFO: useBackHandler, status: ", status);
+	      if (status !== 'hidden') 
+	      {
+	        // Handle it
+	        closeModal();
+	        return true;
+	      }
+	      // Let the default thing happen
+	      return false;
+    	}
+    );
 
-    function closeModal() {
+    function closeModal() 
+    { //console.log("TEMP INFO: closeModal() is called");
       animateWebView('hide');
     }
 
@@ -181,9 +200,10 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
 				async (event) => 
 	            {
 	              const { url, loading } = event.nativeEvent;
+	              //console.log("TEMP INFO: onLoad, nativeEvent: ", event.nativeEvent);
 	              if (url.startsWith(LOGIN_PAGE) && status === 'visible' && !loading) 
-	              {
-	                removeThemeSwitcher();
+	              {		//console.log("TEMP INFO: LOGIN_PAGE: ", LOGIN_PAGE, ", url: ", url);
+	                	removeThemeSwitcher();
 	              }
 	            }
 	        }
@@ -192,9 +212,10 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
             onNavigationStateChange=
             {
 				(event) => 
-				{
+				{	  //console.log("TEMP INFO: onNavigationStateChange, event: ", event);
 		              if (event.url.startsWith(CHAT_PAGE) && event.loading && status === 'visible') 
 		              {
+						  //console.log("TEMP INFO: onNavigationStateChange, before onLoginCompleted()");
 		                // We have successfully logged in. We can hide the webview now.
 		                onLoginCompleted();
 		                animateWebView('hide');
@@ -203,9 +224,13 @@ const ModalWebView = forwardRef<ModalWebViewMethods, Props>(
             }
             userAgent={USER_AGENT}
             sharedCookiesEnabled
-            onContentProcessDidTerminate={() => {
-              reloadWebView();
-            }}
+            onContentProcessDidTerminate=
+            {
+				() => 
+				{   console.log("TEMP INFO: onContentProcessDidTerminate");
+              		reloadWebView();
+            	}
+            }
             onMessage=
             {
 				(event) => 

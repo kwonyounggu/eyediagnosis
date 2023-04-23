@@ -11,18 +11,21 @@ import {AppContext} from '../contexts/appProvider';
 
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
 
-//import { queryData } from '../common/testData';
+import { queryData } from '../common/testData';
 
 const DifferentialDiagnosisScreen = ({route, navigation}) =>
 {
     const {chatGptUser} = React.useContext(AppContext).state;
     
-    const [queryResult, setQueryResult] = React.useState('');
+    const [queryResult, setQueryResult] = React.useState(queryData);
+    //const [queryResult, setQueryResult] = React.useState('');
     const [errorMessage, setErrorMessage] = React.useState('');
-    const [loading, setLoading] = React.useState(true);
+    const [loading, setLoading] = React.useState(false);
+    //const [loading, setLoading] = React.useState(true);
     const [saving, setSaving] = React.useState(false);
     const [onSave, setOnSave] = React.useState(false);
-    const [saved, setSaved] = React.useState(false);
+    //const [saved, setSaved] = React.useState(false);
+    const [savedMessage, setSavedMessage] = React.useState('');
     const [queryDone, setQueryDone] = React.useState(false);
     const {sendMessage} = useChatGpt();
     
@@ -59,7 +62,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
 			
 			if (patientData.chatGptResponse.length > 0)
 				chatGptQueryTable.insert(patientData, chatGptUser.email)
-								 .then(o=>setSaved(true))
+								 .then(o=>setSavedMessage('It is saved.'))
 								 .catch(e=>console.error(e))
 								 .finally(()=>setSaving(false));
 			else 
@@ -70,7 +73,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
 	    },
 	    [onSave]
 	 );
-    
+    /*
     React.useEffect
     (
         () =>
@@ -120,7 +123,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
         },
         [] //empty array, the function is only executed once when this component first mounts.
     ); //useEffect
-    
+    */
     React.useLayoutEffect
     (
         () =>
@@ -135,7 +138,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                                             color='#000' 
                                             size={25} 
                                             disabled={false}
-                                            onPress={()=>onSave ? console.log("INFO: already saved.") : setOnSave(true)}
+                                            onPress={()=>onSave ? setSavedMessage("It is already saved.") : setOnSave(true)}
                                         />
                 }
             );
@@ -154,13 +157,23 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                 }
             </ScrollView>
             <Snackbar 
-                    visible={!!errorMessage || saved}
-                    onDismiss={()=> !saved && setErrorMessage('')}
+                    visible={!!errorMessage}
+                    onDismiss={()=> setErrorMessage('')}
                     duration={4000}
-                    style={saved? {backgroundColor: 'black'} : {backgroundColor: 'red'}}
+                    style={{backgroundColor: 'red'}}
             >
             {
-				saved ? "It is saved" : errorMessage
+				errorMessage
+			}    
+            </Snackbar> 
+            <Snackbar 
+                    visible={savedMessage.length > 0}
+                    onDismiss={()=> setSavedMessage('')}
+                    duration={4000}
+                    style={{backgroundColor: 'black'}}
+            >
+            {
+				savedMessage
 			}    
             </Snackbar> 
             {
@@ -168,13 +181,6 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                                 <ActivityIndicator size='large' />
                             </View>
             }  
-            {/*
-            <FAB style={styles.fab}
-			     small
-			     icon="archive"
-			     onPress={()=>{}}
-			     visible={queryDone || loading}
-			/>*/}
         </View>
     );
 };

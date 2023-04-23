@@ -26,10 +26,15 @@ export default function ListDataScreen({navigation, route})
   const [loading, setLoading] = useState(true);
   const [offset, setOffset] = useState(0);
   
-  const [maxRecords, setMaxRecords] = useState(-1);
+  //const [maxRecords, setMaxRecords] = useState(-1);
   
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  
+  const [noMoreData, setNoMoreData] = useState(false);
+  
+  //let offset = 0;
  
+ /*
   React.useEffect
   (
 		() => 
@@ -40,6 +45,7 @@ export default function ListDataScreen({navigation, route})
 			
 	  	}, []
   );
+  */
   React.useEffect
   (
 		() => 
@@ -47,7 +53,7 @@ export default function ListDataScreen({navigation, route})
 			console.log("INFO: deleteId = ", route.params?.deleteId)
 			setChatGptData(chatGptData.filter((item)=>item.id !== route.params?.deleteId));
 			setSelectedIndex(-1);
-			setMaxRecords(maxRecords -1);
+			//setMaxRecords(maxRecords -1);
 			
 	  	}, [route.params?.deleteId]
   );
@@ -55,22 +61,27 @@ export default function ListDataScreen({navigation, route})
   (
 		() => 
 	    {
-			if (loading)
+			if (loading && !noMoreData)
 			chatGptQueryTable.getLimitedByUserId(chatGptUser.id, SQL_QUERY_LIMIT, offset)
 						     .then
 						     (
 								 (resultSet) => 
 							     {
-									 setLoading(false);
 									 if (resultSet.length > 0)
 									 {
 										 offset ? setChatGptData([...chatGptData, ...resultSet]) : setChatGptData(resultSet);
+										 //if (offset) setChatGptData([...chatGptData, ...resultSet])
+										 //else setChatGptData(resultSet);
+										 setOffset(offset + 1);
 									 }
+									 
+									 if (resultSet.length < SQL_QUERY_LIMIT) setNoMoreData(true);
 								 }
 							 )
-						     .catch((e) => console.error(e));
+						     .catch((e) => console.error(e))
+						     .finally(() => setLoading(false));
 			
-	  	}, [offset]
+	  	}, [loading]
   );
   const sortTable = (column) => 
   {
@@ -122,12 +133,18 @@ export default function ListDataScreen({navigation, route})
   )
   const getMoreData = () =>
   {
-	  //console.log("get More data with offset: " + offset, " maxRecords: ", maxRecords, " currently retrieved len: ", chatGptData.length);
-	  if (chatGptData.length < maxRecords && !loading) 
+	  console.log("get More data with offset: " + offset, "  currently retrieved len: ", chatGptData.length);
+	  /*if (chatGptData.length < maxRecords && !loading) 
 	  {
 		  console.log("more data with offset: " + offset, " maxRecords: ", maxRecords, " currently retrieved len: ", chatGptData.length); 
 		  setLoading(true); 
 		  setOffset(offset + 1);
+	  }*/
+	  
+	  if (!noMoreData && !loading)
+	  {
+		  setLoading(true); 
+		  //setOffset(offset + 1);
 	  }
   }
   const onSelectRow = (item, index) =>
@@ -139,7 +156,7 @@ export default function ListDataScreen({navigation, route})
   const renderFooter = () =>
   (
 	<View>
-		{ chatGptData.length >= maxRecords ? <Text style={{textAlign: 'center'}}>No More Data</Text> :
+		{ noMoreData ? <Text style={{textAlign: 'center'}}>No (More) Data</Text> :
 											 loading && <ActivityIndicator />
 		}
 	</View>  
