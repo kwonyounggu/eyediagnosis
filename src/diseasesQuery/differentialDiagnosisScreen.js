@@ -19,18 +19,22 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
     
     const [queryResult, setQueryResult] = React.useState(queryData);
     //const [queryResult, setQueryResult] = React.useState('');
+    
     const [errorMessage, setErrorMessage] = React.useState('');
+    
     const [loading, setLoading] = React.useState(false);
     //const [loading, setLoading] = React.useState(true);
+    
     const [saving, setSaving] = React.useState(false);
     const [onSave, setOnSave] = React.useState(false);
-    //const [saved, setSaved] = React.useState(false);
+
     const [savedMessage, setSavedMessage] = React.useState('');
     const [queryDone, setQueryDone] = React.useState(false);
     const {sendMessage} = useChatGpt();
     
     const messageId = React.useRef('');
     const conversationId = React.useRef('');
+    
 
 	React.useEffect
 	(
@@ -133,17 +137,17 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
             navigation.setOptions
             (
                 {
-                    headerRight: () => <IconButton 
+                    headerRight: () => !onSave && <IconButton 
                                             icon='archive' 
                                             color='#000' 
                                             size={25} 
                                             disabled={false}
-                                            onPress={()=>onSave ? setSavedMessage("It is already saved.") : setOnSave(true)}
+                                            onPress={()=>setOnSave(true)}
                                         />
                 }
             );
         },
-        [navigation]
+        [onSave]
     );
     
 

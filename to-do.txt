@@ -1,5 +1,9 @@
 1. differentialDiagnosisScreen.js
-   - onSave
+   - onSave 
+   done
+2. differentiadiagnosisscreen
+   - remove query string
+   - put react-native-web for the screen
 2. Account for the app user
 3. Sharing 
    - chatting
