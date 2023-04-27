@@ -11,25 +11,25 @@ import {AppContext} from '../contexts/appProvider';
 
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
 
-import { queryData } from '../common/testData';
+//import { queryData } from '../common/testData';
 
 const DifferentialDiagnosisScreen = ({route, navigation}) =>
 {
     const {chatGptUser} = React.useContext(AppContext).state;
     
-    const [queryResult, setQueryResult] = React.useState(queryData);
-    //const [queryResult, setQueryResult] = React.useState('');
+    //const [queryResult, setQueryResult] = React.useState(queryData);
+    const [queryResult, setQueryResult] = React.useState('');
     
     const [errorMessage, setErrorMessage] = React.useState('');
     
-    const [loading, setLoading] = React.useState(false);
-    //const [loading, setLoading] = React.useState(true);
+    //const [loading, setLoading] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
     
     const [saving, setSaving] = React.useState(false);
     const [onSave, setOnSave] = React.useState(false);
 
     const [savedMessage, setSavedMessage] = React.useState('');
-    const [queryDone, setQueryDone] = React.useState(false);
+    //const [queryDone, setQueryDone] = React.useState(false);
     const {sendMessage} = useChatGpt();
     
     const messageId = React.useRef('');
@@ -77,7 +77,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
 	    },
 	    [onSave]
 	 );
-    /*
+    
     React.useEffect
     (
         () =>
@@ -106,7 +106,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                                 {
                                     //remove leading white spaces
                                     setQueryResult(accumulatedResponse.message.replace(/^\s+/g, ''));
-                                    setQueryDone(true);
+                                    //setQueryDone(true);
                                 }
                                 else
                                 {
@@ -127,7 +127,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
         },
         [] //empty array, the function is only executed once when this component first mounts.
     ); //useEffect
-    */
+    
     React.useLayoutEffect
     (
         () =>
@@ -154,7 +154,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
     return (
         <View style={{flex: 1}}>
             <ScrollView>
-                <View style={styles.queryStringConatainer}><Text>{route.params.queryStringDisplayable}</Text></View>
+                {/*<View style={styles.queryStringConatainer}><Text>{route.params.queryStringDisplayable}</Text></View>*/}
                 {
                     loading ? <ActivityIndicator size='large' /> :
                               <View style={styles.queryResultContainer}><Text>{queryResult}</Text></View> 
