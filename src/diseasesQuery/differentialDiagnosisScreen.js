@@ -3,6 +3,7 @@ import * as React from 'react';
 import {useChatGpt} from '../chatGpt';
 import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {ActivityIndicator, IconButton, Snackbar, FAB} from 'react-native-paper';
+import Autolink from 'react-native-autolink'
 
 import { ABC } from '../common/utils';
 import {clone} from 'lodash';
@@ -157,7 +158,9 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                 {/*<View style={styles.queryStringConatainer}><Text>{route.params.queryStringDisplayable}</Text></View>*/}
                 {
                     loading ? <ActivityIndicator size='large' /> :
-                              <View style={styles.queryResultContainer}><Text>{queryResult}</Text></View> 
+                              <View style={styles.queryResultContainer}>
+                              	<Autolink text={queryResult} component={Text} />
+                              </View> 
                 }
             </ScrollView>
             <Snackbar 

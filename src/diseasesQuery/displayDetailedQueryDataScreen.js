@@ -4,6 +4,7 @@ import {ActivityIndicator, Card, Paragraph, IconButton} from 'react-native-paper
 import { ABC } from '../common/utils';
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
 import {listSavedDataName} from '../constants';
+import Autolink from 'react-native-autolink'
 
 export default function DisplayDetailedQueryDataScreen({route, navigation})
 {
@@ -103,7 +104,8 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 				<Card.Content>
 				{
 					loading ? <ActivityIndicator size='large' /> :
-					<Paragraph>{ABC.toAscii(chatGptResponse)}</Paragraph>	
+							  <Autolink text={ABC.toAscii(chatGptResponse)} component={Paragraph} />
+					
 				}
 				</Card.Content>
 			</Card>
