@@ -10,7 +10,16 @@ export const OrganizationID = 'org-vMqT7ThQSSckruiQq45mbFbP';
 export const SQL_QUERY_LIMIT = 10;
 
 
+export const homeName = 'Home';
+export const diseasesName = 'Diagnosis';
+export const eyeWikiName = 'EyeWiki';
+export const settingsName = 'Settings';
+export const chattingName = 'Chatting';
+export const forumName = 'Forum';
+
 export const diagnosisName = 'Eye Diagnosis';
 export const differentialDiagnosisName = 'Differential Diagnosis';
 export const listSavedDataName = 'List of Saved Data';
 export const displayDetailedQueryDataName = 'Detailed Data';
+
+export const EYE_WIKI_HOME = 'https://eyewiki.aao.org';

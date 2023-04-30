@@ -359,7 +359,7 @@ const DiagnosisScreen = (props) =>
                     }
                 </Stack.Screen>  
                </Stack.Group>
-               <Stack.Group screenOptions={{presentation: 'modal'}}>
+               <Stack.Group>
                 <Stack.Screen name={displayDetailedQueryDataName} component={DisplayDetailedQueryDataScreen} /> 
                </Stack.Group>
             </Stack.Navigator>

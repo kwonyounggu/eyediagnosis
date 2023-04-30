@@ -1,12 +1,12 @@
-import * as React from "react";
-import { View, Text } from "react-native";
-import { AppContext } from "../../contexts/appProvider";
+import * as React from 'react';
+import { View, Text } from 'react-native';
+import { AppContext } from '../../contexts/appProvider';
 
 //import { getDBConnection, createChatGptUserTable } from "../../database/db-service";
 
-export default function QueryHistoryScreen({navigation})
+export default function ForumScreen({navigation})
 {
-	console.log("INFO in QueryHistoryScreen: ", React.useContext(AppContext));
+	console.log("INFO in ForumScreen: ", React.useContext(AppContext));
 	/*const loadDataCallback = React.useCallback
 	(
 		async () => 
@@ -35,7 +35,7 @@ export default function QueryHistoryScreen({navigation})
         <View styles={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Text onPress={()=>navigation.navigate('Home')}
                   style={{fontSize: 26, fontWeight: 'bold'}}>
-                    Settings Screen
+                    Forum Screen
             </Text>
         </View>
     );

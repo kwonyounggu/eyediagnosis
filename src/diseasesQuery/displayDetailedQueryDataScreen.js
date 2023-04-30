@@ -3,8 +3,8 @@ import {Text, ScrollView} from 'react-native';
 import {ActivityIndicator, Card, Paragraph, IconButton} from 'react-native-paper';
 import { ABC } from '../common/utils';
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
-import {listSavedDataName} from '../constants';
-import Autolink from 'react-native-autolink'
+import {listSavedDataName, eyeWikiName} from '../constants';
+import Autolink from 'react-native-autolink';
 
 export default function DisplayDetailedQueryDataScreen({route, navigation})
 {
@@ -104,7 +104,19 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 				<Card.Content>
 				{
 					loading ? <ActivityIndicator size='large' /> :
-							  <Autolink text={ABC.toAscii(chatGptResponse)} component={Paragraph} />
+							  <Autolink text={ABC.toAscii(chatGptResponse)} 
+							  		    component={Paragraph} 
+							  		    onPress=
+							  		    {
+											  (url, match) =>
+											  {
+												 console.log("url: ", url);
+												 console.log("match: ", match); 
+												 //navigation.navigate(eyeWikiName, "https://eyewiki.aao.org/Age-Related_Macular_De");
+												 navigation.navigate(eyeWikiName, {url});
+											  }
+										}
+							  />
 					
 				}
 				</Card.Content>
