@@ -39,6 +39,7 @@ function ToEyeWikiHome()
 	);
 }
 
+//See https://stackoverflow.com/questions/68900300/react-navigation-opening-a-modal-from-the-tab-bar
 export default function MainContainer()
 {
     return (

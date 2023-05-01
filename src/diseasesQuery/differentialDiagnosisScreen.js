@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {useChatGpt} from '../chatGpt';
-import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {ActivityIndicator, IconButton, Snackbar, FAB} from 'react-native-paper';
 import Autolink from 'react-native-autolink'
 
