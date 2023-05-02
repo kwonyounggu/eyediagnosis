@@ -11,6 +11,7 @@ import {clone} from 'lodash';
 import {AppContext} from '../contexts/appProvider';
 
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
+import {eyeWikiName} from '../constants';
 
 //import { queryData } from '../common/testData';
 
@@ -159,7 +160,19 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                 {
                     loading ? <ActivityIndicator size='large' /> :
                               <View style={styles.queryResultContainer}>
-                              	<Autolink text={queryResult} component={Text} />
+                              	<Autolink text={queryResult} 
+							  		      component={Text} 
+							  		      onPress=
+							  		      {
+											  (url, match) =>
+											  {
+												 //console.log("url: ", url);
+												 //console.log("match: ", match); 
+												 //navigation.navigate(eyeWikiName, "https://eyewiki.aao.org/Age-Related_Macular_De");
+												 navigation.navigate(eyeWikiName, {url});
+											  }
+										  }
+							  />
                               </View> 
                 }
             </ScrollView>

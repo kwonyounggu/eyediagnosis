@@ -2,7 +2,7 @@ import * as React from 'react';
 
 //import { useChatGpt } from 'react-native-chatgpt';
 import { useChatGpt } from '../chatGpt';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, View, ScrollView, StyleSheet } from 'react-native';
 import 
 { 
     IconButton, 
@@ -201,6 +201,7 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
 
     return (
         <ScrollView>
+          <KeyboardAvoidingView behavior={'postion' || 'height' || 'padding'}>
             <View style={{flexDirection: 'column', marginLeft: 20, marginRight: 20}}>
                 <List.Section>
                     <View style={{flexDirection: 'row'}}>
@@ -286,6 +287,7 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
                     </Button>
                 </List.Section>
             </View>
+          </KeyboardAvoidingView>
         </ScrollView>
     );
 }

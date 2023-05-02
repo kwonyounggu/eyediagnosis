@@ -110,8 +110,8 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 							  		    {
 											  (url, match) =>
 											  {
-												 console.log("url: ", url);
-												 console.log("match: ", match); 
+												 //console.log("url: ", url);
+												 //console.log("match: ", match); 
 												 //navigation.navigate(eyeWikiName, "https://eyewiki.aao.org/Age-Related_Macular_De");
 												 navigation.navigate(eyeWikiName, {url});
 											  }
