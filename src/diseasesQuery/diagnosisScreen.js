@@ -3,6 +3,7 @@ import * as React from 'react';
 //import { useChatGpt } from 'react-native-chatgpt';
 import { useChatGpt } from '../chatGpt';
 import { KeyboardAvoidingView, View, ScrollView, StyleSheet } from 'react-native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import 
 { 
     IconButton, 
@@ -27,14 +28,13 @@ import chatGptUserTable from '../database/sqlite/chatGptUser';
 import * as SecureStore from 'expo-secure-store';
 
 import jwt_decode from 'jwt-decode';
+import { useHeaderHeight } from '@react-navigation/elements';
 
-//Screen names
-/*
-const diagnosisName = 'Eye Diagnosis';
-const differentialDiagnosisName = 'Differential Diagnosis';
-const listSavedDataName = 'List of Saved Data';
-export const displayDetailedQueryDataName = 'Detailed Data';
-*/
+/**
+ * https://stackoverflow.com/questions/47475818/react-native-textinput-multiline-is-not-being-pushed-up-by-keyboard
+ * https://blog.logrocket.com/keyboardawarescrollview-keyboardavoidingview-react-native/
+ */
+
 import { diagnosisName, differentialDiagnosisName, listSavedDataName, displayDetailedQueryDataName } from '../constants';
 
 const TOKEN_ACCESS_KEY = 'react_native_chatgpt_access_token';
@@ -81,6 +81,26 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
 
     const [isValid, setIsValid] = React.useState(true);
     
+    //https://stackoverflow.com/questions/48420468/keyboardavoidingview-not-working-properly
+    const headerHeight = useHeaderHeight();
+    
+    /*
+    const [totalLines, setTotalLines] = React.useState(0);
+    
+    React.useEffect
+    (
+		() =>
+		{
+			let tempTotalLines = medicalHistory.split(/\r\n|\r|\n/).length + 
+						  		 symptoms.split(/\r\n|\r|\n/).length +
+						         signs.split(/\r\n|\r|\n/).length;
+			if (totalLines !== tempTotalLines) setTotalLines(tempTotalLines);
+						  
+			console.log(tempTotalLines);
+		}, [medicalHistory, symptoms, signs]
+		
+	);
+    */
     
     React.useEffect
     (
@@ -198,10 +218,15 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
             )
         );
     }
-
+    /**
+	 * <KeyboardAvoidingView keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : (headerHeight+47)} 
+        					  style={{flex: 1}} 
+        					  behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        					  enabled>
+	 */
     return (
-        <ScrollView>
-          <KeyboardAvoidingView behavior={'postion' || 'height' || 'padding'}>
+        <KeyboardAwareScrollView>
+           
             <View style={{flexDirection: 'column', marginLeft: 20, marginRight: 20}}>
                 <List.Section>
                     <View style={{flexDirection: 'row'}}>
@@ -287,8 +312,8 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
                     </Button>
                 </List.Section>
             </View>
-          </KeyboardAvoidingView>
-        </ScrollView>
+          
+        </KeyboardAwareScrollView>
     );
 }
 
