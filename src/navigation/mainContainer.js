@@ -3,7 +3,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Text, TouchableOpacity} from 'react-native';
-import {Button} from 'react-native-paper';
+import {Button, IconButton} from 'react-native-paper';
 
 //Screens
 import HomeScreen from './screens/homeScreen';
@@ -39,6 +39,10 @@ function ToEyeWikiHome()
 	);
 }
 
+function MenuButton ({navigation}) 
+{
+	return (<IconButton icon='three-bars' />);
+}
 //See https://stackoverflow.com/questions/68900300/react-navigation-opening-a-modal-from-the-tab-bar
 export default function MainContainer()
 {
@@ -71,7 +75,18 @@ export default function MainContainer()
                 }
                 
             >
-                <Tab.Screen name={homeName} component={HomeScreen} />
+                <Tab.Screen name={homeName} 
+                			component={HomeScreen} 
+                			options=
+                		    {
+								(navigation, route) =>
+								(
+									{
+										headerLeft: (props)=><IconButton icon='menu' size={30} />
+									}
+								)
+							}
+                />
                 <Tab.Screen name={diseasesName} component={DiseaseQueryScreen} />
                 <Tab.Screen name={eyeWikiName} 
                 		    initialParams={{url: EYE_WIKI_HOME}} 

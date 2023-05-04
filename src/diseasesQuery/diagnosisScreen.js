@@ -2,8 +2,8 @@ import * as React from 'react';
 
 //import { useChatGpt } from 'react-native-chatgpt';
 import { useChatGpt } from '../chatGpt';
-import { KeyboardAvoidingView, View, ScrollView, StyleSheet } from 'react-native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAvoidingView, View, ScrollView, StyleSheet, Platform } from 'react-native';
+import {KeyboardAwareScrollView, KeyboardAwareSectionList} from 'react-native-keyboard-aware-scroll-view';
 import 
 { 
     IconButton, 
@@ -218,16 +218,16 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
             )
         );
     }
+    
     /**
 	 * <KeyboardAvoidingView keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : (headerHeight+47)} 
         					  style={{flex: 1}} 
         					  behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         					  enabled>
 	 */
-    return (
-        <KeyboardAwareScrollView>
-           
-            <View style={{flexDirection: 'column', marginLeft: 20, marginRight: 20}}>
+    return (	
+		<KeyboardAwareScrollView>
+			<View style={{flexDirection: 'column', marginLeft: 20, marginRight: 20}}>
                 <List.Section>
                     <View style={{flexDirection: 'row'}}>
                         <Text style={{flex: 1, borderWidth: 0, fontSize: 14, fontWeight: 'bold', paddingLeft: 10, paddingTop: 15}}>Age (*)</Text>
@@ -312,8 +312,7 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
                     </Button>
                 </List.Section>
             </View>
-          
-        </KeyboardAwareScrollView>
+		</KeyboardAwareScrollView>     
     );
 }
 
