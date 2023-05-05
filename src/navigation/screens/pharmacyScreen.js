@@ -5,7 +5,7 @@ import { AppContext } from '../../contexts/appProvider';
 
 //import { getDBConnection, createChatGptUserTable } from "../../database/db-service";
 
-export default function ForumScreen({navigation})
+export default function PharmacyScreen({navigation})
 {
 	console.log("INFO in ForumScreen: ", React.useContext(AppContext));
 
@@ -35,7 +35,7 @@ export default function ForumScreen({navigation})
   	);*/
     return (
         <View styles={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-<Text>forum</Text>
+<Text>pharmacy</Text>
         </View>
     );
 }

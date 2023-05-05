@@ -13,7 +13,8 @@ import
     Menu,
     HelperText, 
     Text, 
-    TextInput
+    TextInput,
+    Divider
 } from 'react-native-paper'; 
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -321,6 +322,7 @@ const Stack = createNativeStackNavigator();
 /****** 
  * Adding a button to the header
  * https://reactnavigation.org/docs/header-buttons/#:~:text=You%20can%20set%20buttons%20in,headerBackTitle%20%2C%20headerBackTitleStyle%20%2C%20and%20headerBackImageSource%20.
+ * https://github.com/callstack/react-native-paper/issues/3466
  */
 const DiagnosisScreen = (props) =>
 {
@@ -330,7 +332,25 @@ const DiagnosisScreen = (props) =>
     
     return (
         
-            <Stack.Navigator initialRouteName={diagnosisName}>
+            <Stack.Navigator initialRouteName={diagnosisName}
+            	screenOptions=
+            	{
+					({route})=>
+					(
+						{
+							headerStyle: 
+							{
+					            backgroundColor: '#f4511e'
+					        },
+							headerTintColor: '#fff',
+					        headerTitleStyle: 
+					        {
+					            fontWeight: 'bold'
+					        }
+						}
+					)
+				}
+            >
               <Stack.Group>
                 <Stack.Screen 
                 	name={diagnosisName} 
@@ -340,12 +360,13 @@ const DiagnosisScreen = (props) =>
 						({navigation}) =>
 						(
 	                        {
-	                            headerRight: ()=>
-	                            	<Menu visible={popupVisible}
+	                            headerRight: ()=> 
+	                            	<Menu visible={popupVisible} contentStyle={styles.popupMenu}
 	                            		  onDismiss={()=>setPopupVisible(false)}
 	                            		  anchor={<IconButton style={{margin: 0, padding: 0}} icon='dots-vertical' color='#000' size={30} onPress={()=>setPopupVisible(true)}/>}
 	                            	>
 	                            		  <Menu.Item leadingIcon='logout' title='Log out' onPress={flush} />
+	                            		  <Divider />
 	                            		  <Menu.Item leadingIcon='database-sync-outline' 
 	                            		  			 title='List Data' 
 	                            		  			 onPress=
@@ -418,7 +439,15 @@ const styles = StyleSheet.create
             margin: 0,
             borderWidth: 1,
             padding: 10
-        }
+        },
+        popupMenu: 
+		{
+		    borderTopLeftRadius: 10,
+		    borderRadius: 20,
+		    
+		    borderWidth: 5,
+		    backgroundColor: 'red'
+		}
     }
 );
 

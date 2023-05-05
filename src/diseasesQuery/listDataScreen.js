@@ -195,7 +195,7 @@ export default function ListDataScreen({navigation, route})
     </View>
   );
 }
-
+//#37C2D0
 const styles = StyleSheet.create
 (
 	{
@@ -212,10 +212,10 @@ const styles = StyleSheet.create
 	    flexDirection: "row",
 	    justifyContent: "space-evenly",
 	    alignItems: "center",
-	    backgroundColor: "#37C2D0",
-	    borderTopEndRadius: 10,
-	    borderTopStartRadius: 10,
-	    height: 50
+	    backgroundColor: "#f2f1ef",
+	    borderTopEndRadius: 0,
+	    borderTopStartRadius: 0,
+	    height: 45
 	  },
 	  tableRow: 
 	  {
@@ -230,7 +230,7 @@ const styles = StyleSheet.create
 	  },
 	  columnHeaderTxt: 
 	  {
-	    color: "white",
+	    color: "black",
 	    fontWeight: "bold"
 	  },
 	  columnRowTxt: 

@@ -10,12 +10,14 @@ export const OrganizationID = 'org-vMqT7ThQSSckruiQq45mbFbP';
 export const SQL_QUERY_LIMIT = 10;
 
 
-export const homeName = 'Home';
+export const homeRootName = 'Home';
+export const homeName = 'HomeHome';
 export const diseasesName = 'Diagnosis';
 export const eyeWikiName = 'EyeWiki';
 export const settingsName = 'Settings';
 export const chattingName = 'Chatting';
 export const forumName = 'Forum';
+export const pharmacyName = 'Pharmacy';
 
 export const diagnosisName = 'Eye Diagnosis';
 export const differentialDiagnosisName = 'Differential Diagnosis';

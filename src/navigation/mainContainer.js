@@ -2,26 +2,17 @@ import * as React from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Text, TouchableOpacity} from 'react-native';
-import {Button, IconButton} from 'react-native-paper';
+
+import {Button} from 'react-native-paper';
 
 //Screens
-import HomeScreen from './screens/homeScreen';
 import DiseaseQueryScreen from './screens/diseaseQueryScreen';
-import SettingsScreen from './screens/settingsScreen';
-import ChattingScreen from './screens/chattingScreen';
-import ForumScreen from './screens/forumScreen';
 import EyeWikiScreen from './screens/eyeWikiScreen';
+import PharmacyScreen from './screens/pharmacyScreen';
+import HomeRoot from './screens/homeRoot';
 
-//Screen names
-/*
-const homeName = 'Home';
-const diseasesName = 'Diagnosis';
-const settingsName = 'Settings';
-const chattingName = 'ChatGPT';
-*/
+import {homeRootName, homeName, diseasesName, pharmacyName, settingsName, chattingName, eyeWikiName, forumName, EYE_WIKI_HOME} from '../constants'
 
-import {homeName, diseasesName, settingsName, chattingName, eyeWikiName, forumName, EYE_WIKI_HOME} from '../constants'
 
 const Tab = createBottomTabNavigator();
 
@@ -39,10 +30,6 @@ function ToEyeWikiHome()
 	);
 }
 
-function MenuButton ({navigation}) 
-{
-	return (<IconButton icon='three-bars' />);
-}
 //See https://stackoverflow.com/questions/68900300/react-navigation-opening-a-modal-from-the-tab-bar
 export default function MainContainer()
 {
@@ -60,29 +47,37 @@ export default function MainContainer()
                                 let iconName;
                                 let rn = route.name;
 
-                                if (rn === homeName) iconName = focused ? 'home' : 'home-outline';
+                                if (rn === homeRootName) iconName = focused ? 'home' : 'home-outline';
                                 else if (rn === diseasesName) iconName = focused ? 'list' : 'list-outline';
                                 else if (rn === eyeWikiName) iconName = focused ? 'nuclear' : 'nuclear-outline';
-                                else if (rn === forumName) iconName = focused ? 'nuclear' : 'nuclear-outline';
-                                else if (rn === chattingName) iconName = focused ? 'nuclear' : 'nuclear-outline';
-                                else if (rn === settingsName) iconName = focused ? 'settings' : 'settings-outline';
+                                else if (rn === pharmacyName) iconName = focused ? 'nuclear' : 'nuclear-outline';
 
                                 return <Ionicons name={iconName} size={size} color={color} />
                             },
-                            headerShown: route.name !== diseasesName
+                            headerShown: route.name !== diseasesName,
+                            headerStyle: 
+										{
+								            backgroundColor: '#f4511e'
+								        },
+          								headerTintColor: '#fff',
+								        headerTitleStyle: 
+								        {
+								            fontWeight: 'bold'
+								        }
                         }
                     )
                 }
                 
             >
-                <Tab.Screen name={homeName} 
-                			component={HomeScreen} 
+                <Tab.Screen name={homeRootName} 
+                			component={HomeRoot} 
                 			options=
                 		    {
 								(navigation, route) =>
 								(
 									{
-										headerLeft: (props)=><IconButton icon='menu' size={30} />
+										headerLeft: ()=>{},
+										headerShown: false
 									}
 								)
 							}
@@ -97,13 +92,12 @@ export default function MainContainer()
 								(
 									{
 										headerTitle: (props) =>(<ToEyeWikiHome />)
+										
 									}
 								)
 							}
                 />
-                <Tab.Screen name={forumName} component={ForumScreen} />
-                <Tab.Screen name={chattingName} component={ChattingScreen} />
-                <Tab.Screen name={settingsName} component={SettingsScreen} />
+                <Tab.Screen name={pharmacyName} component={PharmacyScreen} />
             </Tab.Navigator>
         </NavigationContainer>
     )
