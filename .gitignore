@@ -17,3 +17,5 @@ web-build/
 .metro-health-check*
 /README.txt
 /to-do.txt
+/google-services.json
+/firebase.js
