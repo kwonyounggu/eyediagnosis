@@ -13,6 +13,7 @@ class AppProvider extends React.Component
     super(props);
     this.state = 
     {
+		appUser: {},
         chatGptUser: {},
         messageId: '',
         conversationId: ''
@@ -32,7 +33,14 @@ class AppProvider extends React.Component
 		(messageId, conversationId) =>
 		{
 			this.setState({messageId, conversationId});
-		}	 
+		},
+		onUpdateAppUser:
+     	(user) =>
+		{
+			//user={email: "kwon.younggu@gamil.com", iat: 1679877172, exp: 1681086772}
+			console.log("AppUser: ", user);
+			this.setState({appUser: user})
+		},	 
 		
   };
 

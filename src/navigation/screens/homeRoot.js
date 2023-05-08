@@ -1,7 +1,10 @@
 import * as React from 'react';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 //import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { AppContext } from '../../contexts/appProvider';
+import {isEmpty} from 'lodash';
 
 import { homeName, chattingName, settingsName, forumName } from '../../constants';
 import HomeScreen from './homeScreen';
@@ -15,11 +18,72 @@ const Drawer = createDrawerNavigator();
 /**
  * https://stackoverflow.com/questions/60375329/add-icon-to-drawer-react-navigation-v5
  * https://reactnavigation.org/docs/drawer-navigator/
+ * https://www.youtube.com/watch?v=mRoDNjhRO3E&ab_channel=FullStackNiraj
  */
+
+const CustomDrawer = (props) =>
+{
+	const {appUser} = React.useContext(AppContext).state;
+	console.log("INFO: isEmpty(appUser) = ", isEmpty(appUser));
+	return (
+	    <View style={{ flex: 1 }}>
+	      <DrawerContentScrollView {...props}>
+	        <View
+	          style=
+	          {
+				  {
+		            flexDirection: 'row',
+		            justifyContent: 'space-between',
+		            alignItems: 'center',
+		            padding: 20,
+		            backgroundColor: '#f6f6f6',
+		            marginBottom: 20,
+	          	  }
+	          }
+	        >
+	        {
+				isEmpty(appUser) ?
+				(<TouchableOpacity onPress={()=>props.navigation.navigate('appLogin')}><Text>Login</Text></TouchableOpacity>):
+	          (<><View>
+	            <Text>John Doe</Text>
+	            <Text>example@email.com</Text>
+	          </View>
+	          <Image
+	            source=
+	            {
+					{
+	              		uri: 'https://images.unsplash.com/photo-1624243225303-261cc3cd2fbc?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+	            	}
+	            }
+	            style={{ width: 60, height: 60, borderRadius: 30 }}
+	          /></>)
+	          }
+	        </View>
+	        <DrawerItemList {...props} />
+	      </DrawerContentScrollView>
+	      <TouchableOpacity
+	        style=
+	        {
+				{
+		          position: 'absolute',
+		          right: 0,
+		          left: 0,
+		          bottom: 50,
+		          backgroundColor: '#f6f6f6',
+		          padding: 20
+		        }
+		    }
+	      >
+	        <Text>Log Out</Text>
+	      </TouchableOpacity>
+	    </View>
+	  );
+};
 export default function HomeRoot({navigation})
 {
     return (
-      <Drawer.Navigator initialRouteName={homeName}
+      <Drawer.Navigator 
+      			initialRouteName={homeName}
       			screenOptions=
             	{
 					({route})=>
@@ -37,6 +101,7 @@ export default function HomeRoot({navigation})
 						}
 					)
 				}
+				drawerContent={props => <CustomDrawer {...props} />}
       >
         <Drawer.Screen name={homeName} 
         			   component={HomeScreen} 
