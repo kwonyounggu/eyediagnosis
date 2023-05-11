@@ -1,8 +1,12 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
+import { auth, db } from '../../firebase/firebase';
+import { signOut } from 'firebase/auth';
+import { GiftedChat } from 'react-native-gifted-chat';
+import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from 'firebase/firestore';
 
-//import { getDBConnection, createChatGptUserTable } from "../../database/db-service";
 
 export default function ChattingScreen({navigation})
 {
@@ -31,12 +35,125 @@ export default function ChattingScreen({navigation})
     		loadDataCallback(); console.log("here in useEffect");
   		}, [loadDataCallback]
   	);*/
+  	
+    const [messages, setMessages] = React.useState([]);
+    const signOutNow = () => 
+    {
+        signOut(auth).then
+        (
+			() => 
+			{
+	            // Sign-out successful.
+	            navigation.replace('appLogin');
+        	}
+        ).
+        catch
+        (
+			(error) => 
+			{
+            // An error happened.
+        	}
+        );
+    }
+    React.useLayoutEffect
+    (
+		() => 
+		{
+	        navigation.setOptions
+	        (
+				{
+		            headerLeft: () => 
+		            (
+		                <View style={{ marginLeft: 20 }}>
+		                    <Avatar
+		                        rounded
+		                        source={{
+		                            uri: auth?.currentUser?.photoURL,
+		                        }}
+		                    />
+		                </View>
+		            ),
+		            headerRight: () => 
+		            (
+		                <TouchableOpacity 
+		                	style={{marginRight: 10}}
+		                    onPress={signOutNow}
+		                >
+		                    <Text>logout</Text>
+		                </TouchableOpacity>
+	                )
+	        	}
+	        );
+	        const q = query(collection(db, 'eyediagnosisChats'), orderBy('createdAt', 'desc'));
+            const unsubscribe = onSnapshot
+            ( q, (snapshot) => 
+            	 setMessages
+            	 (
+            		snapshot.docs.map
+            		(
+						doc => 
+						(
+							{
+				                _id: doc.data()._id,
+				                createdAt: doc.data().createdAt.toDate(),
+				                text: doc.data().text,
+				                user: doc.data().user
+            				}
+            			)
+            		)
+        		)
+        	);
+
+            return () => {unsubscribe();};
+	        
+         }, [navigation]
+      );
+
+	/*
+    React.useEffect
+    (
+		() => 
+		{
+	        setMessages
+	        (
+				[
+		            {
+		                _id: 1,
+		                text: 'Hello developer',
+		                createdAt: new Date(),
+		                user: 
+		                {
+		                    _id: 2,
+		                    name: 'React Native',
+		                    avatar: 'https://placeimg.com/140/140/any',
+		                }
+		             }
+	            ]
+	        )
+	    }, []
+	);*/
+    const onSend = React.useCallback
+    (
+		(messages = []) => 
+		{
+        	const { _id, createdAt, text, user,} = messages[0];
+			addDoc(collection(db, 'eyediagnosisChats'), { _id, createdAt,  text, user });
+    	}, []
+    );
+  
     return (
-        <View styles={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text onPress={()=>navigation.navigate('Home')}
-                  style={{fontSize: 26, fontWeight: 'bold'}}>
-                    Chatting Screen
-            </Text>
-        </View>
+        <GiftedChat
+            messages={messages}
+            showAvatarForEveryMessage={true}
+            onSend={messages => onSend(messages)}
+            user=
+            {
+				{
+	                _id: auth?.currentUser?.email,
+	                name: auth?.currentUser?.displayName,
+	                avatar: auth?.currentUser?.photoURL
+            	}
+            }
+        />
     );
 }

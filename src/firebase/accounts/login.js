@@ -1,20 +1,50 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native'
 import { Input, Button } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+//import Icon from 'react-native-vector-icons/FontAwesome';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useHeaderHeight } from '@react-navigation/elements';
+
+import { chattingName } from '../../constants';
 
 const Login = ({navigation}) => 
 {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const headerHeight = useHeaderHeight();
 
     const openRegisterScreen = () => 
     {
       navigation.navigate('userRegister');
     };
+    
+    const signin = () => 
+    {
+      signInWithEmailAndPassword(auth, email, password)
+        .then
+        (
+			(userCredential) => 
+	        {
+	          navigation.navigate(chattingName);
+	          //console.log("INFO: userCredential=", userCredential);
+	        }
+	    )
+        .catch
+        (
+			(error) => 
+			{
+	          const errorCode = error.code;
+	          const errorMessage = error.message;
+	          alert(errorMessage);
+	        }
+	    );
+    };
 
     return (
-        <View style={styles.container}>
+        <KeyboardAwareScrollView>
+          <View style={styles.container}>
             <Input
                 placeholder='Enter your email'
                 label='Email'
@@ -30,9 +60,10 @@ const Login = ({navigation}) =>
                 onChangeText={text => setPassword(text)}
                 secureTextEntry
             />
-            <Button title='Log in' style={styles.button} />
+            <Button title='Log in' style={styles.button} onPress={signin}/>
             <Button title="Register" style={styles.button} onPress={openRegisterScreen} />
-        </View>
+          </View>
+        </KeyboardAwareScrollView>
     )
 }
 const styles = StyleSheet.create
@@ -43,7 +74,7 @@ const styles = StyleSheet.create
 	        flex: 1,
 	        alignItems: 'center',
 	        padding: 10,
-	        marginTop: 100
+	        marginTop: 10
 	    },
 	    button: 
 	    {

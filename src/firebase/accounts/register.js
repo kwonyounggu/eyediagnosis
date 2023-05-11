@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Platform } from 'react-native'
 import { Input, Button } from 'react-native-elements';
+import { useHeaderHeight } from '@react-navigation/elements';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { auth } from '../firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
@@ -12,6 +14,7 @@ const Register = () =>
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [avatar, setAvatar] = useState('');
+    const headerHeight = useHeaderHeight();
     
 	const register = () => 
 	{
@@ -55,7 +58,8 @@ const Register = () =>
 	}
 	
 	return (
-        <View style={styles.container}>
+        <KeyboardAwareScrollView>
+          <View style={styles.container}>
             <Input
                 placeholder='Enter your name'
                 label='Name'
@@ -81,7 +85,8 @@ const Register = () =>
                 onChangeText={text => setAvatar(text)}
             />
             <Button title='register' onPress={register} style={styles.button} />
-        </View>
+          </View>
+        </KeyboardAwareScrollView>
     )
 }
 
@@ -93,7 +98,7 @@ const styles = StyleSheet.create
 	        flex: 1,
 	        alignItems: 'center',
 	        padding: 10,
-	        marginTop: 100
+	        marginTop: 10
 	    },
 	    button: 
 	    {

@@ -2,8 +2,8 @@ import * as React from 'react';
 
 //import { useChatGpt } from 'react-native-chatgpt';
 import { useChatGpt } from '../chatGpt';
-import { KeyboardAvoidingView, View, ScrollView, StyleSheet, Platform } from 'react-native';
-import {KeyboardAwareScrollView, KeyboardAwareSectionList} from 'react-native-keyboard-aware-scroll-view';
+import { View, StyleSheet, Platform } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import 
 { 
     IconButton, 

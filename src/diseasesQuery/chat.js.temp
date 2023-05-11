@@ -5,7 +5,7 @@ import React from "react";
 //when the component is initially rendered, when it is updated, and when it is unmounted
 //useEffect accepts a function and a dependency array as arguments. The function will be executed when a variable in the dependency array changes. If no dependency array is provided, the function will run every time the component is re-rendered. If the dependency array is empty, the function will only be run when the component first mounts to the DOM. A common use case for an empty dependency array would be when fetching data from an API.
 import {useCallback, useEffect, useRef, useState} from "react";
-import {GiftedChat, IMessage} from "react-native-gifted-chat";
+//import {GiftedChat, IMessage} from "react-native-gifted-chat";
 import {useChatGpt} from "react-native-chatgpt";
 import { useChatGpt } from "../chatGpt";
 //import {Snackbar} from "react-native-paper";
@@ -173,6 +173,7 @@ const createBotMessage = (text) =>
             [messages] //if the messages state variable changes its value, then execute the function.
         ); //useEffect
 
+/*
         const onSend = useCallback
                        (
                             (msgs = []) => 
@@ -189,13 +190,14 @@ const createBotMessage = (text) =>
                             }, 
                             []
                         );
+         */
 
         return (
             <View style={styles.conatainer}>
-                <GiftedChat messages={messages} 
+                {/*<GiftedChat messages={messages} 
                             onSend={onSend}
                             user={{_id: 1}}
-                />
+                />*/}
                 {/*
                 <Snackbar visible={!!errorMessage}
                           onDismiss={()=>setErrorMessage("")}
