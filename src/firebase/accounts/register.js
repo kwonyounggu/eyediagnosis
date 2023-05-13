@@ -5,24 +5,64 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { auth } from '../firebase';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, sendSignInLinkToEmail, sendEmailVerification } from 'firebase/auth';
 
 
 const Register = () =>
 {
 	const [name, setName] = useState('');
+	const [firstName, setFirstName] = useState('');
+	const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [avatar, setAvatar] = useState('');
     const headerHeight = useHeaderHeight();
     
+    
+    const actionCodeSettings = 
+    {
+  		url: 'https://eyediagnosis-mh153.firebaseapp.com',
+	    // This must be true.
+	    handleCodeInApp: true,
+  		iOS: { bundleId: 'com.example.ios'},
+  		android: 
+  		{
+		    packageName: 'com.example.android',
+		    installApp: true,
+		    minimumVersion: '12'
+  		},
+  		dynamicLinkDomain: 'example.page.link'
+	};
 	const register = () => 
 	{
 	  createUserWithEmailAndPassword(auth, email, password)
 	    .then((userCredential) => 
 	    {
+			const user = userCredential.user;
+			sendEmailVerification(actionCodeSettings)
+			.then
+			(
+				()=>
+				{
+					// The link was successfully sent. Inform the user.
+				    // Save the email locally so you don't need to ask the user for it again
+				    // if they open the link on the same device.
+				    alert("Verification email sent!!!");
+				    window.localStorage.setItem('emailForSignIn', email);
+				    // ...
+				}
+			)
+			.catch
+			(
+				(error) => 
+				{
+				    alert(error.message + ", errorCode: ", error.code);
+				    // ...
+				}
+			);
+
 	        // Registered
-	        const user = userCredential.user;
+	        
 	        updateProfile
 	        (
 				user, 
