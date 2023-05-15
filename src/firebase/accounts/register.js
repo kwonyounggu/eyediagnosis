@@ -3,11 +3,22 @@ import { View, StyleSheet, Platform } from 'react-native'
 import { Input, Button } from 'react-native-elements';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+//import * as SecureStore from 'expo-secure-store';
 
 import { auth } from '../firebase';
-import { createUserWithEmailAndPassword, updateProfile, sendSignInLinkToEmail, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
 
-
+/**
+ * https://stackoverflow.com/questions/40404567/how-to-send-verification-email-with-firebase
+ * Steps:
+ * 1. User can use createUserWithEmailAndPassword method.
+ * 2. send verification email
+ * 3. Login and check if the email is verified or not
+ * 4. log out if the email is not verified.
+ * 5. Else login state and store the user object in secure place
+ * 
+ * Ref: https://stackoverflow.com/questions/66096926/sendemailverification-vs-sendsigninlinktoemail-for-email-verification-using-fire
+ */
 const Register = () =>
 {
 	const [name, setName] = useState('');
@@ -23,23 +34,15 @@ const Register = () =>
     {
   		url: 'https://eyediagnosis-mh153.firebaseapp.com',
 	    // This must be true.
-	    handleCodeInApp: true,
-  		iOS: { bundleId: 'com.example.ios'},
-  		android: 
-  		{
-		    packageName: 'com.example.android',
-		    installApp: true,
-		    minimumVersion: '12'
-  		},
-  		dynamicLinkDomain: 'example.page.link'
+	    handleCodeInApp: true
 	};
 	const register = () => 
 	{
-	  createUserWithEmailAndPassword(auth, email, password)
+	    createUserWithEmailAndPassword(auth, email, password)
 	    .then((userCredential) => 
 	    {
 			const user = userCredential.user;
-			sendEmailVerification(actionCodeSettings)
+			sendEmailVerification(user, actionCodeSettings)
 			.then
 			(
 				()=>
@@ -47,52 +50,53 @@ const Register = () =>
 					// The link was successfully sent. Inform the user.
 				    // Save the email locally so you don't need to ask the user for it again
 				    // if they open the link on the same device.
-				    alert("Verification email sent!!!");
-				    window.localStorage.setItem('emailForSignIn', email);
+				    //alert("Verification email sent!!!");
+				    //window.localStorage.setItem('emailForSignIn', email);
 				    // ...
+				    
+				    /*
+				    updateProfile
+			        (
+						user, 
+						{
+			            	displayName: name,
+			            	photoURL: avatar ? avatar : 'https://gravatar.com/avatar/94d45dbdba988afacf30d916e7aaad69?s=200&d=mp&r=x'
+			        	}
+			        )
+			        .then
+			        (
+						() => 
+						{
+			            	alert('You are registered, please login after your email verification is done.');
+			        	}
+			        )
+			        .catch
+			        (
+						(error) => 
+						{
+			            	alert(error.message + ", errorCode: ", error.code);
+			        	}
+			        )
+			        */
+				   alert('You are registered, please login after you verify your email.');
+				   //after ok, route to login page
 				}
 			)
 			.catch
 			(
 				(error) => 
 				{
-				    alert(error.message + ", errorCode: ", error.code);
+					user.delete();
+				    alert("[Verification Email Error], " + error.message + ", errorCode: ", error.code);
 				    // ...
 				}
 			);
-
-	        // Registered
-	        
-	        updateProfile
-	        (
-				user, 
-				{
-	            	displayName: name,
-	            	photoURL: avatar ? avatar : 'https://gravatar.com/avatar/94d45dbdba988afacf30d916e7aaad69?s=200&d=mp&r=x'
-	        	}
-	        )
-	        .then
-	        (
-				() => 
-				{
-	            	alert('Registered, please login.');
-	        	}
-	        )
-	        .catch
-	        (
-				(error) => 
-				{
-	            	alert(error.message);
-	        	}
-	        )
 	    })
 	    .catch
 	    (
 			(error) => 
 			{
-	        	const errorCode = error.code;
-	        	const errorMessage = error.message;
-	        	alert(errorMessage);
+	        	alert("[Creation Error], " + error.message + ", errorCode: ", error.code);
 	    	}
 	    );
 	}
