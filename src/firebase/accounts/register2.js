@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Platform } from 'react-native'
+import { Input, Button } from 'react-native-elements';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import 
-{ 
-    Button, 
-    List, 
-    HelperText, 
-    Text,
-    TextInput
-} from 'react-native-paper'; 
 //import * as SecureStore from 'expo-secure-store';
 
 import { auth } from '../firebase';
@@ -110,44 +103,36 @@ const Register = ({navigation}) =>
 	    );
 	}
 	
-    return (	
-		<KeyboardAwareScrollView>
-			<View style={{flexDirection: 'column', marginLeft: 20, marginRight: 20}}>
-                <List.Section>
-                    <View style={{flexDirection: 'row'}}>
-                        <TextInput 
-                            style={{flex: 1, marginRight: 3}}
-                            mode='outlined'
-                            label='First Name (*)'
-                            placeholder='Type first name'
-                            multiline={false}
-                            maxLength={40}   
-                        />
-                        <TextInput 
-                            style={{flex: 1, marginLeft: 3}}
-                            mode='outlined'
-                            label='Last Name (*)'
-                            placeholder='Type last name'
-                            multiline={false}
-                            maxLength={40}      
-                        />
-                    </View>
-                </List.Section>
-                <List.Section>
-                    <View style={{flexDirection: 'row'}}>
-                        <TextInput 
-                            style={{flex: 1, marginRight: 3}}
-                            mode='outlined'
-                            label='First Name (*)'
-                            placeholder='Type first name'
-                            multiline={false}
-                            maxLength={40} 
-                            left={<TextInput.Icon name='email' />}   
-                        />
-                    </View>
-                </List.Section>
-            </View>
-		</KeyboardAwareScrollView>   
+	return (
+        <KeyboardAwareScrollView>
+          <View style={styles.container}>
+            <Input
+                placeholder='Enter your name'
+                label='Name'
+                value={name}
+                onChangeText={text => setName(text)}
+            />
+            <Input
+                placeholder='Enter your email'
+                label='Email'
+                value={email}
+                onChangeText={text => setEmail(text)}
+            />
+            <Input
+                placeholder='Enter your password'
+                label='Password'
+                value={password} onChangeText={text => setPassword(text)}
+                secureTextEntry
+            />
+            <Input
+                placeholder='Enter your image url'
+                label='Profile Picture'
+                value = {avatar}
+                onChangeText={text => setAvatar(text)}
+            />
+            <Button title='register' onPress={register} style={styles.button} />
+          </View>
+        </KeyboardAwareScrollView>
     )
 }
 
