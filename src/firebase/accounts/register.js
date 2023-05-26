@@ -113,6 +113,7 @@ const Register = ({navigation}) =>
     return (	
 		<KeyboardAwareScrollView>
 			<View style={{flexDirection: 'column', marginLeft: 20, marginRight: 20}}>
+			    <Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', paddingLeft: 10, paddingTop: 15}}>Your basic information</Text>
                 <List.Section>
                     <View style={{flexDirection: 'row'}}>
                         <TextInput 
@@ -138,14 +139,15 @@ const Register = ({navigation}) =>
                         <TextInput 
                             style={{flex: 1, marginRight: 3}}
                             mode='outlined'
-                            label='First Name (*)'
-                            placeholder='Type first name'
+                            label='Email (*)'
+                            placeholder='Type email'
                             multiline={false}
-                            maxLength={40} 
-                            left={<TextInput.Icon name='email' />}   
+                            maxLength={40}   
                         />
                     </View>
                 </List.Section>
+                <Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', paddingLeft: 10, paddingTop: 15}}>Registered province/state</Text>
+
             </View>
 		</KeyboardAwareScrollView>   
     )
