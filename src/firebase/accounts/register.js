@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Platform } from 'react-native'
+import { View, StyleSheet, Platform } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import 
@@ -13,7 +14,7 @@ import
 //import * as SecureStore from 'expo-secure-store';
 
 import { auth } from '../firebase';
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 
 /**
  * https://stackoverflow.com/questions/40404567/how-to-send-verification-email-with-firebase
@@ -35,6 +36,20 @@ const Register = ({navigation}) =>
     const [password, setPassword] = useState('');
     const [avatar, setAvatar] = useState('');
     const headerHeight = useHeaderHeight();
+    
+    const [openProfession, setOpenProfession] = useState(false);
+    const [profession, setProfession] = useState('');
+    const [professionItems, setProfessionItems] = useState
+    (
+		[
+			{label: 'Optometrist', value: 'Optometrist'},
+			{label: 'Ophthalmologist', value: 'ophthalmologist'},
+			{label: 'Pharmacist', value: 'pharmacist'},
+			{label: 'General Phisician', value: 'gp'},
+			{label: 'Specialist', value: 'specialist'}
+		]	
+		
+	);
     
     
     const actionCodeSettings = 
@@ -146,7 +161,43 @@ const Register = ({navigation}) =>
                         />
                     </View>
                 </List.Section>
-                <Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', paddingLeft: 10, paddingTop: 15}}>Registered province/state</Text>
+                <List.Section>
+                	<Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', padding: 10}}>Profession</Text>
+                    <DropDownPicker 
+                    	listMode="MODAL"
+                    	open={openProfession}
+                    	value={profession}
+                    	items={professionItems}
+                    	setOpen={setOpenProfession}
+                    	setValue={setProfession}
+                    	setItems={setProfessionItems}
+                    />
+                </List.Section>
+                <List.Section>
+                	<Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', padding: 10}}>Registered province/state</Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+	                    <DropDownPicker 
+	                    	listMode="MODAL"
+	                    	open={openProfession}
+	                    	value={profession}
+	                    	items={professionItems}
+	                    	setOpen={setOpenProfession}
+	                    	setValue={setProfession}
+	                    	setItems={setProfessionItems}
+	                    	containerStyle={{width: '30%'}}
+	                    />
+	                    <DropDownPicker 
+	                    	listMode="MODAL"
+	                    	open={openProfession}
+	                    	value={profession}
+	                    	items={professionItems}
+	                    	setOpen={setOpenProfession}
+	                    	setValue={setProfession}
+	                    	setItems={setProfessionItems}
+	                    	containerStyle={{width: '68%'}}
+	                    />
+                    </View>
+                </List.Section>
 
             </View>
 		</KeyboardAwareScrollView>   
