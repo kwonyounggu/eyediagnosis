@@ -16,6 +16,8 @@ import
 import { auth } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 
+import { PROFESSIONS, COUNTRIES, CANADA_PROVINCES, USA_STATES } from '../../common/utils';
+
 /**
  * https://stackoverflow.com/questions/40404567/how-to-send-verification-email-with-firebase
  * Steps:
@@ -38,18 +40,17 @@ const Register = ({navigation}) =>
     const headerHeight = useHeaderHeight();
     
     const [openProfession, setOpenProfession] = useState(false);
-    const [profession, setProfession] = useState('');
-    const [professionItems, setProfessionItems] = useState
-    (
-		[
-			{label: 'Optometrist', value: 'Optometrist'},
-			{label: 'Ophthalmologist', value: 'ophthalmologist'},
-			{label: 'Pharmacist', value: 'pharmacist'},
-			{label: 'General Phisician', value: 'gp'},
-			{label: 'Specialist', value: 'specialist'}
-		]	
-		
-	);
+    const [profession, setProfession] = useState('optometrist');
+    const [professionItems, setProfessionItems] = useState(PROFESSIONS);
+    
+    const [openCountry, setOpenCountry] = useState(false);
+    const [country, setCountry] = useState('CA');
+    const [countryItems, setCountryItems] = useState(COUNTRIES);
+    
+    const [openProvince, setOpenProvince] = useState(false);
+    const [province, setProvince] = useState('ON');
+    const [provinceItems, setProvinceItems] = useState(CANADA_PROVINCES)
+    
     
     
     const actionCodeSettings = 
@@ -124,7 +125,21 @@ const Register = ({navigation}) =>
 	    	}
 	    );
 	}
-	
+	const onChangeOfCountry = (value) =>
+	{
+		//console.log("onChangeOfCountry: ", value);
+		switch(value)
+		{
+			case 'CA': setProvinceItems(CANADA_PROVINCES);
+					   setProvince('ON');
+					   break;
+			case 'US': setProvinceItems(USA_STATES);
+					   setProvince('AL');
+					   break;
+			default: console.error("Unknwon value selected: ", value);
+					 break;
+		}
+	}
     return (	
 		<KeyboardAwareScrollView>
 			<View style={{flexDirection: 'column', marginLeft: 20, marginRight: 20}}>
@@ -178,23 +193,24 @@ const Register = ({navigation}) =>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
 	                    <DropDownPicker 
 	                    	listMode="MODAL"
-	                    	open={openProfession}
-	                    	value={profession}
-	                    	items={professionItems}
-	                    	setOpen={setOpenProfession}
-	                    	setValue={setProfession}
-	                    	setItems={setProfessionItems}
-	                    	containerStyle={{width: '30%'}}
+	                    	open={openCountry}
+	                    	value={country}
+	                    	items={countryItems}
+	                    	setOpen={setOpenCountry}
+	                    	setValue={setCountry}
+	                    	setItems={setCountryItems}
+	                    	containerStyle={{width: '35%'}}
+	                    	onChangeValue={onChangeOfCountry}
 	                    />
 	                    <DropDownPicker 
 	                    	listMode="MODAL"
-	                    	open={openProfession}
-	                    	value={profession}
-	                    	items={professionItems}
-	                    	setOpen={setOpenProfession}
-	                    	setValue={setProfession}
-	                    	setItems={setProfessionItems}
-	                    	containerStyle={{width: '68%'}}
+	                    	open={openProvince}
+	                    	value={province}
+	                    	items={provinceItems}
+	                    	setOpen={setOpenProvince}
+	                    	setValue={setProvince}
+	                    	setItems={setProvinceItems}
+	                    	containerStyle={{width: '63%'}}
 	                    />
                     </View>
                 </List.Section>
