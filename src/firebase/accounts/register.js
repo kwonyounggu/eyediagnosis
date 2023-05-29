@@ -9,7 +9,8 @@ import
     List, 
     HelperText, 
     Text,
-    TextInput
+    TextInput,
+    Checkbox
 } from 'react-native-paper'; 
 //import * as SecureStore from 'expo-secure-store';
 
@@ -17,6 +18,7 @@ import { auth } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 
 import { PROFESSIONS, COUNTRIES, CANADA_PROVINCES, USA_STATES } from '../../common/utils';
+import Anchor from './anchor';
 
 /**
  * https://stackoverflow.com/questions/40404567/how-to-send-verification-email-with-firebase
@@ -49,7 +51,13 @@ const Register = ({navigation}) =>
     
     const [openProvince, setOpenProvince] = useState(false);
     const [province, setProvince] = useState('ON');
-    const [provinceItems, setProvinceItems] = useState(CANADA_PROVINCES)
+    const [provinceItems, setProvinceItems] = useState(CANADA_PROVINCES);
+    
+    const [secureTextEntry, setSecureTextEntry] = useState(true);
+    const [passwordIcon, setPasswordIcon] = useState('eye-off');
+    
+    const [isValid, setIsValid] = useState(true);
+    const [checkedTerms, setCheckedTerms] = useState(Platform.OS === 'ios' ? 'checked' : 'unchecked');
     
     
     
@@ -140,6 +148,22 @@ const Register = ({navigation}) =>
 					 break;
 		}
 	}
+	
+	const changePasswordIcon = () =>
+	{
+		passwordIcon !== 'eye-off' ? setPasswordIcon('eye-off') : setPasswordIcon('eye');
+		setSecureTextEntry(!secureTextEntry);
+	}
+	
+	const resetInputs = () =>
+    {
+		/*
+        setAge('');
+        setGender('female');
+        setMedicalHistory('');
+        setSigns('');
+        setSymptoms(''); */
+    }
     return (	
 		<KeyboardAwareScrollView>
 			<View style={{flexDirection: 'column', marginLeft: 20, marginRight: 20}}>
@@ -165,19 +189,25 @@ const Register = ({navigation}) =>
                     </View>
                 </List.Section>
                 <List.Section>
-                    <View style={{flexDirection: 'row'}}>
                         <TextInput 
-                            style={{flex: 1, marginRight: 3}}
                             mode='outlined'
                             label='Email (*)'
                             placeholder='Type email'
                             multiline={false}
                             maxLength={40}   
                         />
-                    </View>
                 </List.Section>
                 <List.Section>
-                	<Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', padding: 10}}>Profession</Text>
+                        <TextInput 
+                            mode='outlined'
+                            label='Profile picture URL'
+                            placeholder='Get your image URL'
+                            multiline={false}
+                            maxLength={40}   
+                        />
+                </List.Section>
+                <List.Section>
+                	<Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', padding: 10}}>Profession (*)</Text>
                     <DropDownPicker 
                     	listMode="MODAL"
                     	open={openProfession}
@@ -189,7 +219,7 @@ const Register = ({navigation}) =>
                     />
                 </List.Section>
                 <List.Section>
-                	<Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', padding: 10}}>Registered province/state</Text>
+                	<Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', padding: 10}}>Registered province/state (*)</Text>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
 	                    <DropDownPicker 
 	                    	listMode="MODAL"
@@ -214,11 +244,66 @@ const Register = ({navigation}) =>
 	                    />
                     </View>
                 </List.Section>
-
+                <List.Section>
+                	<Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', padding: 10}}>Choose your password</Text>
+	                    <TextInput 
+                            mode='outlined'
+                            label='Password (*)'
+                            placeholder='Type passowrd'
+                            multiline={false}
+                            secureTextEntry={secureTextEntry}
+                            maxLength={40}  
+                            right=
+                            {
+						        <TextInput.Icon icon={passwordIcon}
+						          				onPress={changePasswordIcon}
+							    /> 
+							}
+                        />
+	                    <TextInput 
+                            mode='outlined'
+                            label='Confirm password (*)'
+                            placeholder='Type password'
+                            multiline={false}
+                            secureTextEntry={secureTextEntry}
+                            maxLength={40} 
+							right=
+                            {
+						        <TextInput.Icon icon={passwordIcon}
+						          				onPress={changePasswordIcon}
+							    /> 
+							}
+                        />
+                </List.Section>
+                <List.Section>
+                {
+                    isValid ?  
+                    <HelperText style={{paddingLeft: 10}} type='info' padding='none' visible={true}>Info (*): fields are required</HelperText> :
+                    <HelperText style={{paddingLeft: 10}} type='error' padding='none' visible={true}>Error (*): Age, Signs and Symptoms are required</HelperText>
+                }
+                </List.Section>
+                <List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'flex-start'}}>
+                	<Checkbox status={checkedTerms === 'checked' ? 'checked' : 'unchecked'}
+						      onPress={() =>  setCheckedTerms( checkedTerms === 'checked' ? 'unchecked' : 'checked')}
+					/>
+					<Text style={{marginTop: 10}} >I accept the </Text>
+					<Anchor style={{marginTop: 10, color: 'blue'}} href='https://jsparling.github.io/hashmarks/terms_and_conditions'>
+						Terms of Use & Privacy Policy
+					</Anchor>
+                </List.Section>
+				<List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'space-between'}}>
+                    <Button style={{width: 130, marginRight: 10}}  mode='outlined' onPress={resetInputs}>
+                        Reset
+                    </Button>
+                    <Button style={{width: 130}} loading={false} mode='contained' onPress={register} disabled={checkedTerms === 'unchecked'}> 
+                        SignUp
+                    </Button>
+                </List.Section>
             </View>
 		</KeyboardAwareScrollView>   
     )
 }
+//<Text style={{marginTop: 10, color: 'blue'}} onPress={()=>console.log("modal popup")}>Terms of Use & Privacy Policy</Text>
 
 const styles = StyleSheet.create
 (
