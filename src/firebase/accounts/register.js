@@ -33,7 +33,6 @@ import Anchor from './anchor';
  */
 const Register = ({navigation}) =>
 {
-	const [name, setName] = useState('');
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -176,7 +175,9 @@ const Register = ({navigation}) =>
                             label='First Name (*)'
                             placeholder='Type first name'
                             multiline={false}
-                            maxLength={40}   
+                            maxLength={50} 
+                            value={firstName}
+                            onChangeText={(value)=>setFirstName(value.trim())}  
                         />
                         <TextInput 
                             style={{flex: 1, marginLeft: 3}}
@@ -184,7 +185,9 @@ const Register = ({navigation}) =>
                             label='Last Name (*)'
                             placeholder='Type last name'
                             multiline={false}
-                            maxLength={40}      
+                            maxLength={50} 
+                            value={lastName}
+                            onChangeText={(value)=>setLastName(value.trim())}       
                         />
                     </View>
                 </List.Section>
@@ -252,7 +255,7 @@ const Register = ({navigation}) =>
                             placeholder='Type passowrd'
                             multiline={false}
                             secureTextEntry={secureTextEntry}
-                            maxLength={40}  
+                            maxLength={15}  
                             right=
                             {
 						        <TextInput.Icon icon={passwordIcon}
@@ -260,13 +263,14 @@ const Register = ({navigation}) =>
 							    /> 
 							}
                         />
+                        <HelperText style={{paddingLeft: 10}} type='info' padding='none' visible={true}>7 to 15 characters which contain only characters, numeric digits, underscore and first character must be a letter</HelperText>
 	                    <TextInput 
                             mode='outlined'
                             label='Confirm password (*)'
                             placeholder='Type password'
                             multiline={false}
                             secureTextEntry={secureTextEntry}
-                            maxLength={40} 
+                            maxLength={15} 
 							right=
                             {
 						        <TextInput.Icon icon={passwordIcon}
