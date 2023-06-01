@@ -10,7 +10,8 @@ import
     HelperText, 
     Text,
     TextInput,
-    Checkbox
+    Checkbox,
+    Avatar
 } from 'react-native-paper'; 
 //import * as SecureStore from 'expo-secure-store';
 
@@ -19,6 +20,7 @@ import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/
 
 import { PROFESSIONS, COUNTRIES, CANADA_PROVINCES, USA_STATES } from '../../common/utils';
 import Anchor from './anchor';
+import { validateRegister } from '../../common/validate';
 
 /**
  * https://stackoverflow.com/questions/40404567/how-to-send-verification-email-with-firebase
@@ -30,13 +32,21 @@ import Anchor from './anchor';
  * 5. Else login state and store the user object in secure place
  * 
  * Ref: https://stackoverflow.com/questions/66096926/sendemailverification-vs-sendsigninlinktoemail-for-email-verification-using-fire
+ * Ref: https://reactnativeelements.com/docs/3.4.2/avatar
+ * Ref: icons, https://github.com/oblador/react-native-vector-icons/blob/master/glyphmaps/MaterialCommunityIcons.json
  */
+const defaultImageURL = 'https://gravatar.com/avatar/94d45dbdba988afacf30d916e7aaad69?s=200&d=mp&r=x';
+//See https://stackoverflow.com/questions/56675072/react-native-check-image-url
+//<Image source={{uri: ...} defaultSource={defaultImageURL}}
+
 const Register = ({navigation}) =>
 {
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
+    const [url, setURL] = useState('');
     const [password, setPassword] = useState('');
+    const [password2, setPassword2] = useState('');
     const [avatar, setAvatar] = useState('');
     const headerHeight = useHeaderHeight();
     
@@ -58,7 +68,7 @@ const Register = ({navigation}) =>
     const [isValid, setIsValid] = useState(true);
     const [checkedTerms, setCheckedTerms] = useState(Platform.OS === 'ios' ? 'checked' : 'unchecked');
     
-    
+    const [errorMessage, setErrorMessage] = useState('');
     
     const actionCodeSettings = 
     {
@@ -68,6 +78,20 @@ const Register = ({navigation}) =>
 	};
 	const register = () => 
 	{
+		//let ro = validateName(firstName);
+		//if (!ro.valid) setIsValid(false) 
+		//ro = validateName(lastName);
+		
+		let result = validateRegister(firstName, lastName, email, url, password, password2);
+		if (!result.valid)
+		{
+			setIsValid(false);
+			setErrorMessage(result.message);
+			return;
+		}
+		
+		if (1<2) return true;
+		
 	    createUserWithEmailAndPassword(auth, email, password)
 	    .then((userCredential) => 
 	    {
@@ -119,8 +143,10 @@ const Register = ({navigation}) =>
 				(error) => 
 				{
 					user.delete();
-				    alert("[Verification Email Error], " + error.message + ", errorCode: ", error.code);
-				    // ...
+				    //alert("[Verification Email Error], " + error.message + ", errorCode: ", error.code);
+				    setIsValid(false);
+				    setErrorMessage("Sending verification email failed; " + error.message + "; " + error.code);
+				    
 				}
 			);
 	    })
@@ -128,7 +154,9 @@ const Register = ({navigation}) =>
 	    (
 			(error) => 
 			{
-	        	alert("[Creation Error], " + error.message + ", errorCode: ", error.code);
+	        	//alert("[Creation Error], " + error.message + ", errorCode: ", error.code);
+	        	setIsValid(false);
+				setErrorMessage("Creation failed; " + error.message + "; " + error.code);
 	    	}
 	    );
 	}
@@ -197,17 +225,28 @@ const Register = ({navigation}) =>
                             label='Email (*)'
                             placeholder='Type email'
                             multiline={false}
-                            maxLength={40}   
+                            maxLength={62}  
+                            value={email}
+                            onChangeText={(value)=>setEmail(value.trim())}  
                         />
                 </List.Section>
                 <List.Section>
                         <TextInput 
                             mode='outlined'
                             label='Profile picture URL'
-                            placeholder='Get your image URL'
+                            placeholder='Copy & Paste your image URL'
                             multiline={false}
-                            maxLength={40}   
+                            maxLength={255}  
+                            value={url}
+                            onChangeText={(value)=>setURL(value.trim())}  
+                            right=
+                            {
+						        <TextInput.Icon icon='image-frame' size={28}
+						          				onPress={()=>{}}
+							    /> 
+							}
                         />
+                        
                 </List.Section>
                 <List.Section>
                 	<Text style={{borderWidth: 0, fontSize: 14, fontWeight: 'bold', padding: 10}}>Profession (*)</Text>
@@ -262,6 +301,8 @@ const Register = ({navigation}) =>
 						          				onPress={changePasswordIcon}
 							    /> 
 							}
+							value={password}
+                            onChangeText={(value)=>setPassword(value)}  
                         />
                         <HelperText style={{paddingLeft: 10}} type='info' padding='none' visible={true}>7 to 15 characters which contain only characters, numeric digits, underscore and first character must be a letter</HelperText>
 	                    <TextInput 
@@ -277,13 +318,15 @@ const Register = ({navigation}) =>
 						          				onPress={changePasswordIcon}
 							    /> 
 							}
+							value={password2}
+                            onChangeText={(value)=>setPassword2(value)}  
                         />
                 </List.Section>
                 <List.Section>
                 {
                     isValid ?  
                     <HelperText style={{paddingLeft: 10}} type='info' padding='none' visible={true}>Info (*): fields are required</HelperText> :
-                    <HelperText style={{paddingLeft: 10}} type='error' padding='none' visible={true}>Error (*): Age, Signs and Symptoms are required</HelperText>
+                    <HelperText style={{paddingLeft: 10}} type='error' padding='none' visible={true}>{errorMessage}</HelperText>
                 }
                 </List.Section>
                 <List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'flex-start'}}>
