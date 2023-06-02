@@ -1,3 +1,5 @@
+import { URL } from 'react-native-url-polyfill';
+
 //const defaultImageURL = 'https://gravatar.com/avatar/94d45dbdba988afacf30d916e7aaad69?s=200&d=mp&r=x';
 
 // 1< First name or last name <50
@@ -25,7 +27,7 @@ function validateEmail(email)
 
 function validatePassword(password)
 {
-	let validPassword = /^[A-Za-z]\w{7,14}$/;
+	let validPassword = /^[A-Za-z]\w{6,14}$/;
 	
 	if (password.match(validPassword)) return true;
 	return false;
@@ -33,9 +35,13 @@ function validatePassword(password)
 
 function validate2Passwords(password1, password2)
 {
-	if (validatePassword(password1) && validatePassword(password2) && password1 === password2) 
-		return {message: '', valid: true}
-	return {message: 'Password(s) is not valid.', valid: false};
+	if (validatePassword(password1) && validatePassword(password2))
+	   if (password1 === password2) 
+			return {message: '', valid: true}
+	   else
+	   		return {message: 'Both passwords are not identical.', valid: false};
+	else 
+		return {message: 'Password(s) is not valid.', valid: false};
 } 
 
 function validateURL(url)

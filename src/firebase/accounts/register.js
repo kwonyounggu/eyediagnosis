@@ -89,7 +89,7 @@ const Register = ({navigation}) =>
 			setErrorMessage(result.message);
 			return;
 		}
-		
+		console.log("all inputs are passed now");
 		if (1<2) return true;
 		
 	    createUserWithEmailAndPassword(auth, email, password)
