@@ -3867,6 +3867,20 @@ expo-font@~10.2.1:
   dependencies:
     fontfaceobserver "^2.1.0"
 
+expo-image-loader@~3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/expo-image-loader/-/expo-image-loader-3.2.0.tgz#d98b021660edef7243f7c5ec011b8d0545626d41"
+  integrity sha512-LU3Q2prn64/HxdToDmxgMIRXS1ZvD9Q3iCxRVTZn1fPQNNDciIQFE5okaa74Ogx20DFHs90r6WoUd7w9Af1OGQ==
+
+expo-image-picker@~13.3.1:
+  version "13.3.1"
+  resolved "https://registry.yarnpkg.com/expo-image-picker/-/expo-image-picker-13.3.1.tgz#7e8fe1dd7a58ab9e0fa17569ab6b64256ece0c98"
+  integrity sha512-IY84uDu9uxetAup5yw0CIIujigl/lM3grwyfpeZFMKGmWHzmKamptjd/sG8K65xkb6tF9awmGMW0qglHQ9hakQ==
+  dependencies:
+    "@expo/config-plugins" "~5.0.0"
+    expo-image-loader "~3.2.0"
+    uuid "7.0.2"
+
 expo-json-utils@~0.3.0:
   version "0.3.0"
   resolved "https://registry.npmjs.org/expo-json-utils/-/expo-json-utils-0.3.0.tgz"
@@ -7792,6 +7806,11 @@ uuid@3.4.0, uuid@^3.3.2, uuid@^3.4.0:
   version "3.4.0"
   resolved "https://registry.npmjs.org/uuid/-/uuid-3.4.0.tgz"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
+
+uuid@7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.2.tgz#7ff5c203467e91f5e0d85cfcbaaf7d2ebbca9be6"
+  integrity sha512-vy9V/+pKG+5ZTYKf+VcphF5Oc6EFiu3W8Nv3P3zIh0EqVI80ZxOzuPfe9EHjkFNvf8+xuTHVeei4Drydlx4zjw==
 
 uuid@^7.0.3:
   version "7.0.3"
