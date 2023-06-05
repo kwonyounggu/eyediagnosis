@@ -27,8 +27,14 @@ const Login = ({navigation}) =>
         (
 			(userCredential) => 
 	        {
-	          navigation.navigate(chattingName);
-	          //console.log("INFO: userCredential=", userCredential);
+	          //navigation.navigate(chattingName);
+	          console.log("INFO: userCredential=", userCredential.user);
+	          console.log("len: ", userCredential.user.providerData.length)
+	          for (let i=0; i<userCredential.user.providerData.length; i++)
+	          {
+				  console.log(i, "-", userCredential.user.providerData[i]);
+			  }
+	            
 	        }
 	    )
         .catch

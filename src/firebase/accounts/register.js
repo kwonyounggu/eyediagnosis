@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useHeaderHeight } from '@react-navigation/elements';
+//import { useHeaderHeight } from '@react-navigation/elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import 
 { 
@@ -10,13 +10,12 @@ import
     HelperText, 
     Text,
     TextInput,
-    Checkbox,
-    Avatar
+    Checkbox
 } from 'react-native-paper'; 
 //import * as SecureStore from 'expo-secure-store';
 
 import { auth } from '../firebase';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 
 import { PROFESSIONS, COUNTRIES, CANADA_PROVINCES, USA_STATES } from '../../common/utils';
 import Anchor from './anchor';
@@ -35,6 +34,9 @@ import { validateRegister } from '../../common/validate';
  * Ref: https://reactnativeelements.com/docs/3.4.2/avatar
  * Ref: icons, https://github.com/oblador/react-native-vector-icons/blob/master/glyphmaps/MaterialCommunityIcons.json
  */
+
+//A profile photo uploadig
+//ref 1: https://javascript.plainenglish.io/using-react-native-image-picker-4495776c8bae
 const defaultImageURL = 'https://gravatar.com/avatar/94d45dbdba988afacf30d916e7aaad69?s=200&d=mp&r=x';
 //See https://stackoverflow.com/questions/56675072/react-native-check-image-url
 //<Image source={{uri: ...} defaultSource={defaultImageURL}}
@@ -47,8 +49,8 @@ const Register = ({navigation}) =>
     const [url, setURL] = useState('');
     const [password, setPassword] = useState('');
     const [password2, setPassword2] = useState('');
-    const [avatar, setAvatar] = useState('');
-    const headerHeight = useHeaderHeight();
+    //const [avatar, setAvatar] = useState('');
+    //const headerHeight = useHeaderHeight();
     
     const [openProfession, setOpenProfession] = useState(false);
     const [profession, setProfession] = useState('optometrist');
@@ -78,10 +80,6 @@ const Register = ({navigation}) =>
 	};
 	const register = () => 
 	{
-		//let ro = validateName(firstName);
-		//if (!ro.valid) setIsValid(false) 
-		//ro = validateName(lastName);
-		
 		let result = validateRegister(firstName, lastName, email, url, password, password2);
 		if (!result.valid)
 		{
@@ -90,7 +88,7 @@ const Register = ({navigation}) =>
 			return;
 		}
 		console.log("all inputs are passed now");
-		if (1<2) return true;
+		//if (1<2) return true;
 		
 	    createUserWithEmailAndPassword(auth, email, password)
 	    .then((userCredential) => 
@@ -108,13 +106,13 @@ const Register = ({navigation}) =>
 				    //window.localStorage.setItem('emailForSignIn', email);
 				    // ...
 				    
-				    /*
+				    
 				    updateProfile
 			        (
 						user, 
 						{
-			            	displayName: name,
-			            	photoURL: avatar ? avatar : 'https://gravatar.com/avatar/94d45dbdba988afacf30d916e7aaad69?s=200&d=mp&r=x'
+			            	displayName: firstName + ' ' + lastName,
+			            	photoURL: url.length === 0 ? defaultImageURL : url
 			        	}
 			        )
 			        .then
@@ -131,9 +129,10 @@ const Register = ({navigation}) =>
 			            	alert(error.message + ", errorCode: ", error.code);
 			        	}
 			        )
-			        */
+			        
 				   
 				   //Here, 1. put signup information to fire-store
+				   //save, first name, last name, 
 				   alert('You are registered, please login after you verify your email.');
 				   //after ok, route to login page
 				}
@@ -143,7 +142,6 @@ const Register = ({navigation}) =>
 				(error) => 
 				{
 					user.delete();
-				    //alert("[Verification Email Error], " + error.message + ", errorCode: ", error.code);
 				    setIsValid(false);
 				    setErrorMessage("Sending verification email failed; " + error.message + "; " + error.code);
 				    
@@ -154,9 +152,13 @@ const Register = ({navigation}) =>
 	    (
 			(error) => 
 			{
-	        	//alert("[Creation Error], " + error.message + ", errorCode: ", error.code);
 	        	setIsValid(false);
-				setErrorMessage("Creation failed; " + error.message + "; " + error.code);
+	        	if (error.code === 'auth/email-already-in-use')
+	        		setErrorMessage('That email address is already in use!');
+	        	else if (error.code === 'auth/invalid-email')
+	        		setErrorMessage('That email address is invalid!');
+				else 
+					setErrorMessage("Creation failed; " + error.message + "; " + error.code);
 	    	}
 	    );
 	}

@@ -5,6 +5,7 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppContext } from '../../contexts/appProvider';
 import {isEmpty} from 'lodash';
+import { signOut} from 'firebase/auth';
 
 import { homeName, chattingName, settingsName, forumName } from '../../constants';
 import HomeScreen from './homeScreen';
@@ -73,6 +74,7 @@ const CustomDrawer = (props) =>
 		          padding: 20
 		        }
 		    }
+		    onPress={()=>signOut().then(()=>console.log('Signed out'))}
 	      >
 	        <Text>Log Out</Text>
 	      </TouchableOpacity>
