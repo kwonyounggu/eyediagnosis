@@ -5,6 +5,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import 
 { 
+	ActivityIndicator,
     Button, 
     List, 
     HelperText, 
@@ -72,6 +73,8 @@ const Register = ({navigation}) =>
     
     const [errorMessage, setErrorMessage] = useState('');
     
+    const [registeringNow, setRegisteringNow] = useState(false);
+    
     const actionCodeSettings = 
     {
   		url: 'https://eyediagnosis-mh153.firebaseapp.com',
@@ -87,66 +90,78 @@ const Register = ({navigation}) =>
 			setErrorMessage(result.message);
 			return;
 		}
-		console.log("all inputs are passed now");
+		setRegisteringNow(true);
+		if (errorMessage.length !== 0) setErrorMessage('');
+		
+		//console.log("all inputs are passed now --");
 		//if (1<2) return true;
 		
 	    createUserWithEmailAndPassword(auth, email, password)
 	    .then((userCredential) => 
 	    {
 			const user = userCredential.user;
-			sendEmailVerification(user, actionCodeSettings)
-			.then
-			(
-				()=>
+			updateProfile
+	        (
+				user, 
 				{
-					// The link was successfully sent. Inform the user.
-				    // Save the email locally so you don't need to ask the user for it again
-				    // if they open the link on the same device.
-				    //alert("Verification email sent!!!");
-				    //window.localStorage.setItem('emailForSignIn', email);
-				    // ...
-				    
-				    
-				    updateProfile
-			        (
-						user, 
+	            	displayName: firstName + ' ' + lastName,
+	            	photoURL: url.length === 0 ? defaultImageURL : url
+	        	}
+	        )
+	        .then
+	        (
+				() => 
+				{
+	            	console.log("INFO: updateProfile Done");
+	            	sendEmailVerification(user, actionCodeSettings)
+					.then
+					(
+						()=>
 						{
-			            	displayName: firstName + ' ' + lastName,
-			            	photoURL: url.length === 0 ? defaultImageURL : url
-			        	}
-			        )
-			        .then
-			        (
-						() => 
-						{
-			            	alert('You are registered, please login after your email verification is done.');
-			        	}
-			        )
-			        .catch
-			        (
+							// The link was successfully sent. Inform the user.
+						    // Save the email locally so you don't need to ask the user for it again
+						    // if they open the link on the same device.
+						    //alert("Verification email sent!!!");
+						    //window.localStorage.setItem('emailForSignIn', email);
+						    // ...
+						    
+						    
+						    
+					        
+						   
+						   //Here, 1. put signup information to fire-store
+						   //save, first name, last name, 
+						   //alert('You are registered, please login after you verify your email.');
+						   //after ok, route to login page
+						   
+						   
+						   //Finally after storing data into firestore
+						   alert('You are registered, please login after your email verification is done.');
+
+						}
+					)
+					.catch
+					(
 						(error) => 
 						{
-			            	alert(error.message + ", errorCode: ", error.code);
-			        	}
-			        )
-			        
-				   
-				   //Here, 1. put signup information to fire-store
-				   //save, first name, last name, 
-				   alert('You are registered, please login after you verify your email.');
-				   //after ok, route to login page
-				}
-			)
-			.catch
-			(
+							user.delete();
+						    setIsValid(false);
+						    setErrorMessage("Sending verification email failed; " + error.message);
+						    
+						}
+					);
+	        	}
+	        )
+	        .catch
+	        (
 				(error) => 
 				{
-					user.delete();
-				    setIsValid(false);
-				    setErrorMessage("Sending verification email failed; " + error.message + "; " + error.code);
-				    
-				}
-			);
+	            	user.delete();
+					setIsValid(false);
+					setErrorMessage("Updating profile failed; " + error.message);
+	        	}
+	        );
+			
 	    })
 	    .catch
 	    (
@@ -158,9 +173,16 @@ const Register = ({navigation}) =>
 	        	else if (error.code === 'auth/invalid-email')
 	        		setErrorMessage('That email address is invalid!');
 				else 
-					setErrorMessage("Creation failed; " + error.message + "; " + error.code);
+					setErrorMessage("Creation failed; " + error.message);
 	    	}
-	    );
+	    )
+	    .finally
+	    (
+			() =>
+			{
+				setRegisteringNow(false);
+			}
+		)
 	}
 	const onChangeOfCountry = (value) =>
 	{
@@ -348,8 +370,13 @@ const Register = ({navigation}) =>
                         SignUp
                     </Button>
                 </List.Section>
+                {
+					registeringNow && <View style={styles.registeringNow}>
+                                <ActivityIndicator size='large' />
+                            </View>
+				}
             </View>
-		</KeyboardAwareScrollView>   
+		</KeyboardAwareScrollView>
     )
 }
 //<Text style={{marginTop: 10, color: 'blue'}} onPress={()=>console.log("modal popup")}>Terms of Use & Privacy Policy</Text>
@@ -368,7 +395,17 @@ const styles = StyleSheet.create
 	    {
 	        width: 370,
 	        marginTop: 10
-	    }
+	    },
+	    registeringNow:
+        {
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            alignItems: 'center',
+            justifyContent: 'center'
+        }
 	}
 );
 
