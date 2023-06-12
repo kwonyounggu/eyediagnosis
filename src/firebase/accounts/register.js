@@ -15,12 +15,22 @@ import
 } from 'react-native-paper'; 
 //import * as SecureStore from 'expo-secure-store';
 
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import 
+{
+  getFirestore,
+  query,
+  getDocs,
+  collection,
+  where,
+  addDoc,
+} from 'firebase/firestore';
 
 import { PROFESSIONS, COUNTRIES, CANADA_PROVINCES, USA_STATES } from '../../common/utils';
 import Anchor from './anchor';
 import { validateRegister } from '../../common/validate';
+import { appLoginName } from '../../constants';
 
 /**
  * https://stackoverflow.com/questions/40404567/how-to-send-verification-email-with-firebase
@@ -116,27 +126,33 @@ const Register = ({navigation}) =>
 	            	sendEmailVerification(user, actionCodeSettings)
 					.then
 					(
-						()=>
+						async ()=>
 						{
-							// The link was successfully sent. Inform the user.
-						    // Save the email locally so you don't need to ask the user for it again
-						    // if they open the link on the same device.
-						    //alert("Verification email sent!!!");
-						    //window.localStorage.setItem('emailForSignIn', email);
-						    // ...
-						    
-						    
-						    
-					        
-						   
-						   //Here, 1. put signup information to fire-store
-						   //save, first name, last name, 
-						   //alert('You are registered, please login after you verify your email.');
-						   //after ok, route to login page
-						   
-						   
-						   //Finally after storing data into firestore
-						   alert('You are registered, please login after your email verification is done.');
+							/**
+							* uploading images
+							* firebase
+							* .storage()
+							* .ref('users/' + uid)
+							* .putString(imageBase64String.split(',')[1], "base64", {contentType: 'image/jpeg'})
+						    */
+
+						   //https://blog.logrocket.com/user-authentication-firebase-react-apps/
+						   //https://stackoverflow.com/questions/68572749/how-can-i-save-users-image-with-their-sign-up-credentials-in-the-registration-f
+						   await addDoc
+						   (
+							   collection(db, 'registeredUsers'), 
+							   {
+							      uid: user.uid,
+							      firstName: firstName,
+							      lastName: lastName,
+							      email,
+							      profession,
+							      country,
+							      province
+							    }
+						   );
+						   //alert('You are registered, please login after your email verification is done.');
+						   navigation.navigate(appLoginName, {email, password});
 
 						}
 					)
@@ -146,7 +162,7 @@ const Register = ({navigation}) =>
 						{
 							user.delete();
 						    setIsValid(false);
-						    setErrorMessage("Sending verification email failed; " + error.message);
+						    setErrorMessage("Sending verification email/addDoc failed; " + error.message);
 						    
 						}
 					);

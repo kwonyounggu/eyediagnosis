@@ -18,6 +18,8 @@ export const settingsName = 'Settings';
 export const chattingName = 'Chatting';
 export const forumName = 'Forum';
 export const pharmacyName = 'Pharmacy';
+export const appLoginName = 'App SignIn';
+export const appRegisterName = 'App SignUp';
 
 export const diagnosisName = 'Eye Diagnosis';
 export const differentialDiagnosisName = 'Differential Diagnosis';
