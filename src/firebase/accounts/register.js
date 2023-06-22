@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 //import { useHeaderHeight } from '@react-navigation/elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -14,7 +14,7 @@ import
     Checkbox
 } from 'react-native-paper'; 
 //import * as SecureStore from 'expo-secure-store';
-
+import { theme } from '../../common/theme';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import 
@@ -30,7 +30,7 @@ import
 import { PROFESSIONS, COUNTRIES, CANADA_PROVINCES, USA_STATES } from '../../common/utils';
 import Anchor from './anchor';
 import { validateRegister } from '../../common/validate';
-import { appLoginName } from '../../constants';
+import { appLoginScreenName } from '../../constants';
 
 /**
  * https://stackoverflow.com/questions/40404567/how-to-send-verification-email-with-firebase
@@ -152,7 +152,7 @@ const Register = ({navigation}) =>
 							    }
 						   );
 						   //alert('You are registered, please login after your email verification is done.');
-						   navigation.navigate(appLoginName, {email, password});
+						   navigation.navigate(appLoginScreenName, {email, password});
 
 						}
 					)
@@ -268,6 +268,9 @@ const Register = ({navigation}) =>
                             maxLength={62}  
                             value={email}
                             onChangeText={(value)=>setEmail(value.trim())}  
+                            textContentType='emailAddress'
+                            keyboardType='email-address'
+                            autoCapitalize='none'
                         />
                 </List.Section>
                 <List.Section>
@@ -386,6 +389,12 @@ const Register = ({navigation}) =>
                         SignUp
                     </Button>
                 </List.Section>
+                <List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'center'}}>
+                	<Text style={[styles.labelSecondary, {marginTop: 0}]} >Already have an account?  </Text>
+                	<TouchableOpacity onPress={() => navigation.navigate(appLoginScreenName, {email: '', password: ''})}>
+			          <Text style={styles.link}>Login</Text>
+			        </TouchableOpacity>
+                </List.Section>
                 {
 					registeringNow && <View style={styles.registeringNow}>
                                 <ActivityIndicator size='large' />
@@ -421,7 +430,20 @@ const styles = StyleSheet.create
             bottom: 0,
             alignItems: 'center',
             justifyContent: 'center'
-        }
+        },
+        labelSecondary:
+        {
+			color: theme.colors.secondary
+		},
+		labelError:
+		{
+			color: theme.colors.error
+		},
+		link: 
+		{
+		    fontWeight: 'bold',
+		    color: theme.colors.primary
+		}
 	}
 );
 

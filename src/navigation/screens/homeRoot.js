@@ -7,7 +7,7 @@ import { AppContext } from '../../contexts/appProvider';
 import {isEmpty} from 'lodash';
 import { signOut} from 'firebase/auth';
 
-import { homeName, chattingName, settingsName, forumName, appLoginName } from '../../constants';
+import { homeName, chattingName, settingsName, forumName, appLoginScreenName } from '../../constants';
 import HomeScreen from './homeScreen';
 import ForumScreen from './forumScreen';
 import ChattingScreen from './chattingScreen';
@@ -44,7 +44,7 @@ const CustomDrawer = (props) =>
 	        >
 	        {
 				isEmpty(appUser) ?
-				(<TouchableOpacity onPress={()=>props.navigation.navigate(appLoginName)}><Text>Login</Text></TouchableOpacity>):
+				(<TouchableOpacity onPress={()=>props.navigation.navigate(appLoginScreenName, {email: '', password: ''})}><Text>Login</Text></TouchableOpacity>):
 	          (<><View>
 	            <Text>John Doe</Text>
 	            <Text>example@email.com</Text>

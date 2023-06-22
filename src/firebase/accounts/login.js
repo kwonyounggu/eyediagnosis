@@ -13,18 +13,17 @@ import
 } from 'react-native-paper'; 
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-//import Icon from 'react-native-vector-icons/FontAwesome';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useHeaderHeight } from '@react-navigation/elements';
+
 import { theme } from '../../common/theme';
 
-import { chattingName } from '../../constants';
+import { chattingName, appForgotPasswordScreenName, appRegisterScreenName } from '../../constants';
 
-const Login = ({navigation}) => 
+const Login = ({route, navigation}) => 
 {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const headerHeight = useHeaderHeight();
+    const [email, setEmail] = useState({value: '', error: ''});
+    const [password, setPassword] = useState({value: '', error: ''});
+
     const [isValid, setIsValid] = useState(true);
     const [checkedTerms, setCheckedTerms] = useState(Platform.OS === 'ios' ? 'checked' : 'unchecked');
     const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -32,10 +31,20 @@ const Login = ({navigation}) =>
     const [errorMessage, setErrorMessage] = useState('');
     
     const [signingInNow, setSigningInNow] = useState(false);
+    
+    //console.log("params: ", route.params.email, " email: ", eml, " password: ", password);
 
+	React.useEffect
+	(
+		() => 
+		{
+    		setEmail({value: route.params.email, error: ''});
+    		setPassword({value: route.params.password, error: ''});
+  		}, [route.params]
+  	);
     const openRegisterScreen = () => 
     {
-      navigation.navigate('userRegister');
+      navigation.navigate(appRegisterScreenName);
     };
     const changePasswordIcon = () =>
 	{
@@ -44,15 +53,23 @@ const Login = ({navigation}) =>
 	}
 	const resetInputs = () =>
     {
-		/*
-        setAge('');
-        setGender('female');
-        setMedicalHistory('');
-        setSigns('');
-        setSymptoms(''); */
+        setEmail({value: '', error: ''});
+        setPassword({value: '', error: ''});
     }
     const signin = () => 
     {
+		/**
+		 * const emailError = emailValidator(email.value);
+    const passwordError = passwordValidator(password.value);
+
+    if (emailError || passwordError) {
+      setEmail({ ...email, error: emailError });
+      setPassword({ ...password, error: passwordError });
+      return;
+    }
+
+    navigation.navigate('Dashboard');
+		 */
       signInWithEmailAndPassword(auth, email, password)
         .then
         (
@@ -94,8 +111,14 @@ const Login = ({navigation}) =>
                             placeholder='Type email'
                             multiline={false}
                             maxLength={62}  
-                            value={email}
-                            onChangeText={(value)=>setEmail(value.trim())}  
+                            value={email.value}
+                            onChangeText={(value)=>setEmail({value: value.trim(), error: ''})} 
+                            error={!!email.error} 
+                            errorText={email.error}
+                            returnKeyType='next'
+                            textContentType='emailAddress'
+                            keyboardType='email-address'
+                            autoCapitalize='none'
                         />
                 </List.Section>        
                 <List.Section>
@@ -112,12 +135,15 @@ const Login = ({navigation}) =>
 					          				onPress={changePasswordIcon}
 						    /> 
 						}
-						value={password}
-                        onChangeText={(value)=>setPassword(value)}  
+						value={password.value}
+                        onChangeText={(value)=>setPassword({value, error: ''})}  
+                        returnKeyType='done'
+                        error={!!password.error}
+        				errorText={password.error}
                     />                     
                 </List.Section>
                 <List.Section style={{flexDirection: 'row-reverse', marginTop: 0, justifyContent: 'flex-start'}}>
-                	<TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+                	<TouchableOpacity onPress={() => navigation.navigate(appForgotPasswordScreenName)}>
                 		<Text style={[styles.labelSecondary, {marginTop: 0}]} >Forgot your password? </Text>
                 	</TouchableOpacity>
                 </List.Section>
