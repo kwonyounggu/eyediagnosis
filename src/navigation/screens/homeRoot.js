@@ -5,7 +5,8 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppContext } from '../../contexts/appProvider';
 import {isEmpty} from 'lodash';
-import { signOut} from 'firebase/auth';
+import { signOut, onAuthStateChanged} from 'firebase/auth';
+import { auth } from '../../firebase/firebase';
 
 import { homeName, chattingName, settingsName, forumName, appLoginScreenName } from '../../constants';
 import HomeScreen from './homeScreen';
@@ -24,8 +25,30 @@ const Drawer = createDrawerNavigator();
 
 const CustomDrawer = (props) =>
 {
+	//75: const {onUpdateChatGptUser} = React.useContext(AppContext).actions; 
 	const {appUser} = React.useContext(AppContext).state;
-	console.log("INFO: isEmpty(appUser) = ", isEmpty(appUser));
+	//console.log("INFO: isEmpty(appUser) = ", isEmpty(appUser));
+	
+	const {onUpdateAppUser} = React.useContext(AppContext).actions;
+	
+	React.useEffect
+	(
+		() =>
+		{
+			const unsubscribe = onAuthStateChanged
+			(
+				auth,
+				(user) =>
+				{
+					if (user) onUpdateAppUser(user);
+					else onUpdateAppUser({});
+				}
+				
+			)
+			return unsubscribe;
+		},
+		[]
+	);
 	return (
 	    <View style={{ flex: 1 }}>
 	      <DrawerContentScrollView {...props}>
