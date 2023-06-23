@@ -17,14 +17,14 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { theme } from '../../common/theme';
 
-import { chattingName, appForgotPasswordScreenName, appRegisterScreenName } from '../../constants';
+import { chattingName, appForgotPasswordScreenName, appRegisterScreenName, homeRootName } from '../../constants';
+import { emailValidator, passwordValidator } from '../../common/validate';
 
 const Login = ({route, navigation}) => 
 {
     const [email, setEmail] = useState({value: '', error: ''});
     const [password, setPassword] = useState({value: '', error: ''});
 
-    const [isValid, setIsValid] = useState(true);
     const [checkedTerms, setCheckedTerms] = useState(Platform.OS === 'ios' ? 'checked' : 'unchecked');
     const [secureTextEntry, setSecureTextEntry] = useState(true);
     const [passwordIcon, setPasswordIcon] = useState('eye-off');
@@ -40,6 +40,7 @@ const Login = ({route, navigation}) =>
 		{
     		setEmail({value: route.params.email, error: ''});
     		setPassword({value: route.params.password, error: ''});
+    		setErrorMessage('');
   		}, [route.params]
   	);
     const openRegisterScreen = () => 
@@ -58,30 +59,41 @@ const Login = ({route, navigation}) =>
     }
     const signin = () => 
     {
-		/**
-		 * const emailError = emailValidator(email.value);
-    const passwordError = passwordValidator(password.value);
+		let error = '';
+		if (error=emailValidator(email.value))
+    	{
+			setEmail({ ...email, error });
+		}
+		else if (error=passwordValidator(password.value))
+		{
+			setPassword({ ...password, error });
+		}
+		
+		if (error) 
+		{
+			setErrorMessage(error);
+			return;
+		}
+		
+		if (errorMessage.length !== 0) setErrorMessage('');
+		
+		
 
-    if (emailError || passwordError) {
-      setEmail({ ...email, error: emailError });
-      setPassword({ ...password, error: passwordError });
-      return;
-    }
-
-    navigation.navigate('Dashboard');
-		 */
-      signInWithEmailAndPassword(auth, email, password)
+    //navigation.navigate('Dashboard');
+		 
+        signInWithEmailAndPassword(auth, email.value, password.value)
         .then
         (
 			(userCredential) => 
 	        {
 	          //navigation.navigate(chattingName);
 	          console.log("INFO: userCredential=", userCredential.user);
-	          console.log("len: ", userCredential.user.providerData.length)
-	          for (let i=0; i<userCredential.user.providerData.length; i++)
+	          console.log("emailVerified: ", userCredential.user.emailVerified);
+	          if (userCredential.user.emailVerified) 
 	          {
-				  console.log(i, "-", userCredential.user.providerData[i]);
+				  navigation.navigate(homeRootName);//check if it is working, do onauthstatechanged without using rememeberme
 			  }
+	          else setErrorMessage('Ooops! You haven\'t verified your email if it\'s yours.');
 	            
 	        }
 	    )
@@ -89,11 +101,15 @@ const Login = ({route, navigation}) =>
         (
 			(error) => 
 			{
-	          const errorCode = error.code;
-	          const errorMessage = error.message;
-	          alert(errorMessage);
+	          console.log("errorCode: ", error.code);
+	          if (error.code.includes('auth/invalid-value-(email)')) setErrorMessage('Ooops!, The email is not valid.');
+	          else if (error.code === 'auth/user-not-found') setErrorMessage('Ooops!, The email is not found in our account list.');
+	          else if (error.code === 'auth/wrong-password') setErrorMessage('Ooops!, The password is not correct.');
+	          else if (error.code === 'auth/user-disabled') setErrorMessage('Ooops!, Your account is disabled.');
+	          else setErrorMessage(error.message);
 	        }
 	    );
+	    
     };
 
     return (
@@ -143,13 +159,13 @@ const Login = ({route, navigation}) =>
                     />                     
                 </List.Section>
                 <List.Section style={{flexDirection: 'row-reverse', marginTop: 0, justifyContent: 'flex-start'}}>
-                	<TouchableOpacity onPress={() => navigation.navigate(appForgotPasswordScreenName)}>
+                	<TouchableOpacity onPress={() => navigation.navigate(appForgotPasswordScreenName, {email: email.value})}>
                 		<Text style={[styles.labelSecondary, {marginTop: 0}]} >Forgot your password? </Text>
                 	</TouchableOpacity>
                 </List.Section>
                 <List.Section>
                 {
-                    !isValid && <HelperText style={{paddingLeft: 10}} type='error' padding='none' visible={true}>{errorMessage}</HelperText>
+                    !!errorMessage && <HelperText style={{paddingLeft: 10}} type='error' padding='none' visible={true}>{errorMessage}</HelperText>
                 }
                 </List.Section>
                 <List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'flex-start'}}>
@@ -162,8 +178,8 @@ const Login = ({route, navigation}) =>
                     <Button style={{width: 130, marginRight: 10}}  mode='outlined' onPress={resetInputs}>
                         Reset
                     </Button>
-                    <Button style={{width: 130}} loading={false} mode='contained' onPress={signin} disabled={checkedTerms === 'unchecked'}> 
-                        SignUp
+                    <Button style={{width: 130}} loading={false} mode='contained' onPress={signin} disabled={false}> 
+                        Login
                     </Button>
                 </List.Section>
                 <List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'center'}}>

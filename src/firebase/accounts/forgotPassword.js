@@ -18,7 +18,7 @@ import { theme } from '../../common/theme';
 import { appLoginScreenName } from '../../constants';
 import { emailValidator } from '../../common/validate';
 
-const ForgotPassword = ({navigation}) => 
+const ForgotPassword = ({route, navigation}) => 
 {
     const [email, setEmail] = useState({value: '', error: ''});
     const [isValid, setIsValid] = useState(true);
@@ -26,6 +26,14 @@ const ForgotPassword = ({navigation}) =>
     
     const [sendingNow, setSendingNow] = useState(false);
 
+	React.useEffect
+	(
+		() => 
+		{
+    		setEmail({value: route.params.email, error: ''});
+  		}, [route.params]
+  	);
+  	
     const resetPassword = () => 
     {
 		const emailError = emailValidator(email.value);
