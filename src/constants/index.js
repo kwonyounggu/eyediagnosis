@@ -20,6 +20,7 @@ export const forumName = 'Forum';
 export const pharmacyName = 'Pharmacy';
 export const appLoginScreenName = 'App SignIn';
 export const appRegisterScreenName = 'App SignUp';
+export const appHome = 'App Home';
 
 export const appForgotPasswordScreenName = 'Forgot Password';
 

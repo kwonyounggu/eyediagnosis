@@ -8,11 +8,13 @@ import {isEmpty} from 'lodash';
 import { signOut, onAuthStateChanged} from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
 
-import { homeName, chattingName, settingsName, forumName, appLoginScreenName } from '../../constants';
+import { homeName, chattingName, settingsName, forumName, appLoginScreenName, appHome, appForgotPasswordScreenName, appRegisterScreenName } from '../../constants';
 import HomeScreen from './homeScreen';
 import ForumScreen from './forumScreen';
 import ChattingScreen from './chattingScreen';
 import SettingsScreen from './settingsScreen';
+
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 //const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -21,6 +23,7 @@ const Drawer = createDrawerNavigator();
  * https://stackoverflow.com/questions/60375329/add-icon-to-drawer-react-navigation-v5
  * https://reactnavigation.org/docs/drawer-navigator/
  * https://www.youtube.com/watch?v=mRoDNjhRO3E&ab_channel=FullStackNiraj
+ * https://github.com/react-navigation/react-navigation/issues/10059
  */
 
 const CustomDrawer = (props) =>
@@ -69,14 +72,14 @@ const CustomDrawer = (props) =>
 				isEmpty(appUser) ?
 				(<TouchableOpacity onPress={()=>props.navigation.navigate(appLoginScreenName, {email: '', password: ''})}><Text>Login</Text></TouchableOpacity>):
 	          (<><View>
-	            <Text>John Doe</Text>
-	            <Text>example@email.com</Text>
+	            <Text ellipsizeMode='tail'>{appUser.displayName}</Text>
+	            <Text ellipsizeMode='tail'>{appUser.email}</Text>
 	          </View>
 	          <Image
 	            source=
 	            {
 					{
-	              		uri: 'https://images.unsplash.com/photo-1624243225303-261cc3cd2fbc?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+	              		uri: appUser.photoURL,
 	            	}
 	            }
 	            style={{ width: 60, height: 60, borderRadius: 30 }}
@@ -85,33 +88,76 @@ const CustomDrawer = (props) =>
 	        </View>
 	        <DrawerItemList {...props} />
 	      </DrawerContentScrollView>
-	      <TouchableOpacity
-	        style=
-	        {
-				{
-		          position: 'absolute',
-		          right: 0,
-		          left: 0,
-		          bottom: 50,
-		          backgroundColor: '#f6f6f6',
-		          padding: 20
-		        }
-		    }
-		    onPress={()=>signOut().then(()=>console.log('Signed out'))}
-	      >
-	        <Text>Log Out</Text>
-	      </TouchableOpacity>
+	      {
+			  !isEmpty(appUser) &&
+			  <TouchableOpacity
+		        style=
+		        {
+					{
+			          position: 'absolute',
+			          right: 0,
+			          left: 0,
+			          bottom: 50,
+			          backgroundColor: '#f6f6f6',
+			          padding: 20
+			        }
+			    }
+			    onPress={()=>signOut(auth).then(()=>console.log('Signed out'))}
+		      >
+		        <Text>Log Out</Text>
+		      </TouchableOpacity>
+		  }
 	    </View>
 	  );
 };
 export default function HomeRoot({navigation})
 {
+	const getHeaderTitle  = (route) =>
+	{
+		const routeName = getFocusedRouteNameFromRoute(route)?? appHome;
+		
+		console.log("routeName: ", routeName);
+		
+		switch(routeName)
+		{
+			case appHome: return 'Home';
+			case appLoginScreenName: return 'Login';
+			case appRegisterScreenName: return 'SignUp';
+			case appForgotPasswordScreenName: return 'Restore Password';
+			default: return 'Unknown';
+		}
+	}
+	
+	const getHeaderTitleNavigator  = (route, navigation) =>
+	{
+		console.log("--route: ", route);
+		console.log("--navigation: ", navigation);
+		const routeName = getFocusedRouteNameFromRoute(route);
+		
+		//if (routeName === undefined) navigation.navigate(appHome);
+		console.log("routeName in getHeaderTitleNavigator: ", routeName);
+		
+		
+	}
     return (
       <Drawer.Navigator 
       			initialRouteName={homeName}
+      			screenListeners=
+      			{
+					{
+					     drawerItemPress: (e) => 
+					     {
+					        if (e.target?.includes(homeName)) 
+					        {
+					         navigation.navigate(appHome);
+					        }
+					        //console.log(e.target);
+					     } 
+				     } 
+				}
       			screenOptions=
             	{
-					({route})=>
+					({route, navigation})=>
 					(
 						{
 							headerStyle: 
@@ -128,22 +174,26 @@ export default function HomeRoot({navigation})
 				}
 				drawerContent={props => <CustomDrawer {...props} />}
       >
-        <Drawer.Screen name={homeName} 
+        <Drawer.Screen name={homeName}
         			   component={HomeScreen} 
         			   options=
         			   {
-						   {
-							   title: 'Home',
-							   drawerIcon: ({focused, size}) => 
-							   (
-							              <Ionicons
-							                 name="md-home"
-							                 size={size}
-							                 color={focused ? '#7cc' : '#ccc'}
-							              />
-							   )
-						   }
-					   }
+						   ({route}) =>
+						   (
+							   {
+								   headerTitle: getHeaderTitle(route),
+								   headerShown: true,
+								   drawerIcon: ({focused, size}) => 
+								   (
+								              <Ionicons
+								                 name="md-home"
+								                 size={size}
+								                 color={focused ? '#7cc' : '#ccc'}
+								              />
+								   )
+							   }
+						   )
+					   } 
         />
         <Drawer.Screen name={forumName} 
         			   component={ForumScreen} 

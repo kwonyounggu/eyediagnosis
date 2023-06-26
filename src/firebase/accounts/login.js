@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, Platform, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import 
 { 
 	ActivityIndicator,
@@ -8,8 +8,7 @@ import
     HelperText, 
     Headline,
     Text,
-    TextInput,
-    Checkbox
+    TextInput
 } from 'react-native-paper'; 
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -25,7 +24,6 @@ const Login = ({route, navigation}) =>
     const [email, setEmail] = useState({value: '', error: ''});
     const [password, setPassword] = useState({value: '', error: ''});
 
-    const [checkedTerms, setCheckedTerms] = useState(Platform.OS === 'ios' ? 'checked' : 'unchecked');
     const [secureTextEntry, setSecureTextEntry] = useState(true);
     const [passwordIcon, setPasswordIcon] = useState('eye-off');
     const [errorMessage, setErrorMessage] = useState('');
@@ -75,6 +73,7 @@ const Login = ({route, navigation}) =>
 			return;
 		}
 		
+		setSigningInNow(true);
 		if (errorMessage.length !== 0) setErrorMessage('');
 		
 		
@@ -108,7 +107,11 @@ const Login = ({route, navigation}) =>
 	          else if (error.code === 'auth/user-disabled') setErrorMessage('Ooops!, Your account is disabled.');
 	          else setErrorMessage(error.message);
 	        }
-	    );
+	    )
+	    .finally
+	    (
+			() => setSigningInNow(false)
+		);
 	    
     };
 
@@ -167,12 +170,6 @@ const Login = ({route, navigation}) =>
                 {
                     !!errorMessage && <HelperText style={{paddingLeft: 10}} type='error' padding='none' visible={true}>{errorMessage}</HelperText>
                 }
-                </List.Section>
-                <List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'flex-start'}}>
-                	<Checkbox status={checkedTerms === 'checked' ? 'checked' : 'unchecked'}
-						      onPress={() =>  setCheckedTerms( checkedTerms === 'checked' ? 'unchecked' : 'checked')}
-					/>
-					<Text style={[styles.labelPrimary, {marginTop: 10}]} >Remember Me</Text>
                 </List.Section>
 				<List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'space-between'}}>
                     <Button style={{width: 130, marginRight: 10}}  mode='outlined' onPress={resetInputs}>

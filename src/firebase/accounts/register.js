@@ -224,12 +224,13 @@ const Register = ({navigation}) =>
 	
 	const resetInputs = () =>
     {
-		/*
-        setAge('');
-        setGender('female');
-        setMedicalHistory('');
-        setSigns('');
-        setSymptoms(''); */
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setPassword('');
+        setPassword2('');
+        setCountry('CA');
+        setProvince('ON');
     }
     return (	
 		<KeyboardAwareScrollView>
@@ -245,7 +246,9 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={50} 
                             value={firstName}
-                            onChangeText={(value)=>setFirstName(value.trim())}  
+                            onChangeText={(value)=>setFirstName(value.trim())}
+                            returnKeyType='next'
+                            keyboardType='ascii-capable'  
                         />
                         <TextInput 
                             style={{flex: 1, marginLeft: 3}}
@@ -255,7 +258,9 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={50} 
                             value={lastName}
-                            onChangeText={(value)=>setLastName(value.trim())}       
+                            onChangeText={(value)=>setLastName(value.trim())}
+                            returnKeyType='next'
+                            keyboardType='ascii-capable'       
                         />
                     </View>
                 </List.Section>
@@ -271,6 +276,7 @@ const Register = ({navigation}) =>
                             textContentType='emailAddress'
                             keyboardType='email-address'
                             autoCapitalize='none'
+                            returnKeyType='next'
                         />
                 </List.Section>
                 <List.Section>
@@ -288,6 +294,8 @@ const Register = ({navigation}) =>
 						          				onPress={()=>{}}
 							    /> 
 							}
+							returnKeyType='next'
+							keyboardType='url'
                         />
                         
                 </List.Section>
@@ -346,6 +354,7 @@ const Register = ({navigation}) =>
 							}
 							value={password}
                             onChangeText={(value)=>setPassword(value)}  
+                            returnKeyType='next'
                         />
                         <HelperText style={{paddingLeft: 10}} type='info' padding='none' visible={true}>7 to 15 characters which contain only characters, numeric digits, underscore and first character must be a letter</HelperText>
 	                    <TextInput 
@@ -362,7 +371,8 @@ const Register = ({navigation}) =>
 							    /> 
 							}
 							value={password2}
-                            onChangeText={(value)=>setPassword2(value)}  
+                            onChangeText={(value)=>setPassword2(value)} 
+                            returnKeyType='done' 
                         />
                 </List.Section>
                 <List.Section>
