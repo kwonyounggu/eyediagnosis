@@ -37,7 +37,7 @@ export default function ChattingScreen({navigation})
   	);*/
   	
     const [messages, setMessages] = React.useState([]);
-    const signOutNow = () => 
+    /*const signOutNow = () => 
     {
         signOut(auth).then
         (
@@ -54,11 +54,12 @@ export default function ChattingScreen({navigation})
             // An error happened.
         	}
         );
-    }
+    }*/
     React.useLayoutEffect
     (
 		() => 
 		{
+			/*
 	        navigation.setOptions
 	        (
 				{
@@ -83,10 +84,10 @@ export default function ChattingScreen({navigation})
 		                </TouchableOpacity>
 	                )
 	        	}
-	        );
+	        );*/
 	        const q = query(collection(db, 'eyediagnosisChats'), orderBy('createdAt', 'desc'));
             const unsubscribe = onSnapshot
-            ( q, (snapshot) => 
+            ( q, (snapshot) =>
             	 setMessages
             	 (
             		snapshot.docs.map
@@ -104,7 +105,7 @@ export default function ChattingScreen({navigation})
         		)
         	);
 
-            return () => {unsubscribe();};
+            return () => unsubscribe();
 	        
          }, [navigation]
       );

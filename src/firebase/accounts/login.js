@@ -11,12 +11,12 @@ import
     TextInput
 } from 'react-native-paper'; 
 import { auth } from '../firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { theme } from '../../common/theme';
 
-import { chattingName, appForgotPasswordScreenName, appRegisterScreenName, homeRootName } from '../../constants';
+import { chattingName, appForgotPasswordScreenName, appRegisterScreenName, homeRootName, appHome } from '../../constants';
 import { emailValidator, passwordValidator } from '../../common/validate';
 
 const Login = ({route, navigation}) => 
@@ -85,14 +85,26 @@ const Login = ({route, navigation}) =>
         (
 			(userCredential) => 
 	        {
-	          //navigation.navigate(chattingName);
 	          console.log("INFO: userCredential=", userCredential.user);
 	          console.log("emailVerified: ", userCredential.user.emailVerified);
 	          if (userCredential.user.emailVerified) 
 	          {
-				  navigation.navigate(homeRootName);//check if it is working, do onauthstatechanged without using rememeberme
+				  navigation.navigate(appHome);//check if it is working, do onauthstatechanged without using rememeberme
 			  }
-	          else setErrorMessage('Ooops! You haven\'t verified your email if it\'s yours.');
+	          else 
+	          {
+				  //here do signOut
+				  setErrorMessage('Ooops! You haven\'t verified your email if it\'s yours.');
+				  signOut(auth)
+				  .then
+				  (
+					  ()=>console.log('Signed out because it has been verified.')
+				  )
+				  .catch
+				  (
+					  (e)=>console.log('Signing out due to the unverified is failed: ', e.message)
+				  )
+			  }
 	            
 	        }
 	    )

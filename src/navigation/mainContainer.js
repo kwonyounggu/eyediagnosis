@@ -11,7 +11,7 @@ import EyeWikiScreen from './screens/eyeWikiScreen';
 import PharmacyScreen from './screens/pharmacyScreen';
 import HomeRoot from './screens/homeRoot';
 
-import {homeRootName, homeName, diseasesName, pharmacyName, settingsName, chattingName, eyeWikiName, forumName, EYE_WIKI_HOME} from '../constants'
+import {homeRootName, homeName, diseasesName, pharmacyName, settingsName, chattingName, eyeWikiName, forumName, EYE_WIKI_HOME, appHome} from '../constants'
 
 
 const Tab = createBottomTabNavigator();
@@ -78,6 +78,20 @@ export default function MainContainer()
 									{
 										headerLeft: ()=>{},
 										headerShown: false
+									}
+								)
+							}
+							listeners=
+							{
+								({navigation, route}) =>
+								(
+									{
+										tabPress: (e) =>
+										{
+											//Used to route directly to Home where authentification page is open
+											e.preventDefault();
+											navigation.navigate(appHome);
+										}
 									}
 								)
 							}

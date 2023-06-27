@@ -28,6 +28,8 @@ const Drawer = createDrawerNavigator();
 
 const CustomDrawer = (props) =>
 {
+	//console.log("customedrawer props: ", props);
+	const {navigation} = props;
 	//75: const {onUpdateChatGptUser} = React.useContext(AppContext).actions; 
 	const {appUser} = React.useContext(AppContext).state;
 	//console.log("INFO: isEmpty(appUser) = ", isEmpty(appUser));
@@ -102,7 +104,7 @@ const CustomDrawer = (props) =>
 			          padding: 20
 			        }
 			    }
-			    onPress={()=>signOut(auth).then(()=>console.log('Signed out'))}
+			    onPress={()=>signOut(auth).then(()=>navigation.navigate(appHome))}
 		      >
 		        <Text>Log Out</Text>
 		      </TouchableOpacity>
@@ -116,7 +118,7 @@ export default function HomeRoot({navigation})
 	{
 		const routeName = getFocusedRouteNameFromRoute(route)?? appHome;
 		
-		console.log("routeName: ", routeName);
+		//console.log("routeName: ", routeName);
 		
 		switch(routeName)
 		{
@@ -126,18 +128,6 @@ export default function HomeRoot({navigation})
 			case appForgotPasswordScreenName: return 'Restore Password';
 			default: return 'Unknown';
 		}
-	}
-	
-	const getHeaderTitleNavigator  = (route, navigation) =>
-	{
-		console.log("--route: ", route);
-		console.log("--navigation: ", navigation);
-		const routeName = getFocusedRouteNameFromRoute(route);
-		
-		//if (routeName === undefined) navigation.navigate(appHome);
-		console.log("routeName in getHeaderTitleNavigator: ", routeName);
-		
-		
 	}
     return (
       <Drawer.Navigator 
@@ -181,6 +171,7 @@ export default function HomeRoot({navigation})
 						   ({route}) =>
 						   (
 							   {
+								   drawerLabel: 'Home',
 								   headerTitle: getHeaderTitle(route),
 								   headerShown: true,
 								   drawerIcon: ({focused, size}) => 
@@ -218,6 +209,8 @@ export default function HomeRoot({navigation})
         			   {
 						   {
 							   title: 'Group Chatting',
+							   drawerLabel: 'Chatting',
+							   gestureEnabled: false,
 							   drawerIcon: ({focused, size}) => 
 							   (
 							              <Ionicons
