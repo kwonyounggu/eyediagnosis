@@ -152,7 +152,7 @@ const Register = ({navigation}) =>
 							    }
 						   );
 						   //alert('You are registered, please login after your email verification is done.');
-						   navigation.navigate(appLoginScreenName, {email, password});
+						   navigation.navigate(appLoginScreenName, {email, password, toRoute: ''});
 
 						}
 					)
@@ -401,7 +401,7 @@ const Register = ({navigation}) =>
                 </List.Section>
                 <List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'center'}}>
                 	<Text style={[styles.labelSecondary, {marginTop: 0}]} >Already have an account?  </Text>
-                	<TouchableOpacity onPress={() => navigation.navigate(appLoginScreenName, {email: '', password: ''})}>
+                	<TouchableOpacity onPress={() => navigation.navigate(appLoginScreenName, {email: '', password: '', toRoute: ''})}>
 			          <Text style={styles.link}>Login</Text>
 			        </TouchableOpacity>
                 </List.Section>

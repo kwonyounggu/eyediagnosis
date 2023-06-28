@@ -7,7 +7,10 @@ import { signOut } from 'firebase/auth';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from 'firebase/firestore';
 
-
+/**
+ * https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
+ * https://enappd.com/blog/react-native-chat-application-using-firebase-and-hooks/207/
+ */
 export default function ChattingScreen({navigation})
 {
 	console.log("INFO in ChattingScreen: ", React.useContext(AppContext));
@@ -55,6 +58,7 @@ export default function ChattingScreen({navigation})
         	}
         );
     }*/
+    
     React.useLayoutEffect
     (
 		() => 
@@ -85,6 +89,7 @@ export default function ChattingScreen({navigation})
 	                )
 	        	}
 	        );*/
+	        //Retrieve old messages from firestore
 	        const q = query(collection(db, 'eyediagnosisChats'), orderBy('createdAt', 'desc'));
             const unsubscribe = onSnapshot
             ( q, (snapshot) =>
@@ -147,6 +152,7 @@ export default function ChattingScreen({navigation})
             messages={messages}
             showAvatarForEveryMessage={true}
             onSend={messages => onSend(messages)}
+            renderUsernameOnMessage={true}
             user=
             {
 				{

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 //import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppContext } from '../../contexts/appProvider';
 import {isEmpty} from 'lodash';
@@ -23,7 +23,10 @@ const Drawer = createDrawerNavigator();
  * https://stackoverflow.com/questions/60375329/add-icon-to-drawer-react-navigation-v5
  * https://reactnavigation.org/docs/drawer-navigator/
  * https://www.youtube.com/watch?v=mRoDNjhRO3E&ab_channel=FullStackNiraj
+ * https://www.youtube.com/watch?v=l8nY4Alk70Q&ab_channel=PradipDebnath
  * https://github.com/react-navigation/react-navigation/issues/10059
+ * https://snack.expo.dev/?platform=web
+ * https://reactnavigation.org/docs/drawer-navigator/
  */
 
 const CustomDrawer = (props) =>
@@ -72,7 +75,13 @@ const CustomDrawer = (props) =>
 	        >
 	        {
 				isEmpty(appUser) ?
-				(<TouchableOpacity onPress={()=>props.navigation.navigate(appLoginScreenName, {email: '', password: ''})}><Text>Login</Text></TouchableOpacity>):
+				(<TouchableOpacity onPress={()=>props.navigation.navigate(appLoginScreenName, {email: '', password: '', toRoute: ''})}>
+					<View style={{flexDirection: 'row', alignItems: 'center'}}>
+	            		<Ionicons name="enter-outline" size={22} />
+			        	<Text> LogIn</Text>
+			        </View>
+				 </TouchableOpacity>
+				):
 	          (<><View>
 	            <Text ellipsizeMode='tail'>{appUser.displayName}</Text>
 	            <Text ellipsizeMode='tail'>{appUser.email}</Text>
@@ -106,7 +115,10 @@ const CustomDrawer = (props) =>
 			    }
 			    onPress={()=>signOut(auth).then(()=>navigation.navigate(appHome))}
 		      >
-		        <Text>Log Out</Text>
+		      	<View style={{flexDirection: 'row', alignItems: 'center'}}>
+            		<Ionicons name="exit-outline" size={22} />
+		        	<Text>Log Out</Text>
+		        </View>
 		      </TouchableOpacity>
 		  }
 	    </View>
@@ -114,6 +126,8 @@ const CustomDrawer = (props) =>
 };
 export default function HomeRoot({navigation})
 {
+	const {appUser} = React.useContext(AppContext).state;
+	
 	const getHeaderTitle  = (route) =>
 	{
 		const routeName = getFocusedRouteNameFromRoute(route)?? appHome;
@@ -132,6 +146,7 @@ export default function HomeRoot({navigation})
     return (
       <Drawer.Navigator 
       			initialRouteName={homeName}
+      			
       			screenListeners=
       			{
 					{
@@ -139,8 +154,14 @@ export default function HomeRoot({navigation})
 					     {
 					        if (e.target?.includes(homeName)) 
 					        {
-					         navigation.navigate(appHome);
+								e.preventDefault();
+					         	navigation.navigate(appHome);
 					        }
+					        else if(e.target?.includes(chattingName) && isEmpty(appUser))
+					        {
+								e.preventDefault();
+								navigation.navigate(appLoginScreenName, {email: '', password: '', toRoute: chattingName});
+							}
 					        //console.log(e.target);
 					     } 
 				     } 
@@ -149,7 +170,7 @@ export default function HomeRoot({navigation})
             	{
 					({route, navigation})=>
 					(
-						{
+						{	swipeEnabled: false,					
 							headerStyle: 
 							{
 					            backgroundColor: '#f4511e'
@@ -207,10 +228,10 @@ export default function HomeRoot({navigation})
 	    			   component={ChattingScreen}
 	    			   options=
         			   {
-						   {
+						   ({navigation}) =>
+						   ({
 							   title: 'Group Chatting',
 							   drawerLabel: 'Chatting',
-							   gestureEnabled: false,
 							   drawerIcon: ({focused, size}) => 
 							   (
 							              <Ionicons
@@ -219,7 +240,7 @@ export default function HomeRoot({navigation})
 							                 color={focused ? '#7cc' : '#ccc'}
 							              />
 							   )
-						   }
+						   })
 					   } 
 	    />
 	    <Drawer.Screen name={settingsName} 

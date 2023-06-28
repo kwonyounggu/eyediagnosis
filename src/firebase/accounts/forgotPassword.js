@@ -48,7 +48,7 @@ const ForgotPassword = ({route, navigation}) =>
 		sendPasswordResetEmail(auth, email.value)
 		.then
 		(
-			() => navigation.navigate(appLoginScreenName, {email: email.value, password: ''})	
+			() => navigation.navigate(appLoginScreenName, {email: email.value, password: '', toRoute: ''})	
 		)
 		.catch
 		(
@@ -98,7 +98,7 @@ const ForgotPassword = ({route, navigation}) =>
                     </Button>
                 </List.Section>
                 <List.Section style={{flexDirection: 'row', marginTop: 0, justifyContent: 'center'}}>            	
-                	<TouchableOpacity onPress={() => navigation.navigate(appLoginScreenName, {email: '', password: ''})} >
+                	<TouchableOpacity onPress={() => navigation.navigate(appLoginScreenName, {email: '', password: '', toRoute: ''})} >
 			          <Text style={[styles.labelSecondary, {marginTop: 0}]} >← Back to login</Text>
 			        </TouchableOpacity>
                 </List.Section>
