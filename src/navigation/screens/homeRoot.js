@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 //import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, useDrawerStatus } from '@react-navigation/drawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppContext } from '../../contexts/appProvider';
 import {isEmpty} from 'lodash';
@@ -14,7 +14,7 @@ import ForumScreen from './forumScreen';
 import ChattingScreen from './chattingScreen';
 import SettingsScreen from './settingsScreen';
 
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
 
 //const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -38,6 +38,9 @@ const CustomDrawer = (props) =>
 	//console.log("INFO: isEmpty(appUser) = ", isEmpty(appUser));
 	
 	const {onUpdateAppUser} = React.useContext(AppContext).actions;
+	
+	const currentRouteName = getFocusedRouteNameFromRoute(useRoute());
+	const isDrawerOpen = useDrawerStatus() === 'open';
 	
 	React.useEffect
 	(
@@ -113,7 +116,30 @@ const CustomDrawer = (props) =>
 			          padding: 20
 			        }
 			    }
-			    onPress={()=>signOut(auth).then(()=>navigation.navigate(appHome))}
+			    onPress=
+			    {
+					()=>
+					{
+						console.log("current route name: ", currentRouteName);
+						switch(currentRouteName)
+						{
+							case chattingName: navigation.navigate(appHome);
+											   break;
+							default: break;
+						}
+						signOut(auth).then
+						(
+							()=>
+							{		
+								if (isDrawerOpen) navigation.closeDrawer();//navigation.openDrawer()
+							}
+						)
+						.catch
+						(
+							(e)=>console.log("[ERROR]: ", e)
+						);
+					}
+				}
 		      >
 		      	<View style={{flexDirection: 'row', alignItems: 'center'}}>
             		<Ionicons name="exit-outline" size={22} />
