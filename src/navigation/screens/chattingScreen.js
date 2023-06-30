@@ -1,15 +1,21 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActionSheetIOS } from 'react-native';
+import { View, StyleSheet, ActionSheetIOS } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
 //import { signOut } from 'firebase/auth';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { launchCameraAsync, launchImageLibraryAsync } from 'expo-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, getDownloadURL, uploadBytes} from "firebase/storage";
 //import uuid from 'react-native-uuid';
 import Video from 'react-native-video';
+import 
+{ 
+    IconButton, 
+    Menu,
+    Divider
+} from 'react-native-paper'; 
 
 /**
  * https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
@@ -21,13 +27,65 @@ import Video from 'react-native-video';
  * https://stackoverflow.com/questions/56798962/display-an-image-or-video-in-gifted-chat
  * https://github.com/FaridSafi/react-native-gifted-chat/tree/master/example/example-gifted-chat
  * https://github.com/FaridSafi/react-native-gifted-chat/tree/master/example/example-slack-message
+ * 
+ * Most recent info
+ * https://code.tutsplus.com/tutorials/how-to-upload-images-to-firebase-from-a-react-native-app--cms-93907
  */
 export default function ChattingScreen({navigation})
 {
 	console.log("INFO in ChattingScreen: ", React.useContext(AppContext));
 	
     const [messages, setMessages] = React.useState([]);
+    const [popupVisible, setPopupVisible] = React.useState(false);
 
+    const handePhotos = () => 
+    {
+		setPopupVisible(false);
+		
+		ImagePicker.launchImageLibraryAsync
+		(
+			{
+				mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            	allowsEditing: false,
+            	aspect: [4, 3],
+            	quality: 1
+			}
+		)
+		.then
+        (
+			(result) => 
+			{ 	console.log("result: ", result);
+                //if (!result.cancelled) uploadMediaToFirestore(result);
+                if (!result.cancelled)
+                {
+					uploadToStorage(result);
+				}
+        	}
+        )
+        .catch
+        (
+			(e)=>console.log("[ERROR]: ", e)
+		);
+	}
+	
+	const uploadToStorage = async (result) =>
+	{
+		const fetchResponse = await fetch(result.uri);
+		const blob = fetchResponse.blob();
+		const filename = result.uri.substring(result.uri.lastIndexOf('/') + 1);
+		const storage = getStorage(app);
+        const storageRef = ref(storage, 'images/' + filename); 
+        
+        uploadBytes(storageRef, blob)
+        .then
+        (
+			(snapshot) =>
+			{
+				console.log("Uploaded a blob or file");
+			}
+		)
+		
+	}
     const goToMedia = () => 
     {
         ActionSheetIOS.showActionSheetWithOptions
@@ -40,7 +98,7 @@ export default function ChattingScreen({navigation})
             { console.log("buttonIndex: ", buttonIndex);
 	          if (buttonIndex == 2) 
 	          {
-	            launchImageLibraryAsync().then
+	            ImagePicker.launchImageLibraryAsync().then
 	            (
 					(res) => 
 					{ 	console.log("res: ", res);
@@ -54,7 +112,7 @@ export default function ChattingScreen({navigation})
 	          } 
 	          else if (buttonIndex == 1) 
 	          {
-	            launchCameraAsync().then
+	            ImagePicker.launchCameraAsync().then
 	            (
 					(res) => 
 					{
@@ -77,7 +135,7 @@ export default function ChattingScreen({navigation})
 	              title: 'Video Picker', 
 	              mediaType: 'video', 
 	            };
-	            launchImageLibraryAsync(options).then
+	            ImagePicker.launchImageLibraryAsync(options).then
 	            (
 					(res) => 
 		            {
@@ -105,8 +163,8 @@ export default function ChattingScreen({navigation})
         console.log("[INFO]: filename=", filename, ", uploadUri=", uploadUri);
 
         const storage = getStorage(app);
-        //const storage = getStorage();
-        const fileRef = ref(storage, filename);
+
+        const storageRef = ref(storage, 'images/' + filename); 
         const img = await fetch(uploadUri);
         const bytes = await img.blob();
         console.log("----- 7 ------");
@@ -125,8 +183,10 @@ export default function ChattingScreen({navigation})
 	              contentType: 'image/jpeg',
 	          };
         }
-        console.log("----- 9 ------");
-        uploadBytes(fileRef, bytes, metadata)
+        console.log("----- 9 ------ bytes: ", bytes);
+        
+        if (1>0) return;
+        uploadBytes(storageRef, bytes, metadata)
         .then
         (
 			async (uploadTask) => 
@@ -150,10 +210,10 @@ export default function ChattingScreen({navigation})
         )
         .catch
         (
-			(err) => 
+			(error) => 
 			{
           			alert('Error while uploading Image!')
-          			console.log(err);
+          			console.log(error);
         	}
         );
     }  
@@ -253,36 +313,55 @@ export default function ChattingScreen({navigation})
           </View>
         );
     }
+    React.useEffect
+    (
+		() =>
+		{
+			navigation.setOptions
+	        (
+				{
+		            headerRight: () => 
+		            (
+		                <Menu visible={popupVisible} 
+		                	  contentStyle={styles.popupMenu}
+		                	  onDismiss={()=>setPopupVisible(false)}
+                    		  anchor=
+                    		  {
+								  <IconButton style={{margin: 0, padding: 0}} 
+								  			  icon='dots-vertical' color='#000' size={30} 
+								  			  onPress={()=>setPopupVisible(true)}
+								  />
+							  }
+                    	>
+                    		  <Menu.Item leadingIcon='logout' title='Camera' onPress={()=>{}} />
+                    		  <Menu.Item leadingIcon='logout' 
+                    		  			 title='Photos' 
+                    		  			 onPress={handePhotos}
+                    		  />
+                    		  <Menu.Item leadingIcon='logout' title='Video' onPress={()=>{}} />
+                    		  <Divider />
+                    		  <Menu.Item leadingIcon='database-sync-outline' 
+                    		  			 title='List Data' 
+                    		  			 onPress=
+                    		  			 {
+											   () =>
+											   {
+												   //setPopupVisible(false); 
+												   //return navigation.navigate(listSavedDataName);
+											   }
+										 } 
+							/>
+                    	</Menu>
+	                )
+	        	}
+	        );
+		}
+		
+	);
     React.useLayoutEffect
     (
 		() => 
 		{
-			
-	        navigation.setOptions
-	        (
-				{
-		            /*headerLeft: () => 
-		            (
-		                <View style={{ marginLeft: 20 }}>
-		                    <Avatar
-		                        rounded
-		                        source={{
-		                            uri: auth?.currentUser?.photoURL,
-		                        }}
-		                    />
-		                </View>
-		            ),*/
-		            headerRight: () => 
-		            (
-		                <TouchableOpacity 
-		                	style={{marginRight: 10}}
-		                    onPress={goToMedia}
-		                >
-		                    <Text>Media</Text>
-		                </TouchableOpacity>
-	                )
-	        	}
-	        );
 	        //Retrieve old messages from firestore
 	        
 	        const q = query(collection(db, 'eyediagnosisChats'), orderBy('createdAt', 'desc'));
@@ -313,31 +392,8 @@ export default function ChattingScreen({navigation})
             return () => unsubscribe();           
 		   
          }, [navigation]
-      );
+    );
 
-	/*
-    React.useEffect
-    (
-		() => 
-		{
-	        setMessages
-	        (
-				[
-		            {
-		                _id: 1,
-		                text: 'Hello developer',
-		                createdAt: new Date(),
-		                user: 
-		                {
-		                    _id: 2,
-		                    name: 'React Native',
-		                    avatar: 'https://placeimg.com/140/140/any',
-		                }
-		             }
-	            ]
-	        )
-	    }, []
-	);*/
     const onSend = React.useCallback
     (
 		(messages = []) => 
@@ -378,3 +434,17 @@ export default function ChattingScreen({navigation})
         />
     );
 }
+
+const styles = StyleSheet.create
+(
+    {
+        popupMenu: 
+		{
+		    borderTopLeftRadius: 10,
+		    borderRadius: 20,
+		    
+		    borderWidth: 5,
+		    backgroundColor: 'red'
+		}
+    }
+);
