@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, ActionSheetIOS } from 'react-native';
+import { View, StyleSheet, ActionSheetIOS, Image } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
@@ -8,7 +8,7 @@ import { GiftedChat } from 'react-native-gifted-chat';
 import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, getDownloadURL, uploadBytes} from "firebase/storage";
-//import uuid from 'react-native-uuid';
+import uuid from 'react-native-uuid';
 import Video from 'react-native-video';
 import 
 { 
@@ -68,20 +68,43 @@ export default function ChattingScreen({navigation})
 		);
 	}
 	
+	//image, video, pdf
 	const uploadToStorage = async (result) =>
 	{
 		const fetchResponse = await fetch(result.uri);
-		const blob = fetchResponse.blob();
+		const blob = await fetchResponse.blob();
 		const filename = result.uri.substring(result.uri.lastIndexOf('/') + 1);
 		const storage = getStorage(app);
-        const storageRef = ref(storage, 'images/' + filename); 
+        const storageRef = ref(storage, result.type +'s/' + filename); //eg: images/imageFileName.jpg, videos/videoFileName.mp4
         
-        uploadBytes(storageRef, blob)
+        //const storageRef = ref(storage, result.type); //eg: images/imageFileName.jpg, videos/videoFileName.mp4
+
+        const metaData = {contentType: blob.type}; //eg: image/jpg
+        
+        console.log("[INFO]: dir file name=", result.type +'s/' + filename);
+        console.log("[INFO]: metaData=", metaData);
+        console.log("[INFO]: blob=", blob);
+        
+        uploadBytes(storageRef, blob, metaData)
         .then
         (
-			(snapshot) =>
+			async (snapshot) =>
 			{
-				console.log("Uploaded a blob or file");
+				console.log("======>Uploaded a blob or file: ", snapshot);
+				getDownloadURL(snapshot.ref).then
+          		(
+					  (url) => 
+					  {
+            				if (result.type == 'video') 
+            				{
+					              setVideoData(url);
+					        } 
+					        else 
+					        {     
+					              setImageData(url);
+					        }
+          			  }
+          		);
 			}
 		)
 		
@@ -250,7 +273,7 @@ export default function ChattingScreen({navigation})
 		);
     }
     const setImageData = (url) => 
-    {   console.log("----- 1 ------");
+    {   
         const imageMessage = 
         [
           {
@@ -310,6 +333,32 @@ export default function ChattingScreen({navigation})
 	              allowsExternalPlayback={false}
 	           >
 	           </Video>    
+          </View>
+        );
+    }
+    const renderMessageImage = (props) => 
+    {
+        const { currentMessage } = props;
+        console.log(currentMessage.image);
+        return (
+          
+          <View style={{ position: 'relative', height: 150, width: 250 }}>
+	          <Image 
+	          		style=
+			        {
+						  {
+					            position: 'absolute',
+					            left: 0,
+					            top: 0,
+					            height: 150,
+					            width: 250,
+					            borderRadius: 20
+			          	  }
+			        }
+	          		source={{uri: currentMessage.image}}
+	          		
+	          />
+    
           </View>
         );
     }
@@ -373,14 +422,17 @@ export default function ChattingScreen({navigation})
             		snapshot.docs.map
             		(
 						doc => 
-						(
-							{
+						{
+							if (doc.data().image) console.log("[INFO] image url: ", doc.data().image);
+							return {
 				                _id: doc.data()._id,
 				                createdAt: doc.data().createdAt.toDate(),
 				                text: doc.data().text,
+				                image: doc.data().image,
+				                video: doc.data().video,
 				                user: doc.data().user
-            				}
-            			)
+            				};
+            			}
             		)
         		),
         	  (error) =>
@@ -431,6 +483,7 @@ export default function ChattingScreen({navigation})
             	}
             }
             renderMessageVideo={renderMessageVideo}
+            renderMessageImage={renderMessageImage}
         />
     );
 }
