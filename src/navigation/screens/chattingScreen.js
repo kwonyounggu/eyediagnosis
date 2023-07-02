@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { View, StyleSheet, ActionSheetIOS, Image } from 'react-native';
+import { View, StyleSheet, ActionSheetIOS, Image, Dimensions } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
 //import { signOut } from 'firebase/auth';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { Bubble, GiftedChat, MessageImage } from 'react-native-gifted-chat';
 import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, getDownloadURL, uploadBytes} from "firebase/storage";
@@ -14,8 +14,11 @@ import
 { 
     IconButton, 
     Menu,
-    Divider
+    Divider,
+    ActivityIndicator
 } from 'react-native-paper'; 
+import Ionicons from 'react-native-vector-icons/Ionicons';
+//import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 /**
  * https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
@@ -30,6 +33,17 @@ import
  * 
  * Most recent info
  * https://code.tutsplus.com/tutorials/how-to-upload-images-to-firebase-from-a-react-native-app--cms-93907
+ * 
+ * DataInputBar change
+ * https://stackoverflow.com/questions/60078901/react-native-gifted-chat-change-color-under-inputtoolbar
+ * 
+ * sending a file 
+ * https://medium.com/@WynneTran/sending-files-through-react-native-gifted-chat-cddd9b1be0a0
+ * 
+ * make a channel
+ * https://chatkitty.com/blog/building-a-chat-app-with-react-native-and-gifted-chat-part-2
+ * 
+ * 
  */
 export default function ChattingScreen({navigation})
 {
@@ -37,6 +51,13 @@ export default function ChattingScreen({navigation})
 	
     const [messages, setMessages] = React.useState([]);
     const [popupVisible, setPopupVisible] = React.useState(false);
+	const [loading, setLoading] = React.useState(false);
+	
+    const user = {
+		              _id: auth?.currentUser?.email,
+			          name: auth?.currentUser?.displayName,
+			          avatar: auth?.currentUser?.photoURL
+		         };
 
     const handePhotos = () => 
     {
@@ -45,7 +66,7 @@ export default function ChattingScreen({navigation})
 		ImagePicker.launchImageLibraryAsync
 		(
 			{
-				mediaTypes: ImagePicker.MediaTypeOptions.Images,
+				mediaTypes: ImagePicker.MediaTypeOptions.All,
             	allowsEditing: false,
             	aspect: [4, 3],
             	quality: 1
@@ -71,26 +92,37 @@ export default function ChattingScreen({navigation})
 	//image, video, pdf
 	const uploadToStorage = async (result) =>
 	{
+		const imageMessage = 
+        [
+          {
+            _id: uuid.v4(),
+            createdAt: new Date(),
+            image: result.uri,
+            user
+          }
+        ];
+        setMessages(previousMessages => GiftedChat.append(previousMessages, imageMessage))
+		//if (3>1) return;
+		
+		setLoading(true);
 		const fetchResponse = await fetch(result.uri);
 		const blob = await fetchResponse.blob();
 		const filename = result.uri.substring(result.uri.lastIndexOf('/') + 1);
 		const storage = getStorage(app);
         const storageRef = ref(storage, result.type +'s/' + filename); //eg: images/imageFileName.jpg, videos/videoFileName.mp4
         
-        //const storageRef = ref(storage, result.type); //eg: images/imageFileName.jpg, videos/videoFileName.mp4
-
         const metaData = {contentType: blob.type}; //eg: image/jpg
         
-        console.log("[INFO]: dir file name=", result.type +'s/' + filename);
-        console.log("[INFO]: metaData=", metaData);
-        console.log("[INFO]: blob=", blob);
-        
+        //console.log("[INFO]: dir file name=", result.type +'s/' + filename);
+        //console.log("[INFO]: metaData=", metaData);
+        //console.log("[INFO]: blob=", blob);
+        //if (2>1) return;
         uploadBytes(storageRef, blob, metaData)
         .then
         (
 			async (snapshot) =>
 			{
-				console.log("======>Uploaded a blob or file: ", snapshot);
+				//console.log("======>Uploaded a blob or file: ", snapshot);
 				getDownloadURL(snapshot.ref).then
           		(
 					  (url) => 
@@ -101,11 +133,22 @@ export default function ChattingScreen({navigation})
 					        } 
 					        else 
 					        {     
-					              setImageData(url);
+					              setImageData([{...imageMessage[0], image: url}]);
 					        }
           			  }
           		);
 			}
+		)
+		.catch
+		(
+			(error)=>
+			{
+				alert(error);
+			}
+		)
+		.finally
+		(
+			()=>setLoading(false)
 		)
 		
 	}
@@ -272,8 +315,9 @@ export default function ChattingScreen({navigation})
 			()=>{}
 		);
     }
-    const setImageData = (url) => 
+    const setImageData = (imageMessage) => 
     {   
+		/*
         const imageMessage = 
         [
           {
@@ -287,7 +331,7 @@ export default function ChattingScreen({navigation})
 	            avatar: auth?.currentUser?.photoURL
             }
           }
-        ];
+        ];*/
         //setMessages(previousMessages => GiftedChat.append(previousMessages, imageMessage))
         const { _id, createdAt, user, image} = imageMessage[0]
         addDoc(collection(db, 'eyediagnosisChats'), { _id, createdAt, image, user })
@@ -336,32 +380,106 @@ export default function ChattingScreen({navigation})
           </View>
         );
     }
+    /**
+	 * see the image TouchableOpacity
+	 */
     const renderMessageImage = (props) => 
     {
         const { currentMessage } = props;
-        console.log(currentMessage.image);
+        console.log("renderMessageImage: ", currentMessage);
+        
         return (
           
-          <View style={{ position: 'relative', height: 150, width: 250 }}>
+          <View style={{ position: 'relative', height: 150, width: 250, opacity: 1 }}>
 	          <Image 
 	          		style=
 			        {
 						  {
 					            position: 'absolute',
+					            marginTop: 0,
 					            left: 0,
 					            top: 0,
 					            height: 150,
 					            width: 250,
-					            borderRadius: 20
+					            borderRadius: 0,
+					            opacity: loading ? 0.3 : 1
 			          	  }
 			        }
 	          		source={{uri: currentMessage.image}}
 	          		
 	          />
-    
+    		  {loading && <Ionicons
+		                name="ios-mic"
+		                size={35}
+		                hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+		                color={"red"}
+		                style={{
+		                  bottom: 50,
+		                  right: Dimensions.get("window").width / 2,
+		                  position: "absolute", 
+		                  shadowColor: "#000",
+		                  shadowOffset: { width: 0, height: 0 },
+		                  shadowOpacity: 0.5,
+		                  zIndex: 2,
+		                  backgroundColor: "transparent"
+		                }}
+		                onPress={()=>{}}
+		              />
+		       }
           </View>
         );
     }
+    const renderMessageImage2 = (props) => 
+    {
+        const { currentMessage } = props;
+        if (currentMessage.user._id === user._id) console.log("renderMessageImage: ", currentMessage);
+        
+        return (
+          
+          <MessageImage
+			    {...props}
+			    imageStyle=
+			    {
+					{
+						resizeMode: 'cover'
+			    	}
+			    }
+		  />
+        );
+    }
+    const renderBubble = (props) =>
+    {
+		//console.log("renderBudder: ", props);
+		return (
+			<Bubble {...props}
+					wrapperStyle=
+					{
+						{
+							right: 
+							{
+								backgroundColor: '#FF7074'
+							}
+						}
+					}	
+					timeTextStyle={{
+					        left: {
+					          color: '#000'
+					          },
+					        right: {
+					          color: '#000'
+					        }
+					      }}
+			/>
+		);
+	}
+	function renderLoading() 
+	{
+	    return (
+	      <View style={styles.loadingContainer}>
+	        <ActivityIndicator size="large" color="#6646ee" />
+	      </View>
+	    );
+	}
     React.useEffect
     (
 		() =>
@@ -423,7 +541,7 @@ export default function ChattingScreen({navigation})
             		(
 						doc => 
 						{
-							if (doc.data().image) console.log("[INFO] image url: ", doc.data().image);
+							//if (doc.data().image) console.log("[INFO] image url: ", doc.data().image);
 							return {
 				                _id: doc.data()._id,
 				                createdAt: doc.data().createdAt.toDate(),
@@ -467,24 +585,61 @@ export default function ChattingScreen({navigation})
 
     	}, []
     );
-  
+    
+    const onViewableItemsChanged = ({viewableItems}) => 
+    {
+	  //console.log("viewableItems: ", viewableItems);
+	};
+	const viewabilityConfigCallbackPairs = React.useRef
+	(
+		[
+  			{ onViewableItemsChanged }
+		]
+	);
     return (
-        <GiftedChat
-            messages={messages}
-            showAvatarForEveryMessage={true}
-            onSend={messages => onSend(messages)}
-            renderUsernameOnMessage={true}
-            user=
-            {
-				{
-	                _id: auth?.currentUser?.email,
-	                name: auth?.currentUser?.displayName,
-	                avatar: auth?.currentUser?.photoURL
-            	}
-            }
-            renderMessageVideo={renderMessageVideo}
-            renderMessageImage={renderMessageImage}
-        />
+		<View style={{flex: 1}}>
+	        <GiftedChat
+	            messages={messages}
+	            showAvatarForEveryMessage={true}
+	            onSend={messages => onSend(messages)}
+	            renderUsernameOnMessage={true}
+	            disableComposer={false}
+	            listViewProps={{ viewabilityConfigCallbackPairs: viewabilityConfigCallbackPairs.current}}
+	            user={user}
+	            renderMessageVideo={renderMessageVideo}
+	            renderMessageImage={renderMessageImage2}
+	            renderLoading={renderLoading}
+	            renderBubble={renderBubble}
+	            renderActions=
+	            {
+					()=>
+				
+		              <Ionicons
+		                name="ios-mic"
+		                size={35}
+		                hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+		                color={"red"}
+		                style={{
+		                  bottom: 50,
+		                  right: Dimensions.get("window").width / 2,
+		                  position: "absolute", 
+		                  shadowColor: "#000",
+		                  shadowOffset: { width: 0, height: 0 },
+		                  shadowOpacity: 0.5,
+		                  zIndex: 2,
+		                  backgroundColor: "transparent"
+		                }}
+		                onPress={()=>{}}
+		              />
+
+				}
+	        />
+        	{
+                loading &&   <View style={styles.loading}>
+                                <ActivityIndicator size='large' />
+                            </View>
+            } 
+        </View>
     );
 }
 
@@ -498,6 +653,16 @@ const styles = StyleSheet.create
 		    
 		    borderWidth: 5,
 		    backgroundColor: 'red'
-		}
+		},
+		loading: 
+        {
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            alignItems: 'center',
+            justifyContent: 'center'
+        }
     }
 );
