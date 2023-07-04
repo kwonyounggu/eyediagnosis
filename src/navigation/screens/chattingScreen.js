@@ -23,6 +23,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 /**
  * https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
  * https://enappd.com/blog/react-native-chat-application-using-firebase-and-hooks/207/
+ * https://www.linkedin.com/pulse/react-native-chat-application-using-firebase-hooks-part-gehani
  * 
  * Name above etc see the below
  * https://medium.com/@decentpianist/react-native-chat-with-image-and-audio-c09054ca2204
@@ -40,10 +41,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
  * sending a file 
  * https://medium.com/@WynneTran/sending-files-through-react-native-gifted-chat-cddd9b1be0a0
  * 
- * make a channel
+ * make a channel for more complex
  * https://chatkitty.com/blog/building-a-chat-app-with-react-native-and-gifted-chat-part-2
  * 
+ * copy or share
+ * https://github.com/FaridSafi/react-native-gifted-chat/issues/2022
  * 
+ * WhatsApp clone using react native using expo and firebase
+ * https://www.youtube.com/watch?v=YPSjNIJEdXU&ab_channel=EstebanCodes
  */
 export default function ChattingScreen({navigation})
 {
@@ -383,97 +388,62 @@ export default function ChattingScreen({navigation})
     /**
 	 * see the image TouchableOpacity
 	 */
+
     const renderMessageImage = (props) => 
-    {
-        const { currentMessage } = props;
-        console.log("renderMessageImage: ", currentMessage);
-        
-        return (
-          
-          <View style={{ position: 'relative', height: 150, width: 250, opacity: 1 }}>
-	          <Image 
-	          		style=
-			        {
-						  {
-					            position: 'absolute',
-					            marginTop: 0,
-					            left: 0,
-					            top: 0,
-					            height: 150,
-					            width: 250,
-					            borderRadius: 0,
-					            opacity: loading ? 0.3 : 1
-			          	  }
-			        }
-	          		source={{uri: currentMessage.image}}
-	          		
-	          />
-    		  {loading && <Ionicons
-		                name="ios-mic"
-		                size={35}
-		                hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-		                color={"red"}
-		                style={{
-		                  bottom: 50,
-		                  right: Dimensions.get("window").width / 2,
-		                  position: "absolute", 
-		                  shadowColor: "#000",
-		                  shadowOffset: { width: 0, height: 0 },
-		                  shadowOpacity: 0.5,
-		                  zIndex: 2,
-		                  backgroundColor: "transparent"
-		                }}
-		                onPress={()=>{}}
-		              />
-		       }
-          </View>
-        );
-    }
-    const renderMessageImage2 = (props) => 
     {
         const { currentMessage } = props;
         if (currentMessage.user._id === user._id) console.log("renderMessageImage: ", currentMessage);
         
         return (
           
-          <MessageImage
+          <MessageImage 
 			    {...props}
 			    imageStyle=
 			    {
 					{
-						resizeMode: 'cover'
+						resizeMode: 'contain' //cover
 			    	}
 			    }
 		  />
         );
     }
+
     const renderBubble = (props) =>
     {
 		//console.log("renderBudder: ", props);
-		return (
-			<Bubble {...props}
-					wrapperStyle=
-					{
-						{
-							right: 
+		//if (props.currentMessage.user._id === user._id && props.currentMessage.image)
+		if (props.currentMessage.image)	
+			if (props.currentMessage.user._id === user._id)//right side image
+				return (
+					<Bubble {...props}
+							wrapperStyle=
 							{
-								backgroundColor: '#FF7074'
+								{
+									right: 
+									{
+										backgroundColor: 'transparent' //image requires no bg color
+									}
+								}
+							}	
+							timeTextStyle=
+							{
+								{
+							        right: 
+							        {
+							          color: '#808080' //grey
+							        }
+							      }
 							}
-						}
-					}	
-					timeTextStyle={{
-					        left: {
-					          color: '#000'
-					          },
-					        right: {
-					          color: '#000'
-					        }
-					      }}
-			/>
-		);
+					/>
+				);
+			else return (<Bubble {...props} />); //left side image
+		else if (props.currentMessage.user._id !== user._id)  //left text 
+			return (<Bubble {...props} wrapperStyle={{left: {backgroundColor: '#d3d3d3'}}}/>);
+		else return (<Bubble {...props} />); //right text
 	}
 	function renderLoading() 
 	{
+		console.log("renderLoading ()...");
 	    return (
 	      <View style={styles.loadingContainer}>
 	        <ActivityIndicator size="large" color="#6646ee" />
@@ -607,9 +577,9 @@ export default function ChattingScreen({navigation})
 	            listViewProps={{ viewabilityConfigCallbackPairs: viewabilityConfigCallbackPairs.current}}
 	            user={user}
 	            renderMessageVideo={renderMessageVideo}
-	            renderMessageImage={renderMessageImage2}
+	            renderMessageImage={renderMessageImage}
 	            renderLoading={renderLoading}
-	            renderBubble={renderBubble}
+	            renderBubble={renderBubble} 
 	            renderActions=
 	            {
 					()=>
