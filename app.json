@@ -34,6 +34,15 @@
         "projectId": "c0147cee-32ef-4dc2-93a3-65c3a50169db"
       }
     },
-    "owner": "webmonster"
+    "owner": "webmonster",
+    "plugins": 
+    [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ]
   }
 }

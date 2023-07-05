@@ -10,7 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { getStorage, ref, getDownloadURL, uploadBytes} from "firebase/storage";
 import uuid from 'react-native-uuid';
-
+import {Video} from 'expo-av';
 import 
 { 
     IconButton, 
@@ -73,10 +73,69 @@ export default function ChattingScreen({navigation})
 	   return fileInfo;
 	}
 	
+	//ExponentImagePicker.launchCameraAsync' has been rejected
+	//https://github.com/expo/expo/issues/19512
+	//About permission
+	//https://www.kindacode.com/article/image-picker-in-react-native/
     const handleMedia = async (option) => 
     {
 		setPopupVisible(false);
 		
+		let result = null;
+		
+		switch(option)
+		{
+			case 'Images':  
+			case 'Videos': result = await ImagePicker.launchImageLibraryAsync
+							(
+								{
+									mediaTypes: option,
+					            	allowsEditing: true,
+					            	aspect: [4, 3],
+					            	base64: true,
+					            	quality: 1
+								}
+							);
+							break;
+			case 'Camera': 
+				const permission = await ImagePicker.requestCameraPermissionsAsync();
+				if (permission.granted === false)
+				{
+					alert("You've refused to allow this app to access your camera!");
+					return;
+				}
+				result = await ImagePicker.launchCameraAsync
+				(
+					{
+						mediaTypes: ImagePicker.MediaTypeOptions.Images,
+						allowsEditing: true,
+		            	//aspect: [4, 3],
+		            	quality: 1
+					}
+				);
+				break;
+			default: return;
+		}
+		
+		if (!result) alert("Selecting or making a media file is failed!");
+		else if (!result.cancelled)
+        {
+			getFileInfo(result.uri)
+			.then
+			(
+				(fileInfo) =>
+				{   
+					if (fileInfo.size > FILE_SIZE_MAX)
+						alert("File size must be smaller than 2.5MB!");
+					else uploadToStorage(result);
+				}
+			)
+			.catch
+			(
+				(e)=> alert("Failed in getting file info: ", e)
+			)
+		}
+		/*
 		ImagePicker.launchImageLibraryAsync
 		(
 			{
@@ -114,6 +173,7 @@ export default function ChattingScreen({navigation})
         (
 			(e) => alert("Selecting a media file failed: ", e)
 		);
+		*/
 	}
 	
 	//image, video, pdf
@@ -151,6 +211,7 @@ export default function ChattingScreen({navigation})
             				if (result.type == 'video') 
             				{
 					              setVideoData([{...imageMessage[0], video: url}]);
+					              //alert("Oops!, sending video is not being perfomed!");
 					        } 
 					        else 
 					        {     
@@ -360,10 +421,24 @@ export default function ChattingScreen({navigation})
     {
         const { currentMessage } = props;
         console.log(currentMessage.video);
+
         return (
           
           <View style={{ position: 'relative', height: 150, width: 250 }}>
-	          
+	         <Video
+		          style=
+		          {
+					  {
+				            position: 'absolute',
+				            left: 0,
+				            top: 0,
+				            height: 150,
+				            width: 250,
+				            borderRadius: 20
+		          	  }
+		          }       	  
+	              source={{ uri: currentMessage.video }}
+	           /> 
 	             
           </View>
         );
@@ -453,7 +528,7 @@ export default function ChattingScreen({navigation})
 								  />
 							  }
                     	>
-                    		  <Menu.Item leadingIcon='logout' title='Camera' onPress={()=>{}} />
+                    		  <Menu.Item leadingIcon='logout' title='Camera' onPress={()=>handleMedia('Camera')} />
                     		  <Menu.Item leadingIcon='logout' 
                     		  			 title='Photos' 
                     		  			 onPress={()=>handleMedia(ImagePicker.MediaTypeOptions.Images)}

@@ -1,4 +1,5 @@
-const { getDefaultConfig } = require('expo/metro-config');
+//see https://docs.expo.dev/guides/using-firebase/
+const { getDefaultConfig } = require('@expo/metro-config');
 
 const defaultConfig = getDefaultConfig(__dirname);
 
