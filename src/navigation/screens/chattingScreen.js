@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, ActionSheetIOS, Image, Dimensions } from 'react-native';
+import { View, StyleSheet, ActionSheetIOS, Dimensions } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
@@ -7,9 +7,10 @@ import { auth, db, app } from '../../firebase/firebase';
 import { Bubble, GiftedChat, MessageImage } from 'react-native-gifted-chat';
 import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import { getStorage, ref, getDownloadURL, uploadBytes} from "firebase/storage";
 import uuid from 'react-native-uuid';
-import Video from 'react-native-video';
+
 import 
 { 
     IconButton, 
@@ -50,6 +51,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
  * WhatsApp clone using react native using expo and firebase
  * https://www.youtube.com/watch?v=YPSjNIJEdXU&ab_channel=EstebanCodes
  */
+
+const FILE_SIZE_MAX = 2621440; //2.5MB
 export default function ChattingScreen({navigation})
 {
 	console.log("INFO in ChattingScreen: ", React.useContext(AppContext));
@@ -64,16 +67,22 @@ export default function ChattingScreen({navigation})
 			          avatar: auth?.currentUser?.photoURL
 		         };
 
-    const handePhotos = () => 
+	const getFileInfo = async (fileURI) => 
+	{
+	   const fileInfo = await FileSystem.getInfoAsync(fileURI, {size: true});
+	   return fileInfo;
+	}
+	
+    const handleMedia = async (option) => 
     {
 		setPopupVisible(false);
 		
 		ImagePicker.launchImageLibraryAsync
 		(
 			{
-				mediaTypes: ImagePicker.MediaTypeOptions.All,
+				mediaTypes: option,
             	allowsEditing: false,
-            	aspect: [4, 3],
+            	//aspect: [4, 3],
             	quality: 1
 			}
 		)
@@ -81,16 +90,29 @@ export default function ChattingScreen({navigation})
         (
 			(result) => 
 			{ 	console.log("result: ", result);
-                //if (!result.cancelled) uploadMediaToFirestore(result);
+
                 if (!result.cancelled)
                 {
-					uploadToStorage(result);
+					getFileInfo(result.uri)
+					.then
+					(
+						(fileInfo) =>
+						{   
+							if (fileInfo.size > FILE_SIZE_MAX)
+								alert("File size must be smaller than 2.5MB!");
+							else uploadToStorage(result);
+						}
+					)
+					.catch
+					(
+						(e)=> alert("Failed in getting file info: ", e)
+					)
 				}
         	}
         )
         .catch
         (
-			(e)=>console.log("[ERROR]: ", e)
+			(e) => alert("Selecting a media file failed: ", e)
 		);
 	}
 	
@@ -102,12 +124,11 @@ export default function ChattingScreen({navigation})
           {
             _id: uuid.v4(),
             createdAt: new Date(),
-            image: result.uri,
+            [result.type]: result.uri, //local path
             user
           }
         ];
         setMessages(previousMessages => GiftedChat.append(previousMessages, imageMessage))
-		//if (3>1) return;
 		
 		setLoading(true);
 		const fetchResponse = await fetch(result.uri);
@@ -118,23 +139,18 @@ export default function ChattingScreen({navigation})
         
         const metaData = {contentType: blob.type}; //eg: image/jpg
         
-        //console.log("[INFO]: dir file name=", result.type +'s/' + filename);
-        //console.log("[INFO]: metaData=", metaData);
-        //console.log("[INFO]: blob=", blob);
-        //if (2>1) return;
         uploadBytes(storageRef, blob, metaData)
         .then
         (
 			async (snapshot) =>
 			{
-				//console.log("======>Uploaded a blob or file: ", snapshot);
 				getDownloadURL(snapshot.ref).then
           		(
 					  (url) => 
 					  {
             				if (result.type == 'video') 
             				{
-					              setVideoData(url);
+					              setVideoData([{...imageMessage[0], video: url}]);
 					        } 
 					        else 
 					        {     
@@ -288,23 +304,8 @@ export default function ChattingScreen({navigation})
         	}
         );
     }  
-    const setVideoData = (url) => 
+    const setVideoData = (imageMessage) => 
     {
-        const imageMessage = 
-        [
-          {
-            _id: uuid.v4(),
-            createdAt: new Date(),
-            video: url,
-            user: 
-            {
-             	_id: auth?.currentUser?.email,
-	            name: auth?.currentUser?.displayName,
-	            avatar: auth?.currentUser?.photoURL
-            }
-          }
-        ];
-        //setMessages(previousMessages => GiftedChat.append(previousMessages, imageMessage))
         const { _id, createdAt, user, video} = imageMessage[0]
         addDoc(collection(db, 'eyediagnosisChats'), { _id, createdAt,  video, user })
     	.then
@@ -322,22 +323,6 @@ export default function ChattingScreen({navigation})
     }
     const setImageData = (imageMessage) => 
     {   
-		/*
-        const imageMessage = 
-        [
-          {
-            _id: uuid.v4(),
-            createdAt: new Date(),
-            image: url,
-            user: 
-            {
-             	_id: auth?.currentUser?.email,
-	            name: auth?.currentUser?.displayName,
-	            avatar: auth?.currentUser?.photoURL
-            }
-          }
-        ];*/
-        //setMessages(previousMessages => GiftedChat.append(previousMessages, imageMessage))
         const { _id, createdAt, user, image} = imageMessage[0]
         addDoc(collection(db, 'eyediagnosisChats'), { _id, createdAt, image, user })
     	.then
@@ -353,14 +338,8 @@ export default function ChattingScreen({navigation})
 			()=>{}
 		);
     }
-    const renderMessageVideo = (props) => 
-    {
-        const { currentMessage } = props;
-        console.log(currentMessage.video);
-        return (
-          
-          <View style={{ position: 'relative', height: 150, width: 250 }}>
-	          <Video
+    /**
+	 * <Video
 		          style=
 		          {
 					  {
@@ -372,16 +351,20 @@ export default function ChattingScreen({navigation})
 				            borderRadius: 20
 		          	  }
 		          }
-	          	  shouldPlay
-	              rate={1.0}
-	              resizeMode="cover"
-	              height={150}
-	              width={250}
-	              muted={false}
-	              source={{ uri: "https://firebasestorage.googleapis.com/v0/b/coupon-2379f.appspot.com/o/small.mp4?alt=media&token=4f4722e3-c9fc-49a8-a753-1d635e99eb43" }}
-	              allowsExternalPlayback={false}
-	           >
-	           </Video>    
+	          	 
+	              source={{ uri: currentMessage.video }}
+	              onError={(e)=>console.error(e)}
+	           />
+	 */
+    const renderMessageVideo = (props) => 
+    {
+        const { currentMessage } = props;
+        console.log(currentMessage.video);
+        return (
+          
+          <View style={{ position: 'relative', height: 150, width: 250 }}>
+	          
+	             
           </View>
         );
     }
@@ -391,8 +374,8 @@ export default function ChattingScreen({navigation})
 
     const renderMessageImage = (props) => 
     {
-        const { currentMessage } = props;
-        if (currentMessage.user._id === user._id) console.log("renderMessageImage: ", currentMessage);
+        //const { currentMessage } = props;
+        //if (currentMessage.user._id === user._id) console.log("renderMessageImage: ", currentMessage);
         
         return (
           
@@ -473,9 +456,12 @@ export default function ChattingScreen({navigation})
                     		  <Menu.Item leadingIcon='logout' title='Camera' onPress={()=>{}} />
                     		  <Menu.Item leadingIcon='logout' 
                     		  			 title='Photos' 
-                    		  			 onPress={handePhotos}
+                    		  			 onPress={()=>handleMedia(ImagePicker.MediaTypeOptions.Images)}
                     		  />
-                    		  <Menu.Item leadingIcon='logout' title='Video' onPress={()=>{}} />
+                    		  <Menu.Item leadingIcon='logout' 
+                    		  			 title='Video' 
+                    		  			 onPress={()=>handleMedia(ImagePicker.MediaTypeOptions.Videos)} 
+                    		  />
                     		  <Divider />
                     		  <Menu.Item leadingIcon='database-sync-outline' 
                     		  			 title='List Data' 
@@ -556,16 +542,6 @@ export default function ChattingScreen({navigation})
     	}, []
     );
     
-    const onViewableItemsChanged = ({viewableItems}) => 
-    {
-	  //console.log("viewableItems: ", viewableItems);
-	};
-	const viewabilityConfigCallbackPairs = React.useRef
-	(
-		[
-  			{ onViewableItemsChanged }
-		]
-	);
     return (
 		<View style={{flex: 1}}>
 	        <GiftedChat
@@ -574,7 +550,6 @@ export default function ChattingScreen({navigation})
 	            onSend={messages => onSend(messages)}
 	            renderUsernameOnMessage={true}
 	            disableComposer={false}
-	            listViewProps={{ viewabilityConfigCallbackPairs: viewabilityConfigCallbackPairs.current}}
 	            user={user}
 	            renderMessageVideo={renderMessageVideo}
 	            renderMessageImage={renderMessageImage}
