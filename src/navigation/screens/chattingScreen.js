@@ -8,9 +8,10 @@ import { Bubble, GiftedChat, MessageImage } from 'react-native-gifted-chat';
 import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import * as DocumentPicker from 'expo-document-picker';
 import { getStorage, ref, getDownloadURL, uploadBytes} from "firebase/storage";
 import uuid from 'react-native-uuid';
-import {Video} from 'expo-av';
+import { Video, ResizeMode} from 'expo-av';
 import 
 { 
     IconButton, 
@@ -114,13 +115,36 @@ export default function ChattingScreen({navigation})
 					}
 				);
 				break;
+			case 'Pdf':
+				DocumentPicker.getDocumentAsync
+				(
+					{
+						copyToCacheDirectory: true,
+						type: 'application/pdf'
+					}
+				)
+				.then
+				(
+					(result) => 
+					{
+						if (result.type === 'success') 
+							checkFileAndUpload({uri: result.uri, type: 'pdf'});
+					}
+				)
+				.catch
+				(
+					(e) => alert("Failed getting a pdf file: ", e)
+				)
+				return;
+				
 			default: return;
 		}
 		
 		if (!result) alert("Selecting or making a media file is failed!");
 		else if (!result.cancelled)
         {
-			getFileInfo(result.uri)
+			checkFileAndUpload(result);
+			/*getFileInfo(result.uri)
 			.then
 			(
 				(fileInfo) =>
@@ -132,50 +156,28 @@ export default function ChattingScreen({navigation})
 			)
 			.catch
 			(
-				(e)=> alert("Failed in getting file info: ", e)
-			)
+				(e)=> alert("Failed in getting a media file info: ", e)
+			)*/
 		}
-		/*
-		ImagePicker.launchImageLibraryAsync
-		(
-			{
-				mediaTypes: option,
-            	allowsEditing: false,
-            	//aspect: [4, 3],
-            	quality: 1
-			}
-		)
-		.then
-        (
-			(result) => 
-			{ 	console.log("result: ", result);
-
-                if (!result.cancelled)
-                {
-					getFileInfo(result.uri)
-					.then
-					(
-						(fileInfo) =>
-						{   
-							if (fileInfo.size > FILE_SIZE_MAX)
-								alert("File size must be smaller than 2.5MB!");
-							else uploadToStorage(result);
-						}
-					)
-					.catch
-					(
-						(e)=> alert("Failed in getting file info: ", e)
-					)
-				}
-        	}
-        )
-        .catch
-        (
-			(e) => alert("Selecting a media file failed: ", e)
-		);
-		*/
 	}
 	
+	const checkFileAndUpload = (result) =>
+	{
+		getFileInfo(result.uri)
+		.then
+		(
+			(fileInfo) =>
+			{   
+				if (fileInfo.size > FILE_SIZE_MAX)
+					alert("File size must be smaller than 2.5MB!");
+				else uploadToStorage(result);
+			}
+		)
+		.catch
+		(
+			(e)=> alert("Failed in getting a media file info: ", e)
+		)
+	}
 	//image, video, pdf
 	const uploadToStorage = async (result) =>
 	{
@@ -208,15 +210,42 @@ export default function ChattingScreen({navigation})
           		(
 					  (url) => 
 					  {
+						  /*
             				if (result.type == 'video') 
             				{
 					              setVideoData([{...imageMessage[0], video: url}]);
 					              //alert("Oops!, sending video is not being perfomed!");
 					        } 
-					        else 
+					        else if (result.type == 'image')
 					        {     
 					              setImageData([{...imageMessage[0], image: url}]);
 					        }
+					        else if (result.type == 'pdf')
+					        	setImageData([{...imageMessage[0], pdf: url}]);
+					        */
+					        
+					        let fbMessage = null;
+					        switch(result.type)
+					        {
+								case 'video': fbMessage = {...imageMessage[0], video: url}; break;
+								case 'image': fbMessage = {...imageMessage[0], image: url}; break;
+								case 'pdf': fbMessage = {...imageMessage[0], pdf: url}; break;
+								default: console.error("Unexpected file type out of video, image, pdf!!!");
+										break;
+							}
+							addDoc(collection(db, 'eyediagnosisChats'), fbMessage)
+					    	.then
+					    	(
+								()=>console.log("[INFO]: a " + result.type + " file is added into firestore")
+							)
+							.catch
+							(
+								(e)=>console.log("[ERROR]: ", e)
+							)
+							.finally
+							(
+								()=>{}
+							);
           			  }
           		);
 			}
@@ -234,137 +263,7 @@ export default function ChattingScreen({navigation})
 		)
 		
 	}
-    const goToMedia = () => 
-    {
-        ActionSheetIOS.showActionSheetWithOptions
-        (
-			{
-		          options: ["Cancel", "Camera", "Photos", "Video"],
-		          cancelButtonIndex: 0
-	        },
-            buttonIndex => 
-            { console.log("buttonIndex: ", buttonIndex);
-	          if (buttonIndex == 2) 
-	          {
-	            ImagePicker.launchImageLibraryAsync().then
-	            (
-					(res) => 
-					{ 	console.log("res: ", res);
-		                if (!res.cancelled) uploadMediaToFirestore(res);
-	            	}
-	            )
-	            .catch
-	            (
-					(e)=>console.log("[ERROR]: ", e)
-				);
-	          } 
-	          else if (buttonIndex == 1) 
-	          {
-	            ImagePicker.launchCameraAsync().then
-	            (
-					(res) => 
-					{
-						console.log("res: ", res);
-		                if (!res.cancelled) 
-		                {
-		                    uploadMediaToFirestore(res);
-		                }
-	            	}
-	            )
-	            .catch
-	            (
-					(e)=>console.log("[ERROR]: ", e)
-				);
-	          } 
-	          else if (buttonIndex == 3) 
-	          {
-	            const options = 
-	            {
-	              title: 'Video Picker', 
-	              mediaType: 'video', 
-	            };
-	            ImagePicker.launchImageLibraryAsync(options).then
-	            (
-					(res) => 
-		            {
-		              if (!res.cancelled) 
-		              {
-		                uploadMediaToFirestore(res, 'video');
-		              }
-		            }
-		        )
-		        .catch
-	            (
-					(e)=>console.log("[ERROR]: ", e)
-				);
-          	  }
-           }
-         );
-    }
-    const uploadMediaToFirestore = async (res) => 
-    {
-        const uri = res.uri;
-        const filename = uri.substring(uri.lastIndexOf('/') + 1);
-        const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-        //const uploadUri = uri;
-        
-        console.log("[INFO]: filename=", filename, ", uploadUri=", uploadUri);
 
-        const storage = getStorage(app);
-
-        const storageRef = ref(storage, 'images/' + filename); 
-        const img = await fetch(uploadUri);
-        const bytes = await img.blob();
-        console.log("----- 7 ------");
-        let metadata;
-        if (res.type == 'video') 
-        {
-	          metadata = 
-	          {
-	              contentType: 'video/mp4',
-	          };
-        } 
-        else 
-        {    console.log("----- 8 ------");
-	          metadata = 
-	          {   
-	              contentType: 'image/jpeg',
-	          };
-        }
-        console.log("----- 9 ------ bytes: ", bytes);
-        
-        if (1>0) return;
-        uploadBytes(storageRef, bytes, metadata)
-        .then
-        (
-			async (uploadTask) => 
-			{
-          		console.log('task', uploadTask);
-          		getDownloadURL(uploadTask.ref).then
-          		(
-					  (url) => 
-					  {
-            				if (res.type == 'video') 
-            				{
-					              setVideoData(url);
-					        } 
-					        else 
-					        {     console.log("----- 0 ------");
-					              setImageData(url);
-					        }
-          			  }
-          		);
-        	}
-        )
-        .catch
-        (
-			(error) => 
-			{
-          			alert('Error while uploading Image!')
-          			console.log(error);
-        	}
-        );
-    }  
     const setVideoData = (imageMessage) => 
     {
         const { _id, createdAt, user, video} = imageMessage[0]
@@ -382,6 +281,7 @@ export default function ChattingScreen({navigation})
 			()=>{}
 		);
     }
+    
     const setImageData = (imageMessage) => 
     {   
         const { _id, createdAt, user, image} = imageMessage[0]
@@ -399,24 +299,7 @@ export default function ChattingScreen({navigation})
 			()=>{}
 		);
     }
-    /**
-	 * <Video
-		          style=
-		          {
-					  {
-				            position: 'absolute',
-				            left: 0,
-				            top: 0,
-				            height: 150,
-				            width: 250,
-				            borderRadius: 20
-		          	  }
-		          }
-	          	 
-	              source={{ uri: currentMessage.video }}
-	              onError={(e)=>console.error(e)}
-	           />
-	 */
+
     const renderMessageVideo = (props) => 
     {
         const { currentMessage } = props;
@@ -434,10 +317,13 @@ export default function ChattingScreen({navigation})
 				            top: 0,
 				            height: 150,
 				            width: 250,
-				            borderRadius: 20
+				            borderRadius: 22
 		          	  }
 		          }       	  
 	              source={{ uri: currentMessage.video }}
+	              useNativeControls
+        		  resizeMode={ResizeMode.CONTAIN}
+        		  isLooping={false}
 	           /> 
 	             
           </View>
@@ -466,11 +352,22 @@ export default function ChattingScreen({navigation})
         );
     }
 
+	const renderCustomView = (props) => 
+	{
+	  if (props?.currentMessage?.file_type) 
+	  {
+	    //(...)
+	  }
+	  else 
+	  {
+	    //(...)
+	  }
+	}
     const renderBubble = (props) =>
     {
 		//console.log("renderBudder: ", props);
 		//if (props.currentMessage.user._id === user._id && props.currentMessage.image)
-		if (props.currentMessage.image)	
+		if (props.currentMessage.image || props.currentMessage.video)	
 			if (props.currentMessage.user._id === user._id)//right side image
 				return (
 					<Bubble {...props}
@@ -528,16 +425,17 @@ export default function ChattingScreen({navigation})
 								  />
 							  }
                     	>
-                    		  <Menu.Item leadingIcon='logout' title='Camera' onPress={()=>handleMedia('Camera')} />
-                    		  <Menu.Item leadingIcon='logout' 
+                    		  <Menu.Item leadingIcon='camera' title='Camera' onPress={()=>handleMedia('Camera')} />
+                    		  <Menu.Item leadingIcon='image' 
                     		  			 title='Photos' 
                     		  			 onPress={()=>handleMedia(ImagePicker.MediaTypeOptions.Images)}
                     		  />
-                    		  <Menu.Item leadingIcon='logout' 
+                    		  <Menu.Item leadingIcon='video' 
                     		  			 title='Video' 
                     		  			 onPress={()=>handleMedia(ImagePicker.MediaTypeOptions.Videos)} 
                     		  />
                     		  <Divider />
+                    		  <Menu.Item leadingIcon='file' title='Pdf' onPress={()=>handleMedia('Pdf')} />
                     		  <Menu.Item leadingIcon='database-sync-outline' 
                     		  			 title='List Data' 
                     		  			 onPress=
@@ -628,6 +526,7 @@ export default function ChattingScreen({navigation})
 	            user={user}
 	            renderMessageVideo={renderMessageVideo}
 	            renderMessageImage={renderMessageImage}
+	            renderCustomView={renderCustomView}
 	            renderLoading={renderLoading}
 	            renderBubble={renderBubble} 
 	            renderActions=
