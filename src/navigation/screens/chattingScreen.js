@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, ActionSheetIOS, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
@@ -20,6 +20,7 @@ import
     ActivityIndicator
 } from 'react-native-paper'; 
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import InChatViewFile from '../../components/inChatViewFile';
 //import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 /**
@@ -264,42 +265,6 @@ export default function ChattingScreen({navigation})
 		
 	}
 
-    const setVideoData = (imageMessage) => 
-    {
-        const { _id, createdAt, user, video} = imageMessage[0]
-        addDoc(collection(db, 'eyediagnosisChats'), { _id, createdAt,  video, user })
-    	.then
-    	(
-			()=>console.log("[INFO]: video is added into firestore")
-		)
-		.catch
-		(
-			(e)=>console.log("[ERROR]: ", e)
-		)
-		.finally
-		(
-			()=>{}
-		);
-    }
-    
-    const setImageData = (imageMessage) => 
-    {   
-        const { _id, createdAt, user, image} = imageMessage[0]
-        addDoc(collection(db, 'eyediagnosisChats'), { _id, createdAt, image, user })
-    	.then
-    	(
-			()=>console.log("[INFO]: image is added into firestore")
-		)
-		.catch
-		(
-			(e)=>console.log("[ERROR]: ", e)
-		)
-		.finally
-		(
-			()=>{}
-		);
-    }
-
     const renderMessageVideo = (props) => 
     {
         const { currentMessage } = props;
@@ -352,22 +317,24 @@ export default function ChattingScreen({navigation})
         );
     }
 
-	const renderCustomView = (props) => 
-	{
-	  if (props?.currentMessage?.file_type) 
-	  {
-	    //(...)
-	  }
-	  else 
-	  {
-	    //(...)
-	  }
-	}
+	const [pdfVisible, setPdfVisible] = React.useState(false);
     const renderBubble = (props) =>
     {
-		//console.log("renderBudder: ", props);
-		//if (props.currentMessage.user._id === user._id && props.currentMessage.image)
-		if (props.currentMessage.image || props.currentMessage.video)	
+		if (props.currentMessage.pdf)
+		{
+			return (
+				<TouchableOpacity
+					onPress={()=>setPdfVisible(true)}	
+				>
+					<InChatViewFile props={props} visible={pdfVisible} onClose={()=>setPdfVisible(false)} />
+					<View style={{flexDirection: 'column'}}>
+					    <Image style={styles.pdfImage} source={require("../../../assets/images/pdf-image.png")} /> 
+						<Text >Click to view PDF</Text>
+					</View>
+				</TouchableOpacity>
+			);
+		}
+		else if (props.currentMessage.image || props.currentMessage.video)	
 			if (props.currentMessage.user._id === user._id)//right side image
 				return (
 					<Bubble {...props}
@@ -470,13 +437,13 @@ export default function ChattingScreen({navigation})
             		(
 						doc => 
 						{
-							//if (doc.data().image) console.log("[INFO] image url: ", doc.data().image);
 							return {
 				                _id: doc.data()._id,
 				                createdAt: doc.data().createdAt.toDate(),
 				                text: doc.data().text,
 				                image: doc.data().image,
 				                video: doc.data().video,
+				                pdf: doc.data().pdf,
 				                user: doc.data().user
             				};
             			}
@@ -526,7 +493,7 @@ export default function ChattingScreen({navigation})
 	            user={user}
 	            renderMessageVideo={renderMessageVideo}
 	            renderMessageImage={renderMessageImage}
-	            renderCustomView={renderCustomView}
+	            renderCustomView={()=>{}}
 	            renderLoading={renderLoading}
 	            renderBubble={renderBubble} 
 	            renderActions=
@@ -582,6 +549,15 @@ const styles = StyleSheet.create
             bottom: 0,
             alignItems: 'center',
             justifyContent: 'center'
+        },
+        pdfImage: 
+        {
+            alignSelf: 'center',
+            width: 128,
+            height: 128,
+            resizeMode: 'contain',
+            borderRadius: 0,
+            marginBottom: 0
         }
     }
 );

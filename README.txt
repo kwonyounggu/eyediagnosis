@@ -9,6 +9,22 @@
 9.              name>eas build --platform android
 
 
+
+The following block of statements are written on July 7 2023
+//expo publish -> npx expo publish
+/*
+    The global expo-cli package has been deprecated.                        │
+│                                                                           │
+│   The new Expo CLI is now bundled in your project in the expo package.    │
+│   Learn more: https://blog.expo.dev/the-new-expo-cli-f4250d8e3421.        │
+│                                                                           │
+│   To use the local CLI instead (recommended in SDK 46 and higher), run:   │
+│   › npx expo <command>      
+*/
+However, 'npx expo publish' did not work but 'expo publish' did work in uploading
+503 means the servers are down
+
+
 github
 token name: eyediagnosis
 
