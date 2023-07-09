@@ -4,7 +4,7 @@ import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text } from 'rea
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
 //import { signOut } from 'firebase/auth';
-import { Bubble, GiftedChat, MessageImage } from 'react-native-gifted-chat';
+import { Bubble, GiftedChat, MessageImage, MessageText } from 'react-native-gifted-chat';
 import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
@@ -21,6 +21,7 @@ import
 } from 'react-native-paper'; 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import InChatViewFile from '../../components/inChatViewFile';
+import { renderMessageText } from '../../components/inChatMessage';
 //import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 /**
@@ -51,7 +52,10 @@ import InChatViewFile from '../../components/inChatViewFile';
  * https://github.com/FaridSafi/react-native-gifted-chat/issues/2022
  * 
  * WhatsApp clone using react native using expo and firebase
- * https://www.youtube.com/watch?v=YPSjNIJEdXU&ab_channel=EstebanCodes
+ * https://www.youtube.com/watch?v=YPSjNIJEdXU&ab_channel=EstebanCodes 
+ * 
+ * InputEntry
+ * https://codesandbox.io/p/sandbox/react-native-gifted-chat-q7ry4n3356?file=%2Fexample%2Fexample-gifted-chat%2Fsrc%2FInputToolbar.js%3A1%2C1
  */
 
 const FILE_SIZE_MAX = 2621440; //2.5MB
@@ -361,7 +365,7 @@ export default function ChattingScreen({navigation})
 			else return (<Bubble {...props} />); //left side image
 		else if (props.currentMessage.user._id !== user._id)  //left text 
 			return (<Bubble {...props} wrapperStyle={{left: {backgroundColor: '#d3d3d3'}}}/>);
-		else return (<Bubble {...props} />); //right text
+		else return (<Bubble {...props} renderMessageText={renderMessageText}/>); //right text
 	}
 	function renderLoading() 
 	{
@@ -493,9 +497,8 @@ export default function ChattingScreen({navigation})
 	            user={user}
 	            renderMessageVideo={renderMessageVideo}
 	            renderMessageImage={renderMessageImage}
-	            renderCustomView={()=>{}}
-	            renderLoading={renderLoading}
-	            renderBubble={renderBubble} 
+	            renderLoadEarlier={renderLoading}
+	            renderBubble={renderBubble} 	            
 	            renderActions=
 	            {
 					()=>
@@ -519,6 +522,17 @@ export default function ChattingScreen({navigation})
 		              />
 
 				}
+				parsePatterns=
+				{
+					(linkStyle) => 
+					[
+				        {
+				          pattern: /#(\w+)/,
+				          style: linkStyle,
+				          onPress: (tag) => console.log(`Pressed on hashtag: ${tag}`),
+				        }
+		      		]
+		      	}
 	        />
         	{
                 loading &&   <View style={styles.loading}>
