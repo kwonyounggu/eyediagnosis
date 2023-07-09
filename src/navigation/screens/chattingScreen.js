@@ -329,7 +329,7 @@ export default function ChattingScreen({navigation})
 					<InChatViewFile props={props} visible={pdfVisible} onClose={()=>setPdfVisible(false)} />
 					<View style={{flexDirection: 'column'}}>
 					    <Image style={styles.pdfImage} source={require("../../../assets/images/pdf-image.png")} /> 
-						<Text >Click to view PDF</Text>
+						<Text style={{color: 'gray'}}>Click to view PDF</Text>
 					</View>
 				</TouchableOpacity>
 			);
