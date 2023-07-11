@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
@@ -22,7 +22,7 @@ import
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import InChatViewFile from '../../components/inChatViewFile';
 import { renderMessageText } from '../../components/inChatMessage';
-//import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
@@ -58,7 +58,9 @@ import { renderMessageText } from '../../components/inChatMessage';
  * https://codesandbox.io/p/sandbox/react-native-gifted-chat-q7ry4n3356?file=%2Fexample%2Fexample-gifted-chat%2Fsrc%2FInputToolbar.js%3A1%2C1
  */
 
-const FILE_SIZE_MAX = 2621440; //2.5MB
+const FILE_SIZE_MAX = 5120000; //4MB
+const FILE_SIZE_MAX_S = ( FILE_SIZE_MAX >>> 20 ) + '.' + ( FILE_SIZE_MAX & (2*0x3FF ) ) + 'MB';
+//console.log("FILE_SIZE_MAX: ", FILE_SIZE_MAX_S);
 export default function ChattingScreen({navigation})
 {
 	console.log("INFO in ChattingScreen: ", React.useContext(AppContext));
@@ -66,6 +68,7 @@ export default function ChattingScreen({navigation})
     const [messages, setMessages] = React.useState([]);
     const [popupVisible, setPopupVisible] = React.useState(false);
 	const [loading, setLoading] = React.useState(false);
+	const insets = useSafeAreaInsets();
 	
     const user = {
 		              _id: auth?.currentUser?.email,
@@ -104,21 +107,28 @@ export default function ChattingScreen({navigation})
 							);
 							break;
 			case 'Camera': 
-				const permission = await ImagePicker.requestCameraPermissionsAsync();
-				if (permission.granted === false)
+				try
 				{
-					alert("You've refused to allow this app to access your camera!");
-					return;
-				}
-				result = await ImagePicker.launchCameraAsync
-				(
+					const permission = await ImagePicker.requestCameraPermissionsAsync();
+					if (permission.granted === false)
 					{
-						mediaTypes: ImagePicker.MediaTypeOptions.Images,
-						allowsEditing: true,
-		            	//aspect: [4, 3],
-		            	quality: 1
+						alert("You've refused to allow this app to access your camera!");
+						return;
 					}
-				);
+					result = await ImagePicker.launchCameraAsync
+					(
+						{
+							mediaTypes: ImagePicker.MediaTypeOptions.Images,
+							allowsEditing: true,
+			            	//aspect: [4, 3],
+			            	quality: 1
+						}
+					);
+				}
+				catch (e)
+				{
+					console.log("[ERROR] in cameraPermissionsAsync: ", e)
+				}
 				break;
 			case 'Pdf':
 				DocumentPicker.getDocumentAsync
@@ -131,9 +141,12 @@ export default function ChattingScreen({navigation})
 				.then
 				(
 					(result) => 
-					{
+					{	//console.log("pdf result: ", result);
 						if (result.type === 'success') 
-							checkFileAndUpload({uri: result.uri, type: 'pdf'});
+						{
+							checkFileAndUpload({assets: [{uri: result.uri, type: 'pdf', fileSize: result.size}]});
+							//uploadToStorage({uri: result.uri, type: 'pdf', fileSize: result.size});
+						}
 					}
 				)
 				.catch
@@ -146,35 +159,22 @@ export default function ChattingScreen({navigation})
 		}
 		
 		if (!result) alert("Selecting or making a media file is failed!");
-		else if (!result.cancelled)
+		else if (!result.canceled)
         {
 			checkFileAndUpload(result);
-			/*getFileInfo(result.uri)
-			.then
-			(
-				(fileInfo) =>
-				{   
-					if (fileInfo.size > FILE_SIZE_MAX)
-						alert("File size must be smaller than 2.5MB!");
-					else uploadToStorage(result);
-				}
-			)
-			.catch
-			(
-				(e)=> alert("Failed in getting a media file info: ", e)
-			)*/
+			//uploadToStorage(result);
 		}
 	}
 	
 	const checkFileAndUpload = (result) =>
-	{
-		getFileInfo(result.uri)
+	{	//console.log("result: ", Object.keys(result.assets[0]));
+		getFileInfo(result.assets[0].uri)
 		.then
 		(
 			(fileInfo) =>
 			{   
 				if (fileInfo.size > FILE_SIZE_MAX)
-					alert("File size must be smaller than 2.5MB!");
+					alert("File size must be smaller than " + FILE_SIZE_MAX_S + "!");
 				else uploadToStorage(result);
 			}
 		)
@@ -186,23 +186,29 @@ export default function ChattingScreen({navigation})
 	//image, video, pdf
 	const uploadToStorage = async (result) =>
 	{
+		//console.log("result: ", Object.keys(result.assets[0]));
+		/*if (result.fileSize > FILE_SIZE_MAX)
+		{
+			alert("File size must be smaller than 2.5MB!");
+			return;
+		}*/
 		const imageMessage = 
         [
           {
             _id: uuid.v4(),
             createdAt: new Date(),
-            [result.type]: result.uri, //local path
+            [result.assets[0].type]: result.assets[0].uri, //local path
             user
           }
         ];
         setMessages(previousMessages => GiftedChat.append(previousMessages, imageMessage))
 		
 		setLoading(true);
-		const fetchResponse = await fetch(result.uri);
+		const fetchResponse = await fetch(result.assets[0].uri);
 		const blob = await fetchResponse.blob();
-		const filename = result.uri.substring(result.uri.lastIndexOf('/') + 1);
+		const filename = result.assets[0].uri.substring(result.assets[0].uri.lastIndexOf('/') + 1);
 		const storage = getStorage(app);
-        const storageRef = ref(storage, result.type +'s/' + filename); //eg: images/imageFileName.jpg, videos/videoFileName.mp4
+        const storageRef = ref(storage, result.assets[0].type +'s/' + filename); //eg: images/imageFileName.jpg, videos/videoFileName.mp4
         
         const metaData = {contentType: blob.type}; //eg: image/jpg
         
@@ -214,23 +220,9 @@ export default function ChattingScreen({navigation})
 				getDownloadURL(snapshot.ref).then
           		(
 					  (url) => 
-					  {
-						  /*
-            				if (result.type == 'video') 
-            				{
-					              setVideoData([{...imageMessage[0], video: url}]);
-					              //alert("Oops!, sending video is not being perfomed!");
-					        } 
-					        else if (result.type == 'image')
-					        {     
-					              setImageData([{...imageMessage[0], image: url}]);
-					        }
-					        else if (result.type == 'pdf')
-					        	setImageData([{...imageMessage[0], pdf: url}]);
-					        */
-					        
+					  {						  
 					        let fbMessage = null;
-					        switch(result.type)
+					        switch(result.assets[0].type)
 					        {
 								case 'video': fbMessage = {...imageMessage[0], video: url}; break;
 								case 'image': fbMessage = {...imageMessage[0], image: url}; break;
@@ -241,7 +233,7 @@ export default function ChattingScreen({navigation})
 							addDoc(collection(db, 'eyediagnosisChats'), fbMessage)
 					    	.then
 					    	(
-								()=>console.log("[INFO]: a " + result.type + " file is added into firestore")
+								()=>console.log("[INFO]: a " + result.assets[0].type + " file is added into firestore")
 							)
 							.catch
 							(
@@ -272,7 +264,7 @@ export default function ChattingScreen({navigation})
     const renderMessageVideo = (props) => 
     {
         const { currentMessage } = props;
-        console.log(currentMessage.video);
+        //console.log(currentMessage.video);
 
         return (
           
@@ -369,7 +361,7 @@ export default function ChattingScreen({navigation})
 	}
 	function renderLoading() 
 	{
-		console.log("renderLoading ()...");
+		console.log("renderLoading ()................");
 	    return (
 	      <View style={styles.loadingContainer}>
 	        <ActivityIndicator size="large" color="#6646ee" />
@@ -485,8 +477,9 @@ export default function ChattingScreen({navigation})
 
     	}, []
     );
-    
-    return (
+    //DEFAULT_BOTTOM_TABBAR_HEIGHT = 50
+    //bottomOffset={Platform.OS==='ios' ? (50+insets.bottom) : 0}, to solve a gap between bottom textinput and keyboard
+    return (		
 		<View style={{flex: 1}}>
 	        <GiftedChat
 	            messages={messages}
@@ -498,7 +491,10 @@ export default function ChattingScreen({navigation})
 	            renderMessageVideo={renderMessageVideo}
 	            renderMessageImage={renderMessageImage}
 	            renderLoadEarlier={renderLoading}
-	            renderBubble={renderBubble} 	            
+	            isLoadingEarlier={true}
+	            renderBubble={renderBubble} 
+	            bottomOffset={Platform.OS==='ios' ? (50+insets.bottom) : 0}
+	                       
 	            renderActions=
 	            {
 					()=>
@@ -539,7 +535,7 @@ export default function ChattingScreen({navigation})
                                 <ActivityIndicator size='large' />
                             </View>
             } 
-        </View>
+        </View>    
     );
 }
 
