@@ -114,7 +114,7 @@ const Register = ({navigation}) =>
 	        (
 				user, 
 				{
-	            	displayName: firstName + ' ' + lastName,
+	            	displayName: firstName + ' ' + lastName.toUpperCase(),
 	            	photoURL: url.length === 0 ? defaultImageURL : url
 	        	}
 	        )
@@ -246,7 +246,7 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={50} 
                             value={firstName}
-                            onChangeText={(value)=>setFirstName(value.trim())}
+                            onChangeText={(value)=>setFirstName(value.trim().toLowerCase())}
                             returnKeyType='next'
                             keyboardType='ascii-capable'  
                         />
@@ -258,7 +258,7 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={50} 
                             value={lastName}
-                            onChangeText={(value)=>setLastName(value.trim())}
+                            onChangeText={(value)=>setLastName(value.trim().toLowerCase())}
                             returnKeyType='next'
                             keyboardType='ascii-capable'       
                         />
@@ -272,7 +272,7 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={62}  
                             value={email}
-                            onChangeText={(value)=>setEmail(value.trim())}  
+                            onChangeText={(value)=>setEmail(value.trim().toLowerCase())}  
                             textContentType='emailAddress'
                             keyboardType='email-address'
                             autoCapitalize='none'
@@ -287,7 +287,7 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={255}  
                             value={url}
-                            onChangeText={(value)=>setURL(value.trim())}  
+                            onChangeText={(value)=>setURL(value.trim().toLowerCase())}  
                             right=
                             {
 						        <TextInput.Icon icon='image-frame' size={28}

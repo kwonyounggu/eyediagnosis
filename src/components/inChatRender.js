@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import { Image } from 'react-native';
+import { Image, Alert } from 'react-native';
 import { InputToolbar, Actions, Composer, Send } from 'react-native-gifted-chat';
 
 export const renderInputToolbar = (props) => 
@@ -87,3 +87,24 @@ export const renderSend = (props) =>
     />
   </Send>
 );
+
+export const onPressAvatar = (props) =>
+{
+	//console.log("onPressAvatar, props: ", props);
+	//get a registered user information from firestore.
+	//const q = query(collection(db, 'registeredUsers'), orderBy('createdAt', 'desc'));
+	return (
+       Alert.alert
+       (
+		   props.name, 
+		   "\n\nOptometrist\n\n" +
+		   "Ontario, Canada\n\n" +
+		   props._id,	   
+      	   [
+      	  		{text: 'OK', onPress: () => console.log('OK Pressed')}
+      	   ]
+       )
+    );
+
+	
+}

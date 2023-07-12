@@ -21,7 +21,7 @@ import
 } from 'react-native-paper'; 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import InChatViewFile from '../../components/inChatViewFile';
-import { renderMessageText } from '../../components/inChatMessage';
+import { onPressAvatar } from '../../components/inChatRender';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
@@ -145,7 +145,6 @@ export default function ChattingScreen({navigation})
 						if (result.type === 'success') 
 						{
 							checkFileAndUpload({assets: [{uri: result.uri, type: 'pdf', fileSize: result.size}]});
-							//uploadToStorage({uri: result.uri, type: 'pdf', fileSize: result.size});
 						}
 					}
 				)
@@ -162,7 +161,6 @@ export default function ChattingScreen({navigation})
 		else if (!result.canceled)
         {
 			checkFileAndUpload(result);
-			//uploadToStorage(result);
 		}
 	}
 	
@@ -187,11 +185,7 @@ export default function ChattingScreen({navigation})
 	const uploadToStorage = async (result) =>
 	{
 		//console.log("result: ", Object.keys(result.assets[0]));
-		/*if (result.fileSize > FILE_SIZE_MAX)
-		{
-			alert("File size must be smaller than 2.5MB!");
-			return;
-		}*/
+
 		const imageMessage = 
         [
           {
@@ -297,7 +291,6 @@ export default function ChattingScreen({navigation})
     const renderMessageImage = (props) => 
     {
         //const { currentMessage } = props;
-        //if (currentMessage.user._id === user._id) console.log("renderMessageImage: ", currentMessage);
         
         return (
           
@@ -357,17 +350,19 @@ export default function ChattingScreen({navigation})
 			else return (<Bubble {...props} />); //left side image
 		else if (props.currentMessage.user._id !== user._id)  //left text 
 			return (<Bubble {...props} wrapperStyle={{left: {backgroundColor: '#d3d3d3'}}}/>);
-		else return (<Bubble {...props} renderMessageText={renderMessageText}/>); //right text
+		else return (<Bubble {...props} />); //right text
 	}
-	function renderLoading() 
+	
+	const renderLoading = () => 
 	{
-		console.log("renderLoading ()................");
+		//console.log("renderLoading ()................");
 	    return (
 	      <View style={styles.loadingContainer}>
 	        <ActivityIndicator size="large" color="#6646ee" />
 	      </View>
 	    );
 	}
+	
     React.useEffect
     (
 		() =>
@@ -490,11 +485,12 @@ export default function ChattingScreen({navigation})
 	            user={user}
 	            renderMessageVideo={renderMessageVideo}
 	            renderMessageImage={renderMessageImage}
-	            renderLoadEarlier={renderLoading}
+	            renderLoading={renderLoading}
 	            isLoadingEarlier={true}
 	            renderBubble={renderBubble} 
 	            bottomOffset={Platform.OS==='ios' ? (50+insets.bottom) : 0}
-	                       
+	            maxInputLength={1024} 
+	            onPressAvatar={onPressAvatar}         
 	            renderActions=
 	            {
 					()=>
