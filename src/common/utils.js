@@ -93,3 +93,27 @@ export const USA_STATES =
     { label: "Wisconsin", value: "WI" },
     { label: "Wyoming", value: "WY" }
 ];
+
+export const getCountryProvinceProfession = (country, province, profession) =>
+{
+	let countryName='', provinceName='';
+	console.log("[INFO] in getCountryProvinceProfession: ", country, " ", province, " ", profession)
+	try
+	{
+		switch (country)
+		{
+			case 'CA' : provinceName = CANADA_PROVINCES.find(({value}) => value === province).label;
+						countryName = 'Canada';
+					    break;
+			case 'US' : provinceName = USA_STATES.find(({value}) => value === province).label;
+						countryName = 'USA';
+					    break;
+			default: break;
+		}
+	}
+	catch (e)
+	{
+		console.error("[ERROR]: ", e);
+	}
+	return {country: countryName, province: provinceName, profession: PROFESSIONS.find(({value}) => value === profession).label};
+}

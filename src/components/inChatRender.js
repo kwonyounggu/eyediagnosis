@@ -3,6 +3,9 @@
 import React from 'react';
 import { Image, Alert } from 'react-native';
 import { InputToolbar, Actions, Composer, Send } from 'react-native-gifted-chat';
+import { collection, query, where, getDocs, limit } from "firebase/firestore";
+import { db } from '../firebase/firebase';
+import { getCountryProvinceProfession } from '../common/utils';
 
 export const renderInputToolbar = (props) => 
 (
@@ -91,20 +94,45 @@ export const renderSend = (props) =>
 export const onPressAvatar = (props) =>
 {
 	//console.log("onPressAvatar, props: ", props);
-	//get a registered user information from firestore.
-	//const q = query(collection(db, 'registeredUsers'), orderBy('createdAt', 'desc'));
-	return (
-       Alert.alert
-       (
-		   props.name, 
-		   "\n\nOptometrist\n\n" +
-		   "Ontario, Canada\n\n" +
-		   props._id,	   
-      	   [
-      	  		{text: 'OK', onPress: () => console.log('OK Pressed')}
-      	   ]
-       )
-    );
+	let userInfo = "\n\nUnknown\n\n" + "State, Canada/USA\n\n";
+	const q = query(collection(db, 'registeredUsers'), where("email", "==", props._id), limit(1));
+	getDocs(q).then
+	(
+		(snapShot) => 
+		{
+			if (!snapShot.empty)
+			{	console.log("user info: ", snapShot.docs[0].data());
+				const data = snapShot.docs[0].data();
+				const o = getCountryProvinceProfession(data.country, data.province, data.profession);
+				userInfo = "\n\n" + o.profession + "\n\n" +
+						   o.province + ", " + o.country + "\n\n";
+			}
+			else
+			{	
+				console.log("[INFO]: user information from firestore is empty...");
+			}
+		}
+	)
+	.catch
+	(
+		(e)=>console.log("Ooops! there found an error: ", e)
+	)
+	.finally
+	(
+		() =>
+		 (
+	       Alert.alert
+	       (
+			   props.name, 
+			   userInfo,
+			   props._id,	   
+	      	   [
+	      	  		{text: 'OK', onPress: () => console.log('OK Pressed')}
+	      	   ]
+	       )
+    	)
+	);
+	
 
 	
 }

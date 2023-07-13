@@ -114,7 +114,7 @@ const Register = ({navigation}) =>
 	        (
 				user, 
 				{
-	            	displayName: firstName + ' ' + lastName.toUpperCase(),
+	            	displayName: firstName.charAt(0).toUpperCase() + firstName.slice(1) + ' ' + lastName.toUpperCase(),
 	            	photoURL: url.length === 0 ? defaultImageURL : url
 	        	}
 	        )
