@@ -56,6 +56,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
  * 
  * InputEntry
  * https://codesandbox.io/p/sandbox/react-native-gifted-chat-q7ry4n3356?file=%2Fexample%2Fexample-gifted-chat%2Fsrc%2FInputToolbar.js%3A1%2C1
+ *
+ * mac simulator
+ * https://stackoverflow.com/questions/1108076/where-does-the-iphone-simulator-store-its-data?rq=3
  */
 
 const FILE_SIZE_MAX = 5120000; //4MB
@@ -95,17 +98,29 @@ export default function ChattingScreen({navigation})
 		switch(option)
 		{
 			case 'Images':  
-			case 'Videos': result = await ImagePicker.launchImageLibraryAsync
-							(
-								{
-									mediaTypes: option,
-					            	allowsEditing: true,
-					            	aspect: [4, 3],
-					            	base64: true,
-					            	quality: 1
-								}
-							);
-							break;
+			case 'Videos': 
+					ImagePicker.launchImageLibraryAsync
+					(
+						{
+							mediaTypes: option,
+			            	allowsEditing: true,
+			            	aspect: [4, 3],
+			            	base64: true,
+			            	quality: 1
+						}
+					)
+					.then
+					(
+						(result) =>
+						{
+							if (!result.canceled) checkFileAndUpload(result);
+						}
+					)
+					.catch
+					(
+						(e) => alert("Failed in getting an image/video file: ", e)
+					)
+					break;	
 			case 'Camera': 
 				try
 				{
@@ -124,10 +139,11 @@ export default function ChattingScreen({navigation})
 			            	quality: 1
 						}
 					);
+					if (!result.canceled) checkFileAndUpload(result);
 				}
 				catch (e)
 				{
-					console.log("[ERROR] in cameraPermissionsAsync: ", e)
+					alert("Failed in cameraPermissionsAsync/launchCameraAsync: ", e);
 				}
 				break;
 			case 'Pdf':
@@ -150,17 +166,11 @@ export default function ChattingScreen({navigation})
 				)
 				.catch
 				(
-					(e) => alert("Failed getting a pdf file: ", e)
+					(e) => alert("Failed in getting a pdf file: ", e)
 				)
-				return;
+				break;
 				
-			default: return;
-		}
-		
-		if (!result) alert("Selecting or making a media file is failed!");
-		else if (!result.canceled)
-        {
-			checkFileAndUpload(result);
+			default: break;
 		}
 	}
 	
