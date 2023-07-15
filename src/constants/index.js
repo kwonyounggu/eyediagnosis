@@ -30,3 +30,5 @@ export const listSavedDataName = 'List of Saved Data';
 export const displayDetailedQueryDataName = 'Detailed Data';
 
 export const EYE_WIKI_HOME = 'https://eyewiki.aao.org';
+
+export const replyMessageBarHeight = 50;

@@ -101,7 +101,7 @@ export const onPressAvatar = (props) =>
 		(snapShot) => 
 		{
 			if (!snapShot.empty)
-			{	console.log("user info: ", snapShot.docs[0].data());
+			{	//console.log("user info: ", snapShot.docs[0].data());
 				const data = snapShot.docs[0].data();
 				const o = getCountryProvinceProfession(data.country, data.province, data.profession);
 				userInfo = "\n\n" + o.profession + "\n\n" +
@@ -111,6 +111,7 @@ export const onPressAvatar = (props) =>
 			{	
 				console.log("[INFO]: user information from firestore is empty...");
 			}
+			
 		}
 	)
 	.catch
@@ -120,17 +121,15 @@ export const onPressAvatar = (props) =>
 	.finally
 	(
 		() =>
-		 (
-	       Alert.alert
+		   Alert.alert
 	       (
 			   props.name, 
-			   userInfo,
+			   userInfo +
 			   props._id,	   
 	      	   [
-	      	  		{text: 'OK', onPress: () => console.log('OK Pressed')}
+	      	  		{text: 'OK', onPress: () => {}}
 	      	   ]
 	       )
-    	)
 	);
 	
 

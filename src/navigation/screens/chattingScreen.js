@@ -4,8 +4,8 @@ import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform }
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
 //import { signOut } from 'firebase/auth';
-import { Bubble, GiftedChat, MessageImage, MessageText } from 'react-native-gifted-chat';
-import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { Bubble, GiftedChat, InputToolbar, MessageImage } from 'react-native-gifted-chat';
+import { collection, addDoc, query, orderBy, onSnapshot } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
@@ -23,6 +23,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import InChatViewFile from '../../components/inChatViewFile';
 import { onPressAvatar } from '../../components/inChatRender';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ReplyMessageBar from '../../components/inChatReplyMessageBar';
 
 /**
  * https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
@@ -71,6 +72,8 @@ export default function ChattingScreen({navigation})
     const [messages, setMessages] = React.useState([]);
     const [popupVisible, setPopupVisible] = React.useState(false);
 	const [loading, setLoading] = React.useState(false);
+	const [replyMessage, setReplyMessage] = React.useState(null);
+	
 	const insets = useSafeAreaInsets();
 	
     const user = {
@@ -373,6 +376,21 @@ export default function ChattingScreen({navigation})
 	    );
 	}
 	
+	const clearReplyMessage = () => setReplyMessage(null);
+	
+	const renderCustomInputToolbar = (props) =>
+	(
+		<InputToolbar {...props} containerStyle={styles.inputContainer} />	
+	);
+	
+	const renderAccessory = () =>
+	(
+		<ReplyMessageBar
+			message={{text: 'Test reply render'}}
+			clearReply={clearReplyMessage}
+		/>	
+	);
+	
     React.useEffect
     (
 		() =>
@@ -500,7 +518,8 @@ export default function ChattingScreen({navigation})
 	            renderBubble={renderBubble} 
 	            bottomOffset={Platform.OS==='ios' ? (50+insets.bottom) : 0}
 	            maxInputLength={1024} 
-	            onPressAvatar={onPressAvatar}         
+	            onPressAvatar={onPressAvatar}
+        		
 	            renderActions=
 	            {
 					()=>
@@ -535,7 +554,13 @@ export default function ChattingScreen({navigation})
 				        }
 		      		]
 		      	}
+		      	isKeyboardInternallyHandled={false}
+		      	renderInputToolbar={renderCustomInputToolbar}
+		      	renderAccessory={renderAccessory}
+		      	onLongPress={(_, message) => console.log(message)}
+		      	
 	        />
+	        
         	{
                 loading &&   <View style={styles.loading}>
                                 <ActivityIndicator size='large' />
@@ -574,6 +599,10 @@ const styles = StyleSheet.create
             resizeMode: 'contain',
             borderRadius: 0,
             marginBottom: 0
-        }
+        },
+        inputContainer:
+        {
+			flexDirection: 'column-reverse'
+		}
     }
 );
