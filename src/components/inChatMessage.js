@@ -61,24 +61,72 @@ export const renderMessage = (props) => (
   />
 );
 
-export const renderMessageText = (props) => (
-  <MessageText
-    {...props}
-    containerStyle={{
-      left: { backgroundColor: 'yellow' },
-      right: { backgroundColor: 'purple' },
-    }}
-    textStyle={{
-      left: { color: 'red' },
-      right: { color: 'green' },
-    }}
-    linkStyle={{
-      left: { color: 'orange' },
-      right: { color: 'orange' },
-    }}
-    customTextStyle={{ fontSize: 24, lineHeight: 24 }}
-  />
-);
+//see https://github.com/FaridSafi/react-native-gifted-chat/issues/750
+export const renderMessageText = (props) => 
+{
+    if (props.currentMessage.replyMessage) 
+    {
+      return <CustomMessageText {...props} />;
+    }
+    return <MessageText {...props} />;
+}
+
+const CustomMessageText = (props) => 
+{
+    return (
+      <>
+        <View style={{padding: 5}}>
+          <View style={{backgroundColor: '#005CB5', borderRadius: 15}}>
+            <View style={{flexDirection: 'row'}}>
+              <View
+	                style=
+	                {
+						{
+			                  height: '100%',
+			                  width: 10,
+			                  backgroundColor: '#00468A',
+			                  borderTopLeftRadius: 15,
+			                  borderBottomLeftRadius: 15
+	                	}
+	                }
+              />
+              <View style={{flexDirection: 'column'}}>
+                <Text
+	                  style=
+	                  {
+						  {
+			                    color: 'white',
+			                    paddingHorizontal: 10,
+			                    paddingTop: 5,
+			                    fontWeight: '700'
+	                  		}
+	                  }
+                 >
+                  {props.currentMessage?.replyMessage?.user.name}
+                </Text>
+                <Text
+	                  style=
+	                  {
+						  {
+			                    color: 'white',
+			                    paddingHorizontal: 10,
+			                    paddingTop: 5,
+			                    marginBottom: 5
+	                  	  }
+	                  }
+                 >
+                  {props.currentMessage?.replyMessage?.text}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <MessageText {...props} />
+      </>
+    );
+  }
+
 
 export const renderCustomView = ({ user }) => (
   <View style={{ minHeight: 20, alignItems: 'center' }}>

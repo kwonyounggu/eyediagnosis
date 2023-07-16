@@ -24,6 +24,7 @@ import InChatViewFile from '../../components/inChatViewFile';
 import { onPressAvatar } from '../../components/inChatRender';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ReplyMessageBar from '../../components/inChatReplyMessageBar';
+import { renderMessageText } from '../../components/inChatMessage';
 
 /**
  * https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
@@ -321,7 +322,7 @@ export default function ChattingScreen({navigation})
 
 	const [pdfVisible, setPdfVisible] = React.useState(false);
     const renderBubble = (props) =>
-    {
+    {   //console.log("renderBubble: ", props.currentMessage);
 		if (props.currentMessage.pdf)
 		{
 			return (
@@ -362,7 +363,7 @@ export default function ChattingScreen({navigation})
 				);
 			else return (<Bubble {...props} />); //left side image
 		else if (props.currentMessage.user._id !== user._id)  //left text 
-			return (<Bubble {...props} wrapperStyle={{left: {backgroundColor: '#d3d3d3'}}}/>);
+			return (<Bubble {...props} wrapperStyle={{left: {backgroundColor: '#e4e7eb'}}}/>);
 		else return (<Bubble {...props} />); //right text
 	}
 	
@@ -380,16 +381,33 @@ export default function ChattingScreen({navigation})
 	
 	const renderCustomInputToolbar = (props) =>
 	(
-		<InputToolbar {...props} containerStyle={styles.inputContainer} />	
+		<InputToolbar 
+			{...props} 
+			containerStyle={styles.inputContainer} 
+			accessoryStyle={styles.replyBarContainer}
+		/>	
 	);
 	
 	const renderAccessory = () =>
 	(
-		<ReplyMessageBar
-			message={{text: 'Test reply render'}}
+		replyMessage && <ReplyMessageBar
+			message={replyMessage}
 			clearReply={clearReplyMessage}
 		/>	
 	);
+	
+	/*
+	const renderReplyMessageView = (props) =>
+	{	props.currentMessage && props.currentMessage.replyMessage && console.log("renderReplyMessageView: ", props.currentMessage);
+		props.currentMessage &&
+		props.currentMessage.replyMessage &&
+		(
+			<View style={styles.replyMessageContainer}>
+				<Text>{props.currentMessage.replyMessage.text}</Text>
+				<View style={styles.replyMessageDivider} />
+			</View>
+		);
+	}*/
 	
     React.useEffect
     (
@@ -456,6 +474,7 @@ export default function ChattingScreen({navigation})
             		(
 						doc => 
 						{
+							/*
 							return {
 				                _id: doc.data()._id,
 				                createdAt: doc.data().createdAt.toDate(),
@@ -463,7 +482,19 @@ export default function ChattingScreen({navigation})
 				                image: doc.data().image,
 				                video: doc.data().video,
 				                pdf: doc.data().pdf,
-				                user: doc.data().user
+				                user: doc.data().user,
+				                replyMessage: doc.data().replyMessage
+            				};*/
+            				
+            				return {
+				                _id: doc.data()._id,
+				                createdAt: doc.data().createdAt.toDate(),
+				                ...(doc.data().text && {text: doc.data().text}),
+				                ...(doc.data().image && {image: doc.data().image}),
+				                ...(doc.data().video && {video: doc.data().video}),
+				                ...(doc.data().pdf && {pdf: doc.data().pdf}),
+				                user: doc.data().user,
+				                ...(doc.data().replyMessage && {replyMessage: doc.data().replyMessage})
             				};
             			}
             		)
@@ -483,8 +514,12 @@ export default function ChattingScreen({navigation})
     (
 		(messages = []) => 
 		{
+			
         	const { _id, createdAt, text, user} = messages[0];
-        	addDoc(collection(db, 'eyediagnosisChats'), { _id, createdAt,  text, user })
+        	
+        	if (replyMessage) console.log("replyMassge: ", replyMessage);
+        	
+        	addDoc(collection(db, 'eyediagnosisChats'), {_id, createdAt, text, user, ...(replyMessage && {replyMessage})})
         	.then
         	(
 				()=>console.log("[INFO]: message is added into firestore")
@@ -497,8 +532,8 @@ export default function ChattingScreen({navigation})
 			(
 				()=>{}
 			);
-
-    	}, []
+			setReplyMessage(null);
+    	}, [replyMessage]
     );
     //DEFAULT_BOTTOM_TABBAR_HEIGHT = 50
     //bottomOffset={Platform.OS==='ios' ? (50+insets.bottom) : 0}, to solve a gap between bottom textinput and keyboard
@@ -508,11 +543,12 @@ export default function ChattingScreen({navigation})
 	            messages={messages}
 	            showAvatarForEveryMessage={true}
 	            onSend={messages => onSend(messages)}
-	            renderUsernameOnMessage={true}
+	            renderUsernameOnMessage={false}
 	            disableComposer={false}
 	            user={user}
 	            renderMessageVideo={renderMessageVideo}
 	            renderMessageImage={renderMessageImage}
+	            renderMessageText={renderMessageText}
 	            renderLoading={renderLoading}
 	            isLoadingEarlier={true}
 	            renderBubble={renderBubble} 
@@ -557,8 +593,9 @@ export default function ChattingScreen({navigation})
 		      	isKeyboardInternallyHandled={false}
 		      	renderInputToolbar={renderCustomInputToolbar}
 		      	renderAccessory={renderAccessory}
-		      	onLongPress={(_, message) => console.log(message)}
-		      	
+		      	onLongPress={(_, message) => setReplyMessage(message)}
+		      	messagesContainerStyle={styles.messagesContainer}
+		      	renderFooter={()=>{}}
 	        />
 	        
         	{
@@ -602,7 +639,27 @@ const styles = StyleSheet.create
         },
         inputContainer:
         {
+			position: 'relative',
 			flexDirection: 'column-reverse'
+		},
+		replyBarContainer:
+		{
+			height: 'auto'
+		},
+		messagesContainer:
+		{
+			flex: 1
+		},
+		replyMessageContainer:
+		{
+			padding: 8,
+			paddingBottom: 0
+		},
+		replyMessageDivider:
+		{
+			borderBottomWidth: 1,
+			borderBottomColor: 'lightgrey',
+			paddingTop: 6
 		}
     }
 );

@@ -3,11 +3,12 @@ import { Text, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { replyMessageBarHeight } from '../constants'
 
 /*
-type ReplyMessageBarProps = 
-{
-  clearReply: () => void;
-  message: { text: string };
-};
+ * https://medium.com/@ravil.nell/react-native-chat-reply-on-swipe-like-in-telegram-9083f83f180c
+	type ReplyMessageBarProps = 
+	{
+	  clearReply: () => void;
+	  message: { text: string };
+	};
 */
 const ReplyMessageBar = ({ clearReply, message }) => 
 {
@@ -21,7 +22,7 @@ const ReplyMessageBar = ({ clearReply, message }) =>
 	      </View>
 	
 	      <View style={styles.messageContainer}>
-	        <Text>{message.text}</Text>
+	        <Text numberOfLines={1} ellipsizeMode='tail'>{message?.text}</Text>
 	      </View>
 	
 	      <TouchableOpacity style={styles.crossButton} onPress={clearReply}>
