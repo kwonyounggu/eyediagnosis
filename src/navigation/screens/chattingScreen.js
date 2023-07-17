@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform, Linking } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
@@ -68,12 +68,13 @@ const FILE_SIZE_MAX_S = ( FILE_SIZE_MAX >>> 20 ) + '.' + ( FILE_SIZE_MAX & (2*0x
 //console.log("FILE_SIZE_MAX: ", FILE_SIZE_MAX_S);
 export default function ChattingScreen({navigation})
 {
-	console.log("INFO in ChattingScreen: ", React.useContext(AppContext));
+	//console.log("INFO in ChattingScreen: ", React.useContext(AppContext));
 	
     const [messages, setMessages] = React.useState([]);
     const [popupVisible, setPopupVisible] = React.useState(false);
 	const [loading, setLoading] = React.useState(false);
 	const [replyMessage, setReplyMessage] = React.useState(null);
+	const [pdfVisible, setPdfVisible] = React.useState(false);
 	
 	const insets = useSafeAreaInsets();
 	
@@ -234,7 +235,14 @@ export default function ChattingScreen({navigation})
 					        {
 								case 'video': fbMessage = {...imageMessage[0], video: url}; break;
 								case 'image': fbMessage = {...imageMessage[0], image: url}; break;
-								case 'pdf': fbMessage = {...imageMessage[0], pdf: url}; break;
+								case 'pdf': fbMessage = 
+											{
+												_id: imageMessage[0]._id,
+												createdAt: imageMessage[0].createdAt,
+												user: imageMessage[0].user,
+											    document: url
+											}; 
+											break;
 								default: console.error("Unexpected file type out of video, image, pdf!!!");
 										break;
 							}
@@ -320,12 +328,12 @@ export default function ChattingScreen({navigation})
         );
     }
 
-	const [pdfVisible, setPdfVisible] = React.useState(false);
     const renderBubble = (props) =>
-    {   //console.log("renderBubble: ", props.currentMessage);
-		if (props.currentMessage.pdf)
-		{
+    {   if (props.currentMessage.document) console.log("renderBubble: <<<<<", props.currentMessage.document);
+		/*if (props.currentMessage.pdf)
+		{   console.log("renderBubble: ", props.currentMessage);
 			return (
+			<Bubble {...props} >
 				<TouchableOpacity
 					onPress={()=>setPdfVisible(true)}	
 				>
@@ -335,7 +343,14 @@ export default function ChattingScreen({navigation})
 						<Text style={{color: 'gray'}}>Click to view PDF</Text>
 					</View>
 				</TouchableOpacity>
+				</Bubble>
+				
 			);
+		}
+		else*/ 
+		if (props.currentMessage.document)
+		{
+			return <Bubble {...props} />
 		}
 		else if (props.currentMessage.image || props.currentMessage.video)	
 			if (props.currentMessage.user._id === user._id)//right side image
@@ -396,6 +411,42 @@ export default function ChattingScreen({navigation})
 		/>	
 	);
 	
+	const renderCustomViewPdf = (props) =>
+	{ 
+		
+		if (props.currentMessage.document)
+		{	console.log("renderCustomViewPdf: >>>>", props.currentMessage.document);
+			return (
+				<TouchableOpacity
+					onPress=
+					{
+						()=>setPdfVisible(true)
+					}	
+				>
+					<InChatViewFile props={props} visible={pdfVisible} onClose={()=>setPdfVisible(false)} />
+					<View style={{flexDirection: 'column'}}>
+					    <Image style={styles.pdfImage} source={require("../../../assets/images/pdf-image.png")} /> 
+						<Text style={{color: 'gray'}}>Click to view PDF</Text>
+					</View>
+				</TouchableOpacity>
+				);
+		}
+		/*
+		if (props.currentMessage.document)
+		{	console.log("renderCustomViewPdf: >>>>", props.currentMessage.document);
+			return (
+				<TouchableOpacity
+					onPress={()=>setPdfVisible(true)}	
+				>
+					<InChatViewFile props={props} visible={pdfVisible} onClose={()=>setPdfVisible(false)} />
+					<View style={{flexDirection: 'column'}}>
+					    <Image style={styles.pdfImage} source={require("../../../assets/images/pdf-image.png")} /> 
+						<Text style={{color: 'gray'}}>Click to view PDF</Text>
+					</View>
+				</TouchableOpacity>
+				);
+		}*/
+	}
 	/*
 	const renderReplyMessageView = (props) =>
 	{	props.currentMessage && props.currentMessage.replyMessage && console.log("renderReplyMessageView: ", props.currentMessage);
@@ -492,7 +543,7 @@ export default function ChattingScreen({navigation})
 				                ...(doc.data().text && {text: doc.data().text}),
 				                ...(doc.data().image && {image: doc.data().image}),
 				                ...(doc.data().video && {video: doc.data().video}),
-				                ...(doc.data().pdf && {pdf: doc.data().pdf}),
+				                ...(doc.data().document && {document: doc.data().document}),
 				                user: doc.data().user,
 				                ...(doc.data().replyMessage && {replyMessage: doc.data().replyMessage})
             				};
@@ -549,6 +600,7 @@ export default function ChattingScreen({navigation})
 	            renderMessageVideo={renderMessageVideo}
 	            renderMessageImage={renderMessageImage}
 	            renderMessageText={renderMessageText}
+	            renderCustomView={renderCustomViewPdf}
 	            renderLoading={renderLoading}
 	            isLoadingEarlier={true}
 	            renderBubble={renderBubble} 
