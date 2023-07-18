@@ -8,13 +8,13 @@ import {isEmpty} from 'lodash';
 import { signOut, onAuthStateChanged} from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
 
-import { homeName, chattingName, settingsName, forumName, appLoginScreenName, appHome, appForgotPasswordScreenName, appRegisterScreenName } from '../../constants';
+import { homeName, settingsName, forumName, appLoginScreenName, appHome, appForgotPasswordScreenName, appRegisterScreenName, chattingHomeName } from '../../constants';
 import HomeScreen from './homeScreen';
 import ForumScreen from './forumScreen';
-import ChattingScreen from './chattingScreen';
 import SettingsScreen from './settingsScreen';
 
 import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
+import ChattingHomeScreen from './chattingHomeScreen';
 
 //const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -123,7 +123,7 @@ const CustomDrawer = (props) =>
 						console.log("current route name: ", currentRouteName);
 						switch(currentRouteName)
 						{
-							case chattingName: navigation.navigate(appHome);
+							case chattingHomeName: navigation.navigate(appHome);
 											   break;
 							default: break;
 						}
@@ -183,10 +183,10 @@ export default function HomeRoot({navigation})
 								e.preventDefault();
 					         	navigation.navigate(appHome);
 					        }
-					        else if(e.target?.includes(chattingName) && isEmpty(appUser))
+					        else if(e.target?.includes(chattingHomeName) && isEmpty(appUser))
 					        {
 								e.preventDefault();
-								navigation.navigate(appLoginScreenName, {email: '', password: '', toRoute: chattingName});
+								navigation.navigate(appLoginScreenName, {email: '', password: '', toRoute: chattingHomeName});
 							}
 					        //console.log(e.target);
 					     } 
@@ -250,8 +250,8 @@ export default function HomeRoot({navigation})
 						   }
 					   }
         />
-	    <Drawer.Screen name={chattingName} 
-	    			   component={ChattingScreen}
+	    <Drawer.Screen name={chattingHomeName} 
+	    			   component={ChattingHomeScreen}
 	    			   options=
         			   {
 						   ({navigation}) =>

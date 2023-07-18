@@ -25,6 +25,7 @@ import { onPressAvatar } from '../../components/inChatRender';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ReplyMessageBar from '../../components/inChatReplyMessageBar';
 import { renderMessageText } from '../../components/inChatMessage';
+import { pdfFileViewerScreenName } from '../../constants';
 
 /**
  * https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
@@ -420,10 +421,10 @@ export default function ChattingScreen({navigation})
 				<TouchableOpacity
 					onPress=
 					{
-						()=>setPdfVisible(true)
+						()=>navigation.navigate(pdfFileViewerScreenName, {document: props.currentMessage.document})
 					}	
 				>
-					<InChatViewFile props={props} visible={pdfVisible} onClose={()=>setPdfVisible(false)} />
+					
 					<View style={{flexDirection: 'column'}}>
 					    <Image style={styles.pdfImage} source={require("../../../assets/images/pdf-image.png")} /> 
 						<Text style={{color: 'gray'}}>Click to view PDF</Text>
@@ -431,34 +432,7 @@ export default function ChattingScreen({navigation})
 				</TouchableOpacity>
 				);
 		}
-		/*
-		if (props.currentMessage.document)
-		{	console.log("renderCustomViewPdf: >>>>", props.currentMessage.document);
-			return (
-				<TouchableOpacity
-					onPress={()=>setPdfVisible(true)}	
-				>
-					<InChatViewFile props={props} visible={pdfVisible} onClose={()=>setPdfVisible(false)} />
-					<View style={{flexDirection: 'column'}}>
-					    <Image style={styles.pdfImage} source={require("../../../assets/images/pdf-image.png")} /> 
-						<Text style={{color: 'gray'}}>Click to view PDF</Text>
-					</View>
-				</TouchableOpacity>
-				);
-		}*/
 	}
-	/*
-	const renderReplyMessageView = (props) =>
-	{	props.currentMessage && props.currentMessage.replyMessage && console.log("renderReplyMessageView: ", props.currentMessage);
-		props.currentMessage &&
-		props.currentMessage.replyMessage &&
-		(
-			<View style={styles.replyMessageContainer}>
-				<Text>{props.currentMessage.replyMessage.text}</Text>
-				<View style={styles.replyMessageDivider} />
-			</View>
-		);
-	}*/
 	
     React.useEffect
     (
@@ -506,7 +480,7 @@ export default function ChattingScreen({navigation})
 	                )
 	        	}
 	        );
-		}
+		},[]
 		
 	);
     React.useLayoutEffect
