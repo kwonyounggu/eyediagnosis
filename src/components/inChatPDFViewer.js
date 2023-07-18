@@ -22,7 +22,8 @@ export default function ChatPDFViewer ({route, navigation})
 			navigation.setOptions
 	        (
 				{
-					headerTitle: () => <Text>PDF</Text>
+					headerTitle: () => <Text>&nbsp;file name</Text>,
+					headerLeft: () => <Text onPress={()=>navigation.goBack()}>&#x2190;&nbsp;PDF</Text>
 		        }
 		    )
 		 },[]

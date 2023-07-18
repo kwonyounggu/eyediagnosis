@@ -260,11 +260,11 @@ export default function HomeRoot({navigation})
 							   drawerLabel: 'Chatting',
 							   drawerIcon: ({focused, size}) => 
 							   (
-							              <Ionicons
-							                 name="md-home"
-							                 size={size}
-							                 color={focused ? '#7cc' : '#ccc'}
-							              />
+						              <Ionicons
+						                 name="md-home"
+						                 size={size}
+						                 color={focused ? '#7cc' : '#ccc'}
+						              />
 							   )
 						   })
 					   } 
