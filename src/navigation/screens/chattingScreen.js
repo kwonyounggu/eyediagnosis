@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform, Linking } from 'react-native';
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
@@ -67,6 +67,7 @@ import { pdfFileViewerScreenName } from '../../constants';
 const FILE_SIZE_MAX = 5120000; //4MB
 const FILE_SIZE_MAX_S = ( FILE_SIZE_MAX >>> 20 ) + '.' + ( FILE_SIZE_MAX & (2*0x3FF ) ) + 'MB';
 //console.log("FILE_SIZE_MAX: ", FILE_SIZE_MAX_S);
+
 export default function ChattingScreen({navigation})
 {
 	//console.log("INFO in ChattingScreen: ", React.useContext(AppContext));
@@ -330,7 +331,7 @@ export default function ChattingScreen({navigation})
     }
 
     const renderBubble = (props) =>
-    {   if (props.currentMessage.document) console.log("renderBubble: <<<<<", props.currentMessage.document);
+    {   //if (props.currentMessage.document) console.log("renderBubble: <<<<<", props.currentMessage.document);
 		/*if (props.currentMessage.pdf)
 		{   console.log("renderBubble: ", props.currentMessage);
 			return (
@@ -416,7 +417,7 @@ export default function ChattingScreen({navigation})
 	{ 
 		
 		if (props.currentMessage.document)
-		{	console.log("renderCustomViewPdf: >>>>", props.currentMessage.document);
+		{	//console.log("renderCustomViewPdf: >>>>", props.currentMessage.document);
 			return (
 				<TouchableOpacity
 					onPress=
@@ -434,6 +435,20 @@ export default function ChattingScreen({navigation})
 		}
 	}
 	
+	const mediaCallback = React.useCallback
+	(
+		(option) =>handleMedia(option),
+		[]
+	);
+	React.useEffect
+    (
+		() =>
+		{
+			//a parameter, function, should be through a callback otherwise there will be no-serization warning.
+			navigation.setParams({handleMedia: mediaCallback})
+		}, []
+	);
+	/*
     React.useEffect
     (
 		() =>
@@ -480,9 +495,9 @@ export default function ChattingScreen({navigation})
 	                )
 	        	}
 	        );
-		},[]
+		}
 		
-	);
+	);*/
     React.useLayoutEffect
     (
 		() => 
