@@ -35,24 +35,51 @@ export default function ChattingHomeScreen({route, navigation})
 									  />
 								  }
 	                    	>
-	                    		  <Menu.Item leadingIcon='camera' title='Camera'  />
+	                    		  <Menu.Item leadingIcon='camera' 
+	                    		  			 title='Camera'  
+	                    		  			 onPress=
+	                    		  			 {
+												   ()=>
+												   {
+													   setPopupVisible(false);
+													   navigationRef.current?.getCurrentRoute().params.handleMedia('Camera');
+												   }
+											 }
+	                    		  />
 	                    		  <Menu.Item leadingIcon='image' 
 	                    		  			 title='Photos' 
 	                    		  			 onPress=
 	                    		  			 {
 												   ()=>
 												   {
+													   setPopupVisible(false);
 													   navigationRef.current?.getCurrentRoute().params.handleMedia(ImagePicker.MediaTypeOptions.Images);
-													   console.log("route.params: ", navigationRef.current?.getCurrentRoute());
 												   }
 											 }
 	                    		  />
 	                    		  <Menu.Item leadingIcon='video' 
 	                    		  			 title='Video' 
-	                    		  			 
+	                    		  			 onPress=
+	                    		  			 {
+												   ()=>
+												   {
+													   setPopupVisible(false);
+													   navigationRef.current?.getCurrentRoute().params.handleMedia(ImagePicker.MediaTypeOptions.Videos);
+												   }
+											 }
 	                    		  />
 	                    		  <Divider />
-	                    		  <Menu.Item leadingIcon='file' title='Pdf' />
+	                    		  <Menu.Item leadingIcon='file' 
+	                    		  			 title='Pdf' 
+	                    		  			 onPress=
+	                    		  			 {
+												   ()=>
+												   {
+													   setPopupVisible(false);
+													   navigationRef.current?.getCurrentRoute().params.handleMedia('Pdf');
+												   }
+											 }
+	                    		  />
 	                    		  <Menu.Item leadingIcon='database-sync-outline' 
 	                    		  			 title='List Data' 
 	                    		  			    
@@ -60,7 +87,7 @@ export default function ChattingHomeScreen({route, navigation})
 	                    	</Menu>
 		                )
 		        }
-		    ), []
+		    )
 		 
 	)
     return (

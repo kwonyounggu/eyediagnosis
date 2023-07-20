@@ -11,7 +11,7 @@ import PDFReader from 'rn-pdf-reader-js';
 
 export default function ChatPDFViewer ({route, navigation})
 {
-	const {document} = route.params;
+	const {document, fileName} = route.params;
 	//console.log("ChatPDFViewer: document=", document);
 	
 	
@@ -22,8 +22,8 @@ export default function ChatPDFViewer ({route, navigation})
 			navigation.setOptions
 	        (
 				{
-					headerTitle: () => <Text>&nbsp;file name</Text>,
-					headerLeft: () => <Text onPress={()=>navigation.goBack()}>&#x2190;&nbsp;PDF</Text>
+					headerTitle: () => <Text numberOfLines={1} ellipsizeMode={'tail'}>&nbsp;{fileName}</Text>,
+					headerLeft: () => <Text onPress={()=>navigation.goBack()}>&#x2190;&nbsp;PDF:</Text>
 		        }
 		    )
 		 },[]

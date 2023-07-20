@@ -77,15 +77,23 @@ const CustomMessageText = (props) =>
     return (
       <>
         <View style={{padding: 5}}>
-          <View style={{backgroundColor: '#005CB5', borderRadius: 15}}>
+          <View 
+	          style=
+	          {
+				  {
+					  //backgroundColor: '#005CB5', 
+	          		  borderRadius: 15
+	          	  }
+	          }
+          >
             <View style={{flexDirection: 'row'}}>
               <View
 	                style=
 	                {
 						{
 			                  height: '100%',
-			                  width: 10,
-			                  backgroundColor: '#00468A',
+			                  width: 0,
+			                  //backgroundColor: '#00468A',
 			                  borderTopLeftRadius: 15,
 			                  borderBottomLeftRadius: 15
 	                	}
@@ -96,20 +104,20 @@ const CustomMessageText = (props) =>
 	                  style=
 	                  {
 						  {
-			                    color: 'white',
+			                    //color: 'white',
 			                    paddingHorizontal: 10,
 			                    paddingTop: 5,
 			                    fontWeight: '700'
 	                  		}
 	                  }
                  >
-                  {props.currentMessage?.replyMessage?.user.name}
+                  {"Reply to " + props.currentMessage?.replyMessage?.user.name}
                 </Text>
                 <Text
 	                  style=
 	                  {
 						  {
-			                    color: 'white',
+			                    //color: 'white',
 			                    paddingHorizontal: 10,
 			                    paddingTop: 5,
 			                    marginBottom: 5

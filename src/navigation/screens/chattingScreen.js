@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform, LogBox } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
@@ -68,15 +68,17 @@ const FILE_SIZE_MAX = 5120000; //4MB
 const FILE_SIZE_MAX_S = ( FILE_SIZE_MAX >>> 20 ) + '.' + ( FILE_SIZE_MAX & (2*0x3FF ) ) + 'MB';
 //console.log("FILE_SIZE_MAX: ", FILE_SIZE_MAX_S);
 
+LogBox.ignoreLogs([ 'Non-serializable values were found in the navigation state', ]);
+
 export default function ChattingScreen({navigation})
 {
 	//console.log("INFO in ChattingScreen: ", React.useContext(AppContext));
 	
     const [messages, setMessages] = React.useState([]);
-    const [popupVisible, setPopupVisible] = React.useState(false);
+    //const [popupVisible, setPopupVisible] = React.useState(false);
 	const [loading, setLoading] = React.useState(false);
 	const [replyMessage, setReplyMessage] = React.useState(null);
-	const [pdfVisible, setPdfVisible] = React.useState(false);
+	//const [pdfVisible, setPdfVisible] = React.useState(false);
 	
 	const insets = useSafeAreaInsets();
 	
@@ -98,7 +100,7 @@ export default function ChattingScreen({navigation})
 	//https://www.kindacode.com/article/image-picker-in-react-native/
     const handleMedia = async (option) => 
     {
-		setPopupVisible(false);
+		//setPopupVisible(false);
 		
 		let result = null;
 		
@@ -164,10 +166,10 @@ export default function ChattingScreen({navigation})
 				.then
 				(
 					(result) => 
-					{	//console.log("pdf result: ", result);
+					{	console.log("pdf result: ", result);
 						if (result.type === 'success') 
 						{
-							checkFileAndUpload({assets: [{uri: result.uri, type: 'pdf', fileSize: result.size}]});
+							checkFileAndUpload({assets: [{uri: result.uri, type: 'pdf', fileSize: result.size, fileName: result.name}]});
 						}
 					}
 				)
@@ -209,7 +211,8 @@ export default function ChattingScreen({navigation})
             _id: uuid.v4(),
             createdAt: new Date(),
             [result.assets[0].type]: result.assets[0].uri, //local path
-            user
+            user,
+            ...(result.assets[0].fileName && {fileName: result.assets[0].fileName})
           }
         ];
         setMessages(previousMessages => GiftedChat.append(previousMessages, imageMessage))
@@ -242,7 +245,8 @@ export default function ChattingScreen({navigation})
 												_id: imageMessage[0]._id,
 												createdAt: imageMessage[0].createdAt,
 												user: imageMessage[0].user,
-											    document: url
+											    document: url,
+											    fileName: imageMessage[0].fileName
 											}; 
 											break;
 								default: console.error("Unexpected file type out of video, image, pdf!!!");
@@ -315,7 +319,8 @@ export default function ChattingScreen({navigation})
     const renderMessageImage = (props) => 
     {
         //const { currentMessage } = props;
-        
+        //see https://github.com/FaridSafi/react-native-gifted-chat/issues/1950
+        console.log("[INFO] in renderMessageImage: ", props);
         return (
           
           <MessageImage 
@@ -332,29 +337,8 @@ export default function ChattingScreen({navigation})
 
     const renderBubble = (props) =>
     {   //if (props.currentMessage.document) console.log("renderBubble: <<<<<", props.currentMessage.document);
-		/*if (props.currentMessage.pdf)
-		{   console.log("renderBubble: ", props.currentMessage);
-			return (
-			<Bubble {...props} >
-				<TouchableOpacity
-					onPress={()=>setPdfVisible(true)}	
-				>
-					<InChatViewFile props={props} visible={pdfVisible} onClose={()=>setPdfVisible(false)} />
-					<View style={{flexDirection: 'column'}}>
-					    <Image style={styles.pdfImage} source={require("../../../assets/images/pdf-image.png")} /> 
-						<Text style={{color: 'gray'}}>Click to view PDF</Text>
-					</View>
-				</TouchableOpacity>
-				</Bubble>
-				
-			);
-		}
-		else*/ 
-		if (props.currentMessage.document)
-		{
-			return <Bubble {...props} />
-		}
-		else if (props.currentMessage.image || props.currentMessage.video)	
+		
+		if (props.currentMessage.image || props.currentMessage.video || props.currentMessage.document)	
 			if (props.currentMessage.user._id === user._id)//right side image
 				return (
 					<Bubble {...props}
@@ -417,87 +401,43 @@ export default function ChattingScreen({navigation})
 	{ 
 		
 		if (props.currentMessage.document)
-		{	//console.log("renderCustomViewPdf: >>>>", props.currentMessage.document);
+		{	console.log("renderCustomViewPdf: props.currentMessage>>>>", props.currentMessage);
 			return (
 				<TouchableOpacity
 					onPress=
 					{
-						()=>navigation.navigate(pdfFileViewerScreenName, {document: props.currentMessage.document})
+						()=>navigation.navigate(pdfFileViewerScreenName, {document: props.currentMessage.document, fileName: props.currentMessage.fileName})
 					}	
+					onLongPress=
+					{
+						()=>console.log("PDF long pressed")
+					}
 				>
 					
 					<View style={{flexDirection: 'column'}}>
 					    <Image style={styles.pdfImage} source={require("../../../assets/images/pdf-image.png")} /> 
-						<Text style={{color: 'gray'}}>Click to view PDF</Text>
+						<Text style={{color: 'grey'}} numberOfLines={1} ellipsizeMode={'tail'}>{props.currentMessage.fileName}</Text>
 					</View>
 				</TouchableOpacity>
 				);
 		}
 	}
 	
+	/*
 	const mediaCallback = React.useCallback
 	(
 		(option) =>handleMedia(option),
 		[]
-	);
+	);*/
 	React.useEffect
     (
 		() =>
 		{
 			//a parameter, function, should be through a callback otherwise there will be no-serization warning.
-			navigation.setParams({handleMedia: mediaCallback})
+			navigation.setParams({handleMedia})
 		}, []
 	);
-	/*
-    React.useEffect
-    (
-		() =>
-		{
-			navigation.setOptions
-	        (
-				{
-		            headerRight: () => 
-		            (
-		                <Menu visible={popupVisible} 
-		                	  contentStyle={styles.popupMenu}
-		                	  onDismiss={()=>setPopupVisible(false)}
-                    		  anchor=
-                    		  {
-								  <IconButton style={{margin: 0, padding: 0}} 
-								  			  icon='dots-vertical' color='#000' size={30} 
-								  			  onPress={()=>setPopupVisible(true)}
-								  />
-							  }
-                    	>
-                    		  <Menu.Item leadingIcon='camera' title='Camera' onPress={()=>handleMedia('Camera')} />
-                    		  <Menu.Item leadingIcon='image' 
-                    		  			 title='Photos' 
-                    		  			 onPress={()=>handleMedia(ImagePicker.MediaTypeOptions.Images)}
-                    		  />
-                    		  <Menu.Item leadingIcon='video' 
-                    		  			 title='Video' 
-                    		  			 onPress={()=>handleMedia(ImagePicker.MediaTypeOptions.Videos)} 
-                    		  />
-                    		  <Divider />
-                    		  <Menu.Item leadingIcon='file' title='Pdf' onPress={()=>handleMedia('Pdf')} />
-                    		  <Menu.Item leadingIcon='database-sync-outline' 
-                    		  			 title='List Data' 
-                    		  			 onPress=
-                    		  			 {
-											   () =>
-											   {
-												   //setPopupVisible(false); 
-												   //return navigation.navigate(listSavedDataName);
-											   }
-										 } 
-							/>
-                    	</Menu>
-	                )
-	        	}
-	        );
-		}
-		
-	);*/
+
     React.useLayoutEffect
     (
 		() => 
@@ -533,6 +473,7 @@ export default function ChattingScreen({navigation})
 				                ...(doc.data().image && {image: doc.data().image}),
 				                ...(doc.data().video && {video: doc.data().video}),
 				                ...(doc.data().document && {document: doc.data().document}),
+				                ...(doc.data().fileName && {fileName: doc.data().fileName}),
 				                user: doc.data().user,
 				                ...(doc.data().replyMessage && {replyMessage: doc.data().replyMessage})
             				};
@@ -634,7 +575,7 @@ export default function ChattingScreen({navigation})
 		      	isKeyboardInternallyHandled={false}
 		      	renderInputToolbar={renderCustomInputToolbar}
 		      	renderAccessory={renderAccessory}
-		      	onLongPress={(_, message) => setReplyMessage(message)}
+		      	onLongPress={(context, message) => {console.log("ctx: ", context); setReplyMessage(message);}}
 		      	messagesContainerStyle={styles.messagesContainer}
 		      	renderFooter={()=>{}}
 	        />
