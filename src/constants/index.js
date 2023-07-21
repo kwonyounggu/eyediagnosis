@@ -33,5 +33,6 @@ export const displayDetailedQueryDataName = 'Detailed Data';
 export const EYE_WIKI_HOME = 'https://eyewiki.aao.org';
 
 export const pdfFileViewerScreenName = 'PDF Viewer';
+export const imageViewerScreenName = 'Image Viewer';
 
 export const replyMessageBarHeight = 50;

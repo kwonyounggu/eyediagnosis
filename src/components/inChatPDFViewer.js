@@ -1,10 +1,7 @@
 import * as React from 'react';
 import 
 {
-  View,
-  Modal,
-  TouchableOpacity,
-  StyleSheet,
+
   Text
 } from 'react-native';
 import PDFReader from 'rn-pdf-reader-js';

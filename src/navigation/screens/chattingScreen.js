@@ -20,12 +20,12 @@ import
     ActivityIndicator
 } from 'react-native-paper'; 
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import InChatViewFile from '../../components/inChatViewFile';
+//import InChatViewFile from '../../components/inChatViewFile';
 import { onPressAvatar } from '../../components/inChatRender';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ReplyMessageBar from '../../components/inChatReplyMessageBar';
 import { renderMessageText } from '../../components/inChatMessage';
-import { pdfFileViewerScreenName } from '../../constants';
+import { imageViewerScreenName, pdfFileViewerScreenName } from '../../constants';
 
 /**
  * https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
@@ -78,7 +78,7 @@ export default function ChattingScreen({navigation})
     //const [popupVisible, setPopupVisible] = React.useState(false);
 	const [loading, setLoading] = React.useState(false);
 	const [replyMessage, setReplyMessage] = React.useState(null);
-	//const [pdfVisible, setPdfVisible] = React.useState(false);
+	
 	
 	const insets = useSafeAreaInsets();
 	
@@ -203,7 +203,7 @@ export default function ChattingScreen({navigation})
 	//image, video, pdf
 	const uploadToStorage = async (result) =>
 	{
-		//console.log("result: ", Object.keys(result.assets[0]));
+		console.log("result: ", Object.keys(result));
 
 		const imageMessage = 
         [
@@ -283,6 +283,9 @@ export default function ChattingScreen({navigation})
 		
 	}
 
+	/** *
+	 * Uncomment if video is needed
+	 * 
     const renderMessageVideo = (props) => 
     {
         const { currentMessage } = props;
@@ -312,29 +315,43 @@ export default function ChattingScreen({navigation})
           </View>
         );
     }
-    /**
-	 * see the image TouchableOpacity
-	 */
-
-    const renderMessageImage = (props) => 
-    {
-        //const { currentMessage } = props;
-        //see https://github.com/FaridSafi/react-native-gifted-chat/issues/1950
-        console.log("[INFO] in renderMessageImage: ", props);
-        return (
-          
-          <MessageImage 
-			    {...props}
-			    imageStyle=
-			    {
+	*/
+	//see https://github.com/FaridSafi/react-native-gifted-chat/issues/1950
+	const renderMessageImage = (props) => 
+    {	    
+	    if (props.currentMessage.image)
+		{	
+			return (
+				<TouchableOpacity
+					onPress=
 					{
-						resizeMode: 'contain' //cover
-			    	}
-			    }
-		  />
-        );
+						()=>navigation.navigate(imageViewerScreenName, {image: props.currentMessage.image, fileName: props.currentMessage.fileName})
+					}	
+					onLongPress=
+					{
+						()=>setReplyMessage(props.currentMessage)
+					}
+				>
+					
+					<View style={{flexDirection: 'column'}}>
+					    <Image 
+						    style=
+						    {
+								{
+						            borderRadius: 14,
+						            height: 150,
+						            width: 200,
+						            marginBottom: -5
+						        }
+						    }
+					    	source={{uri: props.currentMessage.image}} /> 
+						<Text style={{color: 'grey'}} numberOfLines={1} ellipsizeMode={'tail'}>{props.currentMessage.fileName}</Text>
+					</View>
+				</TouchableOpacity>
+				);
+		}
     }
-
+    
     const renderBubble = (props) =>
     {   //if (props.currentMessage.document) console.log("renderBubble: <<<<<", props.currentMessage.document);
 		
@@ -401,7 +418,8 @@ export default function ChattingScreen({navigation})
 	{ 
 		
 		if (props.currentMessage.document)
-		{	console.log("renderCustomViewPdf: props.currentMessage>>>>", props.currentMessage);
+		{	//console.log("renderCustomViewPdf: props.currentMessage>>>>", props.currentMessage);
+		    //console.log("[INFO], ref: ", giftedChatRef.current);
 			return (
 				<TouchableOpacity
 					onPress=
@@ -410,7 +428,7 @@ export default function ChattingScreen({navigation})
 					}	
 					onLongPress=
 					{
-						()=>console.log("PDF long pressed")
+						()=>setReplyMessage(props.currentMessage)
 					}
 				>
 					
@@ -429,12 +447,32 @@ export default function ChattingScreen({navigation})
 		(option) =>handleMedia(option),
 		[]
 	);*/
+	const tempF = () =>
+	{
+		console.log("Scroll test", Object.keys(giftedChatRef.current._listRef._scrollRef));
+		/*giftedChatRef.current?._messageContainerRef?.current?.scrollToIndex
+		(
+			{
+		        animated: true,
+		        index: 5,
+	      	}
+	    );
+	    */
+	    giftedChatRef.current.scrollToIndex({index: 8, viewOffset: 0, viewPosition: 1});
+	}
+	const onViewableItemsChanged = ({viewableItems}) => 
+	{
+	  // Do stuff
+	  	console.log("", viewableItems);
+	};
+	
+	const giftedChatRef = React.useRef();
 	React.useEffect
     (
 		() =>
 		{
-			//a parameter, function, should be through a callback otherwise there will be no-serization warning.
-			navigation.setParams({handleMedia})
+			//this param function will be called from the header bar
+			navigation.setParams({handleMedia, scroll: tempF})
 		}, []
 	);
 
@@ -453,19 +491,7 @@ export default function ChattingScreen({navigation})
             		snapshot.docs.map
             		(
 						doc => 
-						{
-							/*
-							return {
-				                _id: doc.data()._id,
-				                createdAt: doc.data().createdAt.toDate(),
-				                text: doc.data().text,
-				                image: doc.data().image,
-				                video: doc.data().video,
-				                pdf: doc.data().pdf,
-				                user: doc.data().user,
-				                replyMessage: doc.data().replyMessage
-            				};*/
-            				
+						{            				
             				return {
 				                _id: doc.data()._id,
 				                createdAt: doc.data().createdAt.toDate(),
@@ -521,13 +547,14 @@ export default function ChattingScreen({navigation})
     return (		
 		<View style={{flex: 1}}>
 	        <GiftedChat
+	            messageContainerRef={giftedChatRef}
 	            messages={messages}
 	            showAvatarForEveryMessage={true}
 	            onSend={messages => onSend(messages)}
 	            renderUsernameOnMessage={false}
 	            disableComposer={false}
 	            user={user}
-	            renderMessageVideo={renderMessageVideo}
+	            renderMessageVideo={()=>{}}
 	            renderMessageImage={renderMessageImage}
 	            renderMessageText={renderMessageText}
 	            renderCustomView={renderCustomViewPdf}
@@ -575,7 +602,7 @@ export default function ChattingScreen({navigation})
 		      	isKeyboardInternallyHandled={false}
 		      	renderInputToolbar={renderCustomInputToolbar}
 		      	renderAccessory={renderAccessory}
-		      	onLongPress={(context, message) => {console.log("ctx: ", context); setReplyMessage(message);}}
+		      	onLongPress={(_, message) => setReplyMessage(message)}
 		      	messagesContainerStyle={styles.messagesContainer}
 		      	renderFooter={()=>{}}
 	        />

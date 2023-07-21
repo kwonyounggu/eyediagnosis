@@ -1,8 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { Avatar, Bubble, SystemMessage, Message, MessageText } from 'react-native-gifted-chat';
-import InChatViewFile from './inChatViewFile';
 
 export const renderAvatar = (props) => (
   <Avatar
@@ -117,14 +116,18 @@ const CustomMessageText = (props) =>
 	                  style=
 	                  {
 						  {
-			                    //color: 'white',
+			                    color: '#443355',
+			                    fontSize: 11,
 			                    paddingHorizontal: 10,
 			                    paddingTop: 5,
 			                    marginBottom: 5
 	                  	  }
 	                  }
                  >
-                  {props.currentMessage?.replyMessage?.text}
+                  {
+					  props.currentMessage?.replyMessage?.document ? props.currentMessage?.replyMessage?.fileName :
+					  props.currentMessage?.replyMessage?.image ? 'Photo' : props.currentMessage?.replyMessage?.text
+                  }
                 </Text>
               </View>
             </View>

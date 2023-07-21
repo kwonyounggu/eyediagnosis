@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ChatPDFViewer from '../../components/inChatPDFViewer';
-import { chattingName, pdfFileViewerScreenName } from '../../constants';
+import ChatImageViewer from '../../components/inChatImageViewer';
+import { chattingName, pdfFileViewerScreenName, imageViewerScreenName } from '../../constants';
 import ChattingScreen from "./chattingScreen";
 import { Menu, IconButton, Divider } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
@@ -56,18 +57,7 @@ export default function ChattingHomeScreen({route, navigation})
 													   navigationRef.current?.getCurrentRoute().params.handleMedia(ImagePicker.MediaTypeOptions.Images);
 												   }
 											 }
-	                    		  />
-	                    		  <Menu.Item leadingIcon='video' 
-	                    		  			 title='Video' 
-	                    		  			 onPress=
-	                    		  			 {
-												   ()=>
-												   {
-													   setPopupVisible(false);
-													   navigationRef.current?.getCurrentRoute().params.handleMedia(ImagePicker.MediaTypeOptions.Videos);
-												   }
-											 }
-	                    		  />
+	                    		  />	                    		  
 	                    		  <Divider />
 	                    		  <Menu.Item leadingIcon='file' 
 	                    		  			 title='Pdf' 
@@ -79,11 +69,18 @@ export default function ChattingHomeScreen({route, navigation})
 													   navigationRef.current?.getCurrentRoute().params.handleMedia('Pdf');
 												   }
 											 }
-	                    		  />
-	                    		  <Menu.Item leadingIcon='database-sync-outline' 
-	                    		  			 title='List Data' 
-	                    		  			    
-								/>
+	                    		  />	
+	                    		  <Menu.Item leadingIcon='video' 
+								  			 title='Video' 
+								  			 onPress=
+								  			 {
+												   ()=>
+												   {
+													   setPopupVisible(false);
+													   navigationRef.current?.getCurrentRoute().params.scroll();
+												   }
+											 }
+								  />                  		  
 	                    	</Menu>
 		                )
 		        }
@@ -129,6 +126,18 @@ export default function ChattingHomeScreen({route, navigation})
 					}
 				}
         	/>
+        	<Stack.Screen 
+        		name={imageViewerScreenName} 
+        		component={ChatImageViewer} 
+        		options=
+        		{
+					{
+						title: 'Image Viewer',
+						headerShown: true
+						
+					}
+				}
+        	/>
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -147,3 +156,17 @@ const styles = StyleSheet.create
 		}
     }
 );
+
+/**
+ * <Menu.Item leadingIcon='video' 
+  			 title='Video' 
+  			 onPress=
+  			 {
+				   ()=>
+				   {
+					   setPopupVisible(false);
+					   navigationRef.current?.getCurrentRoute().params.handleMedia(ImagePicker.MediaTypeOptions.Videos);
+				   }
+			 }
+  />
+ */

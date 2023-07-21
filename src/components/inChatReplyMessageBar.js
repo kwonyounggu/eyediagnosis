@@ -12,7 +12,10 @@ import { replyMessageBarHeight } from '../constants'
 */
 const ReplyMessageBar = ({ clearReply, message }) => 
 {
+	console.log("[INFO] in ReplyMessageBar, message: ", message);
   return(
+	 <View style={{flexDirection: 'column'}}>
+	 	<View><Text style={{paddingLeft: 10, fontWeight: 'bold'}}>Reply to {message?.user?.name}</Text></View>
 	    <View style={styles.container} >
 	      <View style={styles.replyImageContainer} >
 	        <Image
@@ -22,7 +25,12 @@ const ReplyMessageBar = ({ clearReply, message }) =>
 	      </View>
 	
 	      <View style={styles.messageContainer}>
-	        <Text numberOfLines={1} ellipsizeMode='tail'>{message?.text}</Text>
+	        <Text numberOfLines={1} ellipsizeMode='tail' >
+	        {
+				message.document ? message.fileName :
+				message.image ? 'Photo' : message?.text
+			}
+			</Text>
 	      </View>
 	
 	      <TouchableOpacity style={styles.crossButton} onPress={clearReply}>
@@ -32,6 +40,7 @@ const ReplyMessageBar = ({ clearReply, message }) =>
 	        />
 	      </TouchableOpacity>
 	    </View>  
+	 </View>
   );
 
 
