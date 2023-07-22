@@ -12,7 +12,7 @@ import { replyMessageBarHeight } from '../constants'
 */
 const ReplyMessageBar = ({ clearReply, message }) => 
 {
-	console.log("[INFO] in ReplyMessageBar, message: ", message);
+	//console.log("[INFO] in ReplyMessageBar, message: ", message);
   return(
 	 <View style={{flexDirection: 'column'}}>
 	 	<View><Text style={{paddingLeft: 10, fontWeight: 'bold'}}>Reply to {message?.user?.name}</Text></View>

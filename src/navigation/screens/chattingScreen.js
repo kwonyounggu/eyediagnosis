@@ -14,10 +14,8 @@ import uuid from 'react-native-uuid';
 import { Video, ResizeMode} from 'expo-av';
 import 
 { 
-    IconButton, 
-    Menu,
-    Divider,
-    ActivityIndicator
+    ActivityIndicator,
+    Chip
 } from 'react-native-paper'; 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 //import InChatViewFile from '../../components/inChatViewFile';
@@ -78,6 +76,7 @@ export default function ChattingScreen({navigation})
     //const [popupVisible, setPopupVisible] = React.useState(false);
 	const [loading, setLoading] = React.useState(false);
 	const [replyMessage, setReplyMessage] = React.useState(null);
+	const [showBackToReplyMsg, setShowBackToReplyMsg] = React.useState(true);
 	
 	
 	const insets = useSafeAreaInsets();
@@ -353,7 +352,8 @@ export default function ChattingScreen({navigation})
     }
     
     const renderBubble = (props) =>
-    {   //if (props.currentMessage.document) console.log("renderBubble: <<<<<", props.currentMessage.document);
+    {   
+		//if (props.currentMessage) console.log("renderBubble: <<<<<", props.currentMessage);
 		
 		if (props.currentMessage.image || props.currentMessage.video || props.currentMessage.document)	
 			if (props.currentMessage.user._id === user._id)//right side image
@@ -405,7 +405,13 @@ export default function ChattingScreen({navigation})
 			accessoryStyle={styles.replyBarContainer}
 		/>	
 	);
-	
+	const goToMessage = (_id) =>
+	{
+		const msgIndex = messages.findIndex(x => x._id === _id);
+		console.log("[INFO] goToMessage, msgIndex: ", msgIndex);
+		giftedChatRef.current.scrollToIndex({animated: true, index: msgIndex, viewOffset: 0, viewPosition: 1});
+		setShowBackToReplyMsg(true);
+	}
 	const renderAccessory = () =>
 	(
 		replyMessage && <ReplyMessageBar
@@ -458,7 +464,7 @@ export default function ChattingScreen({navigation})
 	      	}
 	    );
 	    */
-	    giftedChatRef.current.scrollToIndex({index: 8, viewOffset: 0, viewPosition: 1});
+	    giftedChatRef.current.scrollToIndex({animated: true, index: 8, viewOffset: 0, viewPosition: 1});
 	}
 	const onViewableItemsChanged = ({viewableItems}) => 
 	{
@@ -556,7 +562,7 @@ export default function ChattingScreen({navigation})
 	            user={user}
 	            renderMessageVideo={()=>{}}
 	            renderMessageImage={renderMessageImage}
-	            renderMessageText={renderMessageText}
+	            renderMessageText={(props)=>renderMessageText({...props, goToMessage})}
 	            renderCustomView={renderCustomViewPdf}
 	            renderLoading={renderLoading}
 	            isLoadingEarlier={true}
@@ -605,6 +611,7 @@ export default function ChattingScreen({navigation})
 		      	onLongPress={(_, message) => setReplyMessage(message)}
 		      	messagesContainerStyle={styles.messagesContainer}
 		      	renderFooter={()=>{}}
+		      	onPress={()=>setShowBackToReplyMsg(false)}
 	        />
 	        
         	{
@@ -612,6 +619,23 @@ export default function ChattingScreen({navigation})
                                 <ActivityIndicator size='large' />
                             </View>
             } 
+            {
+				showBackToReplyMsg && <View style={styles.moveToMessage}>
+								<Chip
+									style=
+									{
+										{
+											width: 160,
+											resizeMode: 'contain'
+										}
+									} 
+									textStyle={{fontSize: 11}}
+									onClose={()=>setShowBackToReplyMsg(false)}
+									icon='information' mode='outlined'  >
+									Back to Reply Message
+								</Chip>
+							</View>
+			}
         </View>    
     );
 }
@@ -629,6 +653,7 @@ const styles = StyleSheet.create
 		},
 		loading: 
         {
+			
             position: 'absolute',
             left: 0,
             right: 0,
@@ -636,6 +661,16 @@ const styles = StyleSheet.create
             bottom: 0,
             alignItems: 'center',
             justifyContent: 'center'
+        },
+        moveToMessage: 
+        {
+            position: 'absolute',
+			flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '8%',
+            bottom: 0
         },
         pdfImage: 
         {

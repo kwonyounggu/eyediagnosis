@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Avatar, Bubble, SystemMessage, Message, MessageText } from 'react-native-gifted-chat';
 
 export const renderAvatar = (props) => (
@@ -85,20 +85,13 @@ const CustomMessageText = (props) =>
 	          	  }
 	          }
           >
-            <View style={{flexDirection: 'row'}}>
-              <View
-	                style=
-	                {
-						{
-			                  height: '100%',
-			                  width: 0,
-			                  //backgroundColor: '#00468A',
-			                  borderTopLeftRadius: 15,
-			                  borderBottomLeftRadius: 15
-	                	}
-	                }
-              />
-              <View style={{flexDirection: 'column'}}>
+          <TouchableOpacity
+					onPress=
+					{
+						()=>props.goToMessage(props.currentMessage?.replyMessage?._id)
+					}	
+				>
+            <View style={{flexDirection: 'column'}}>
                 <Text
 	                  style=
 	                  {
@@ -113,11 +106,12 @@ const CustomMessageText = (props) =>
                   {"Reply to " + props.currentMessage?.replyMessage?.user.name}
                 </Text>
                 <Text
+                	  numberOfLines={1} ellipsizeMode='tail'
 	                  style=
 	                  {
 						  {
 			                    color: '#443355',
-			                    fontSize: 11,
+			                    fontSize: 12,
 			                    paddingHorizontal: 10,
 			                    paddingTop: 5,
 			                    marginBottom: 5
@@ -130,7 +124,7 @@ const CustomMessageText = (props) =>
                   }
                 </Text>
               </View>
-            </View>
+			</TouchableOpacity>
           </View>
         </View>
 
