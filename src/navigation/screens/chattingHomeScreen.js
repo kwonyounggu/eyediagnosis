@@ -70,17 +70,7 @@ export default function ChattingHomeScreen({route, navigation})
 												   }
 											 }
 	                    		  />	
-	                    		  <Menu.Item leadingIcon='video' 
-								  			 title='Video' 
-								  			 onPress=
-								  			 {
-												   ()=>
-												   {
-													   setPopupVisible(false);
-													   navigationRef.current?.getCurrentRoute().params.scroll();
-												   }
-											 }
-								  />                  		  
+                		  
 	                    	</Menu>
 		                )
 		        }

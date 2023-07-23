@@ -6,8 +6,8 @@ import { Avatar, Bubble, SystemMessage, Message, MessageText } from 'react-nativ
 export const renderAvatar = (props) => (
   <Avatar
     {...props}
-    containerStyle={{ left: { borderWidth: 3, borderColor: 'red' }, right: {} }}
-    imageStyle={{ left: { borderWidth: 3, borderColor: 'blue' }, right: {} }}
+    containerStyle={{ left: { borderWidth: 0, borderColor: 'red' }, right: {} }}
+    imageStyle={{ left: { borderWidth: 0, borderColor: 'blue' }, right: {} }}
   />
 );
 
@@ -88,7 +88,7 @@ const CustomMessageText = (props) =>
           <TouchableOpacity
 					onPress=
 					{
-						()=>props.goToMessage(props.currentMessage?.replyMessage?._id)
+						()=>props.goToMessage(props.currentMessage?.replyMessage?._id, props.currentMessage?._id)
 					}	
 				>
             <View style={{flexDirection: 'column'}}>

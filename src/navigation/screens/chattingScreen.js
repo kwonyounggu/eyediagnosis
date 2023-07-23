@@ -22,7 +22,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { onPressAvatar } from '../../components/inChatRender';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ReplyMessageBar from '../../components/inChatReplyMessageBar';
-import { renderMessageText } from '../../components/inChatMessage';
+import { renderAvatar, renderMessageText } from '../../components/inChatMessage';
 import { imageViewerScreenName, pdfFileViewerScreenName } from '../../constants';
 
 /**
@@ -76,8 +76,9 @@ export default function ChattingScreen({navigation})
     //const [popupVisible, setPopupVisible] = React.useState(false);
 	const [loading, setLoading] = React.useState(false);
 	const [replyMessage, setReplyMessage] = React.useState(null);
-	const [showBackToReplyMsg, setShowBackToReplyMsg] = React.useState(true);
+	const [showBackToReplyMsg, setShowBackToReplyMsg] = React.useState(null);
 	
+	const giftedChatRef = React.useRef();
 	
 	const insets = useSafeAreaInsets();
 	
@@ -389,7 +390,7 @@ export default function ChattingScreen({navigation})
 	{
 		//console.log("renderLoading ()................");
 	    return (
-	      <View style={styles.loadingContainer}>
+	      <View style={styles.loading}>
 	        <ActivityIndicator size="large" color="#6646ee" />
 	      </View>
 	    );
@@ -405,12 +406,28 @@ export default function ChattingScreen({navigation})
 			accessoryStyle={styles.replyBarContainer}
 		/>	
 	);
-	const goToMessage = (_id) =>
+	const goToMessage = (_id, backId) =>
 	{
 		const msgIndex = messages.findIndex(x => x._id === _id);
-		console.log("[INFO] goToMessage, msgIndex: ", msgIndex);
-		giftedChatRef.current.scrollToIndex({animated: true, index: msgIndex, viewOffset: 0, viewPosition: 1});
-		setShowBackToReplyMsg(true);
+		//console.log("[INFO] goToMessage, msgIndex: ", msgIndex);
+		
+		if (msgIndex !== -1)
+		{
+			giftedChatRef.current.scrollToIndex({animated: true, index: msgIndex, viewOffset: 0, viewPosition: 1});
+			setShowBackToReplyMsg(backId);
+		}
+	}
+	
+	const backToTheMessage = () =>
+	{
+		const msgIndex = messages.findIndex(x => x._id === showBackToReplyMsg);
+		//console.log("[INFO] goToMessage, msgIndex: ", msgIndex);
+		
+		if (msgIndex !== -1)
+		{
+			giftedChatRef.current.scrollToIndex({animated: true, index: msgIndex, viewOffset: 0, viewPosition: 1});
+			setShowBackToReplyMsg(null);
+		}
 	}
 	const renderAccessory = () =>
 	(
@@ -447,38 +464,20 @@ export default function ChattingScreen({navigation})
 		}
 	}
 	
-	/*
-	const mediaCallback = React.useCallback
-	(
-		(option) =>handleMedia(option),
-		[]
-	);*/
-	const tempF = () =>
+	/** 
+	 * This function is not used because TouchableOpacity component disturbes all screen touching overlaying
+	const isAnyPressInScreen = () => 
 	{
-		console.log("Scroll test", Object.keys(giftedChatRef.current._listRef._scrollRef));
-		/*giftedChatRef.current?._messageContainerRef?.current?.scrollToIndex
-		(
-			{
-		        animated: true,
-		        index: 5,
-	      	}
-	    );
-	    */
-	    giftedChatRef.current.scrollToIndex({animated: true, index: 8, viewOffset: 0, viewPosition: 1});
-	}
-	const onViewableItemsChanged = ({viewableItems}) => 
-	{
-	  // Do stuff
-	  	console.log("", viewableItems);
+	  if (showBackToReplyMsg !== null) setShowBackToReplyMsg(null);
 	};
+	*/
 	
-	const giftedChatRef = React.useRef();
 	React.useEffect
     (
 		() =>
 		{
 			//this param function will be called from the header bar
-			navigation.setParams({handleMedia, scroll: tempF})
+			navigation.setParams({handleMedia})
 		}, []
 	);
 
@@ -551,7 +550,7 @@ export default function ChattingScreen({navigation})
     //DEFAULT_BOTTOM_TABBAR_HEIGHT = 50
     //bottomOffset={Platform.OS==='ios' ? (50+insets.bottom) : 0}, to solve a gap between bottom textinput and keyboard
     return (		
-		<View style={{flex: 1}}>
+		<View style={{flex: 1}} >
 	        <GiftedChat
 	            messageContainerRef={giftedChatRef}
 	            messages={messages}
@@ -560,6 +559,7 @@ export default function ChattingScreen({navigation})
 	            renderUsernameOnMessage={false}
 	            disableComposer={false}
 	            user={user}
+	            renderAvatar={renderAvatar}
 	            renderMessageVideo={()=>{}}
 	            renderMessageImage={renderMessageImage}
 	            renderMessageText={(props)=>renderMessageText({...props, goToMessage})}
@@ -570,30 +570,7 @@ export default function ChattingScreen({navigation})
 	            bottomOffset={Platform.OS==='ios' ? (50+insets.bottom) : 0}
 	            maxInputLength={1024} 
 	            onPressAvatar={onPressAvatar}
-        		
-	            renderActions=
-	            {
-					()=>
-				
-		              <Ionicons
-		                name="ios-mic"
-		                size={35}
-		                hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-		                color={"red"}
-		                style={{
-		                  bottom: 50,
-		                  right: Dimensions.get("window").width / 2,
-		                  position: "absolute", 
-		                  shadowColor: "#000",
-		                  shadowOffset: { width: 0, height: 0 },
-		                  shadowOpacity: 0.5,
-		                  zIndex: 2,
-		                  backgroundColor: "transparent"
-		                }}
-		                onPress={()=>{}}
-		              />
-
-				}
+        			    
 				parsePatterns=
 				{
 					(linkStyle) => 
@@ -611,7 +588,6 @@ export default function ChattingScreen({navigation})
 		      	onLongPress={(_, message) => setReplyMessage(message)}
 		      	messagesContainerStyle={styles.messagesContainer}
 		      	renderFooter={()=>{}}
-		      	onPress={()=>setShowBackToReplyMsg(false)}
 	        />
 	        
         	{
@@ -620,17 +596,18 @@ export default function ChattingScreen({navigation})
                             </View>
             } 
             {
-				showBackToReplyMsg && <View style={styles.moveToMessage}>
+				(showBackToReplyMsg !== null) && <View style={styles.moveToMessage}>
 								<Chip
 									style=
 									{
 										{
-											width: 160,
+											width: '50%',
 											resizeMode: 'contain'
 										}
 									} 
 									textStyle={{fontSize: 11}}
-									onClose={()=>setShowBackToReplyMsg(false)}
+									onPress={backToTheMessage}
+									onClose={()=>setShowBackToReplyMsg(null)}
 									icon='information' mode='outlined'  >
 									Back to Reply Message
 								</Chip>

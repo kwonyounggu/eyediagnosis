@@ -44,6 +44,7 @@ import { appLoginScreenName } from '../../constants';
  * Ref: https://stackoverflow.com/questions/66096926/sendemailverification-vs-sendsigninlinktoemail-for-email-verification-using-fire
  * Ref: https://reactnativeelements.com/docs/3.4.2/avatar
  * Ref: icons, https://github.com/oblador/react-native-vector-icons/blob/master/glyphmaps/MaterialCommunityIcons.json
+ * free avatar https://ui-avatars.com/api/?background=0dbc3f&color=FFF&name=YG
  */
 
 //A profile photo uploadig
