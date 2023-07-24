@@ -8,7 +8,7 @@ import {isEmpty} from 'lodash';
 import { signOut, onAuthStateChanged} from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
 
-import { homeName, settingsName, forumName, appLoginScreenName, appHome, appForgotPasswordScreenName, appRegisterScreenName, chattingHomeName } from '../../constants';
+import { homeName, settingsName, forumName, appLoginScreenName, appHome, appForgotPasswordScreenName, appRegisterScreenName, chattingHomeName, myPageScreenName } from '../../constants';
 import HomeScreen from './homeScreen';
 import ForumScreen from './forumScreen';
 import SettingsScreen from './settingsScreen';
@@ -85,19 +85,23 @@ const CustomDrawer = (props) =>
 			        </View>
 				 </TouchableOpacity>
 				):
-	          (<><View>
-	            <Text ellipsizeMode='tail'>{appUser.displayName}</Text>
-	            <Text ellipsizeMode='tail'>{appUser.email}</Text>
-	          </View>
-	          <Image
-	            source=
-	            {
-					{
-	              		uri: appUser.photoURL,
-	            	}
-	            }
-	            style={{ width: 60, height: 60, borderRadius: 30 }}
-	          /></>)
+	          (<TouchableOpacity onPress={()=>props.navigation.navigate(myPageScreenName)}>
+		          <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
+			          <Image
+			            source=
+			            {
+							{
+			              		uri: appUser.photoURL,
+			            	}
+			            }
+			            style={{ width: 60, height: 60, borderRadius: 30 }}
+			          />
+		          </View>
+		          <View>
+		            <Text ellipsizeMode='tail'>{appUser.displayName}</Text>
+		            <Text ellipsizeMode='tail'>{appUser.email}</Text>
+		          </View>
+	          </TouchableOpacity>)
 	          }
 	        </View>
 	        <DrawerItemList {...props} />
@@ -166,6 +170,7 @@ export default function HomeRoot({navigation})
 			case appLoginScreenName: return 'Login';
 			case appRegisterScreenName: return 'SignUp';
 			case appForgotPasswordScreenName: return 'Restore Password';
+			case myPageScreenName: return 'My Personal Page';
 			default: return 'Unknown';
 		}
 	}

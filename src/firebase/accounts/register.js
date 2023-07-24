@@ -19,12 +19,8 @@ import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import 
 {
-  getFirestore,
-  query,
-  getDocs,
   collection,
-  where,
-  addDoc,
+  addDoc
 } from 'firebase/firestore';
 
 import { PROFESSIONS, COUNTRIES, CANADA_PROVINCES, USA_STATES } from '../../common/utils';
@@ -49,7 +45,7 @@ import { appLoginScreenName } from '../../constants';
 
 //A profile photo uploadig
 //ref 1: https://javascript.plainenglish.io/using-react-native-image-picker-4495776c8bae
-const defaultImageURL = 'https://gravatar.com/avatar/94d45dbdba988afacf30d916e7aaad69?s=200&d=mp&r=x';
+//const defaultImageURL = 'https://gravatar.com/avatar/94d45dbdba988afacf30d916e7aaad69?s=200&d=mp&r=x';
 //See https://stackoverflow.com/questions/56675072/react-native-check-image-url
 //<Image source={{uri: ...} defaultSource={defaultImageURL}}
 
@@ -92,6 +88,22 @@ const Register = ({navigation}) =>
 	    // This must be true.
 	    handleCodeInApp: true
 	};
+	
+	//This is to use a web site providing avatar link
+	const formatPhotoURL = () =>
+	{
+		const name = firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
+		let backgroundColor = '0dbc3f'; //default for optometrist
+		switch(profession)
+		{
+			case 'ophthalmologist': backgroundColor='461959'; break;
+			case 'pharmacist': backgroundColor='7A316F'; break;
+			case 'gp': backgroundColor='CD6688'; break;
+			case 'md_specialist': backgroundColor='94ADD7'; break;
+			default: break;
+		}
+		return `https://ui-avatars.com/api/?background=${backgroundColor}&color=FFF&name=${name}`;
+	}
 	const register = () => 
 	{
 		let result = validateRegister(firstName, lastName, email, url, password, password2);
@@ -115,8 +127,8 @@ const Register = ({navigation}) =>
 	        (
 				user, 
 				{
-	            	displayName: firstName.charAt(0).toUpperCase() + firstName.slice(1) + ' ' + lastName.toUpperCase(),
-	            	photoURL: url.length === 0 ? defaultImageURL : url
+	            	displayName: firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase() + ' ' + lastName.toUpperCase(),
+	            	photoURL: url.length === 0 ? formatPhotoURL() : url
 	        	}
 	        )
 	        .then
@@ -144,9 +156,9 @@ const Register = ({navigation}) =>
 							   collection(db, 'registeredUsers'), 
 							   {
 							      uid: user.uid,
-							      firstName: firstName,
-							      lastName: lastName,
-							      email,
+							      firstName: firstName.toLowerCase(),
+							      lastName: lastName.toLowerCase(),
+							      email: email.toLowerCase(),
 							      profession,
 							      country,
 							      province
@@ -247,7 +259,7 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={50} 
                             value={firstName}
-                            onChangeText={(value)=>setFirstName(value.trim().toLowerCase())}
+                            onChangeText={(value)=>setFirstName(value.trim())}
                             returnKeyType='next'
                             keyboardType='ascii-capable'  
                         />
@@ -259,7 +271,7 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={50} 
                             value={lastName}
-                            onChangeText={(value)=>setLastName(value.trim().toLowerCase())}
+                            onChangeText={(value)=>setLastName(value.trim())}
                             returnKeyType='next'
                             keyboardType='ascii-capable'       
                         />
@@ -273,7 +285,7 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={62}  
                             value={email}
-                            onChangeText={(value)=>setEmail(value.trim().toLowerCase())}  
+                            onChangeText={(value)=>setEmail(value.trim())}  
                             textContentType='emailAddress'
                             keyboardType='email-address'
                             autoCapitalize='none'
@@ -288,7 +300,7 @@ const Register = ({navigation}) =>
                             multiline={false}
                             maxLength={255}  
                             value={url}
-                            onChangeText={(value)=>setURL(value.trim().toLowerCase())}  
+                            onChangeText={(value)=>setURL(value.trim())}  
                             right=
                             {
 						        <TextInput.Icon icon='image-frame' size={28}

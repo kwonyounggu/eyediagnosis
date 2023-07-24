@@ -22,6 +22,7 @@ export const pharmacyName = 'Pharmacy';
 export const appLoginScreenName = 'App SignIn';
 export const appRegisterScreenName = 'App SignUp';
 export const appHome = 'App Home';
+export const myPageScreenName = 'My Personal Page';
 
 export const appForgotPasswordScreenName = 'Forgot Password';
 

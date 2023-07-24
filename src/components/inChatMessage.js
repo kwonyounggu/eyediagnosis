@@ -102,6 +102,7 @@ const CustomMessageText = (props) =>
 			                    fontWeight: '700'
 	                  		}
 	                  }
+	                  numberOfLines={1} ellipsizeMode={'tail'}
                  >
                   {"Reply to " + props.currentMessage?.replyMessage?.user.name}
                 </Text>

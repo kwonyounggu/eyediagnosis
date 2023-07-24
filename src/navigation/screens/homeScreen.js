@@ -4,7 +4,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from '../../firebase/accounts/login';
 import Register from '../../firebase/accounts/register';
 import ForgotPassword from '../../firebase/accounts/forgotPassword';
-import { appHome, appLoginScreenName, appRegisterScreenName, appForgotPasswordScreenName } from '../../constants';
+import MyPage from '../../firebase/accounts/myPage';
+import { appHome, appLoginScreenName, appRegisterScreenName, appForgotPasswordScreenName, myPageScreenName } from '../../constants';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,7 @@ export default function HomeScreen({navigation})
 	        />
         	<Stack.Screen name={appRegisterScreenName} component={Register} />
         	<Stack.Screen name={appForgotPasswordScreenName} component={ForgotPassword} />
+        	<Stack.Screen name={myPageScreenName} component={MyPage} />
         </Stack.Navigator>
     );
 }
