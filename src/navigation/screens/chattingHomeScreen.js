@@ -31,7 +31,7 @@ export default function ChattingHomeScreen({route, navigation})
 	                    		  anchor=
 	                    		  {
 									  <IconButton style={{margin: 0, padding: 0}} 
-									  			  icon='dots-vertical' color='#000' size={30} 
+									  			  icon='upload' color='#000' size={30} 
 									  			  onPress={()=>setPopupVisible(true)}
 									  />
 								  }
@@ -47,6 +47,7 @@ export default function ChattingHomeScreen({route, navigation})
 												   }
 											 }
 	                    		  />
+	                    		  <Divider />
 	                    		  <Menu.Item leadingIcon='image' 
 	                    		  			 title='Photos' 
 	                    		  			 onPress=
@@ -140,9 +141,9 @@ const styles = StyleSheet.create
 		{
 		    borderTopLeftRadius: 10,
 		    borderRadius: 20,
-		    
-		    borderWidth: 5,
-		    backgroundColor: 'red'
+		    borderColor: 'white',
+		    borderWidth: 2,
+		    backgroundColor: '#f4511e'
 		}
     }
 );

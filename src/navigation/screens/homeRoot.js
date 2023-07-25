@@ -170,7 +170,7 @@ export default function HomeRoot({navigation})
 			case appLoginScreenName: return 'Login';
 			case appRegisterScreenName: return 'SignUp';
 			case appForgotPasswordScreenName: return 'Restore Password';
-			case myPageScreenName: return 'My Personal Page';
+			case myPageScreenName: return 'My Profile Page';
 			default: return 'Unknown';
 		}
 	}

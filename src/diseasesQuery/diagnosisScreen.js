@@ -397,7 +397,7 @@ const DiagnosisScreen = (props) =>
                     options=
                     {
                         {
-                            headerRight: ()=><IconButton icon='quora' color='#000' size={30}/>
+                            headerRight: ()=>{}
                         }
                     }
                     > 
@@ -445,8 +445,9 @@ const styles = StyleSheet.create
 		    borderTopLeftRadius: 10,
 		    borderRadius: 20,
 		    
-		    borderWidth: 5,
-		    backgroundColor: 'red'
+		    borderWidth: 2,
+		    borderColor: 'white',
+		    backgroundColor: '#f4511e'
 		}
     }
 );
