@@ -5,7 +5,7 @@ import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
 //import { signOut } from 'firebase/auth';
 import { Bubble, GiftedChat, InputToolbar, MessageImage } from 'react-native-gifted-chat';
-import { collection, addDoc, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, query, orderBy, onSnapshot, Timestamp, where } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
@@ -486,8 +486,15 @@ export default function ChattingScreen({navigation})
 		() => 
 		{
 	        //Retrieve old messages from firestore
-	        
-	        const q = query(collection(db, 'eyediagnosisChats'), orderBy('createdAt', 'desc'));
+	        //listens for any changes on the Firestore Database
+	        //https://bytebytego.com/courses/system-design-interview/design-a-chat-system
+
+	        const q = query
+	        		  (
+						  collection(db, 'eyediagnosisChats'), 
+						  where ('createdAt', '>=', Timestamp.fromMillis(auth?.currentUser?.metadata.createdAt)), 
+						  orderBy('createdAt', 'desc')
+					  );
             const unsubscribe = onSnapshot
             ( q, 
               (snapshot) =>

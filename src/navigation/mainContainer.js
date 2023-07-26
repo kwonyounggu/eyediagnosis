@@ -12,12 +12,26 @@ import EyeWikiScreen from './screens/eyeWikiScreen';
 import PharmacyScreen from './screens/pharmacyScreen';
 import HomeRoot from './screens/homeRoot';
 import { AppContext } from '../contexts/appProvider';
-import {isEmpty} from 'lodash';
+import _ from 'lodash';
 import { useChatGpt } from '../chatGpt';
+import * as SecureStore from 'expo-secure-store';
 import {homeRootName, homeName, diseasesName, pharmacyName, settingsName, chattingName, eyeWikiName, forumName, EYE_WIKI_HOME, appHome} from '../constants'
 
 
 const Tab = createBottomTabNavigator();
+
+const SESSION_TIME_KEY = 'app_session_time_access_key';
+const ONE_HOUR_MS = 3600000; 
+//const ONE_HOUR_MS = 60000; 
+async function persistToken(value) 
+{
+  return SecureStore.setItemAsync(SESSION_TIME_KEY, value);
+}
+
+async function getTokenFromDisk() 
+{
+  return SecureStore.getItemAsync(SESSION_TIME_KEY);
+}
 
 function ToEyeWikiHome()
 {
@@ -40,28 +54,44 @@ export default function MainContainer()
 	//const {chatGptUser} = React.useContext(AppContext).state;
 	//const {onUpdateChatGptUser} = React.useContext(AppContext).actions;
 	const {flush} = useChatGpt();
+	
+	//Check if session, 1 hour in inactive/background mode, is expired.
+	//This way chatGpt data query will be more stabliized
+	const sessionTimeout = async () =>
+	{
+		const sessionTime = await getTokenFromDisk();
+		console.log("what is sesstionTime: ", sessionTime);
+		
+		  if (sessionTime && (_.now() - Number(sessionTime)) > ONE_HOUR_MS) 
+		  {
+			  flush();
+			  console.log("[INFO] session timed out");
+		  }
+	}
+	
 	React.useEffect
 	(
 		() => 
 		{
+			console.log("system start ............");
+			sessionTimeout();
     		const subscription = AppState.addEventListener
     		(
 				'change', 
-				nextAppState => 
+				async (nextAppState) => 
 				{
-				      //if (appState.current.match(/inactive|background/) && nextAppState === 'active') 
-				      // console.log('App has come to the foreground!');
-				      
-					  //if (nextAppState !== 'active' && !isEmpty(chatGptUser)) 
-					  if (nextAppState !== 'active')
-					  {
-						  flush();
-						  //onUpdateChatGptUser({});
-						  //console.log("It will be in background mode ...");
+					  /*
+				      if (appState.current.match(/inactive|background/) && nextAppState === 'active') 
+				      {
+						  console.log('App has come to the foreground!');
 					  }
+				      */
+					  if (nextAppState === 'active') sessionTimeout(); 
+					  else //whenever this app is in background mode, store the current time
+					   	   await persistToken(_.now().toString());
+					  
 				      appState.current = nextAppState;
 				      console.log('AppState', appState.current);
-				      //console.log(">>> ChatGptUser: ", isEmpty(chatGptUser), chatGptUser);
 				}
 			);
 
