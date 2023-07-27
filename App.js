@@ -12,7 +12,7 @@ export default function App()
     <AppProvider>   
       <SafeAreaProvider>
             <PaperProvider>
-                <ChatGptProvider>
+                <ChatGptProvider streamedRequestTimeout={900000}>
                     <MainContainer />
                 </ChatGptProvider>
             </PaperProvider>

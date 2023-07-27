@@ -7,12 +7,44 @@ import ForgotPassword from '../../firebase/accounts/forgotPassword';
 import MyPage from '../../firebase/accounts/myPage';
 import { appHome, appLoginScreenName, appRegisterScreenName, appForgotPasswordScreenName, myPageScreenName } from '../../constants';
 
+import {Configuration, OpenAIApi} from 'openai';
+import { OPENAI_API_KEY, OPENAI_ORGANIZATION_ID } from '@env';
 const Stack = createNativeStackNavigator();
 
 const FinalHome = ({navigation}) =>
 {
+	const [msg, setMsg] = React.useState();
+	
+	React.useEffect
+	(
+		()=>
+		{
+			const configuration = new Configuration
+			(
+				{
+				    organization: `${OPENAI_ORGANIZATION_ID}`,
+				    apiKey: `${OPENAI_API_KEY}`
+				}
+			);
+			const openai = new OpenAIApi(configuration);
+			openai.listEngines().then
+			(
+				(response)=>setMsg(response)
+			)
+			.catch
+			(
+				
+				(e)=>
+				{
+					console.error(e);
+					setMsg("error: ", e);
+				}
+			)
+		},[]
+	);
+
 	return (
-		<View><Text>Final Home</Text></View>	
+		<View><Text>Final Home{msg}</Text></View>	
 	);
 }
 export default function HomeScreen({navigation})

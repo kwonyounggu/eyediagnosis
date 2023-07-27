@@ -46,7 +46,7 @@ async function getTokenFromDisk()
   return SecureStore.getItemAsync(TOKEN_ACCESS_KEY);
 }
 
-function createQueryString (params) 
+function createQueryString (params, messageId, conversationId) 
 {
     console.log("params in createQueryString: ", params);
     
@@ -64,7 +64,7 @@ function createQueryString (params)
     queryString += " In addition, please summarize each disease according to eyewiki.aao.org and" +
                    " include its direct href link address at the bottom of the whole page separately altogether."
 
-    return {queryString, queryStringDisplayable, patient: params};
+    return {queryString, queryStringDisplayable, patient: params, messageId, conversationId};
 }
 
 const EyeDiagnosisInputScreen = ({navigation}) =>
@@ -85,23 +85,8 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
     //https://stackoverflow.com/questions/48420468/keyboardavoidingview-not-working-properly
     const headerHeight = useHeaderHeight();
     
-    /*
-    const [totalLines, setTotalLines] = React.useState(0);
-    
-    React.useEffect
-    (
-		() =>
-		{
-			let tempTotalLines = medicalHistory.split(/\r\n|\r|\n/).length + 
-						  		 symptoms.split(/\r\n|\r|\n/).length +
-						         signs.split(/\r\n|\r|\n/).length;
-			if (totalLines !== tempTotalLines) setTotalLines(tempTotalLines);
-						  
-			console.log(tempTotalLines);
-		}, [medicalHistory, symptoms, signs]
-		
-	);
-    */
+    const messageId = React.useRef('');
+    const conversationId = React.useRef('');
     
     React.useEffect
     (
@@ -204,6 +189,7 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
         }
         else if (!isValid) setIsValid(true);
         
+        
         navigation.navigate
         (
             differentialDiagnosisName, 
@@ -215,7 +201,9 @@ const EyeDiagnosisInputScreen = ({navigation}) =>
                     signs: signsArray, 
                     symptoms: symptomsArray, 
                     medicalHistory: medicalHistoryArray
-                }
+                },
+                messageId,
+                conversationId
             )
         );
     }

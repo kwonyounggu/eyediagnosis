@@ -17,25 +17,20 @@ import {eyeWikiName} from '../constants';
 
 const DifferentialDiagnosisScreen = ({route, navigation}) =>
 {
-    const {chatGptUser} = React.useContext(AppContext).state;
-    
-    //const [queryResult, setQueryResult] = React.useState(queryData);
-    const [queryResult, setQueryResult] = React.useState('');
-    
+    const {chatGptUser,} = React.useContext(AppContext).state; 
+    //const {onUpdateChatGptIds} = React.useContext(AppContext).actions;  
+    const [queryResult, setQueryResult] = React.useState('');    
     const [errorMessage, setErrorMessage] = React.useState('');
-    
-    //const [loading, setLoading] = React.useState(false);
-    const [loading, setLoading] = React.useState(true);
+	const [loading, setLoading] = React.useState(true);
     
     const [saving, setSaving] = React.useState(false);
     const [onSave, setOnSave] = React.useState(false);
-
     const [savedMessage, setSavedMessage] = React.useState('');
-    //const [queryDone, setQueryDone] = React.useState(false);
+    
     const {sendMessage} = useChatGpt();
     
-    const messageId = React.useRef('');
-    const conversationId = React.useRef('');
+    //const messageId = React.useRef('');
+    //const conversationId = React.useRef('');
     
 
 	React.useEffect
@@ -80,10 +75,14 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
 	    [onSave]
 	 );
     
+
+    //Only streamed way of response is working. July 26, 2023   
     React.useEffect
     (
         () =>
-        {
+        {	const {messageId, conversationId} = route.params;
+			//console.log("messageId.current: ", typeof messageId);
+        	//console.log("conversationId.current: ", typeof conversationId);
                 sendMessage
                 (
                     {
@@ -129,7 +128,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
         },
         [] //empty array, the function is only executed once when this component first mounts.
     ); //useEffect
-    
+   
     React.useLayoutEffect
     (
         () =>

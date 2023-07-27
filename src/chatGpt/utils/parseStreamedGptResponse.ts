@@ -36,7 +36,7 @@ export default function parseStreamedGptResponse(data: string) {
   //isDone: response.message?.end_turn === true
   const response = JSON.parse(sanitizedChunks[sanitizedChunks.length - 1]);
   
-  console.log("parseStreamedGptResponse in parseStreamedGptResonse.js data: \n", data);
+  //console.log("parseStreamedGptResponse in parseStreamedGptResonse.js data: \n", data);
   return {
 		    message: response.message.content.parts[0],
 		    messageId: response.message.id,

@@ -11,6 +11,7 @@ class AppProvider extends React.Component
   constructor(props) 
   {
     super(props);
+    
     this.state = 
     {
 		appUser: {},
@@ -26,10 +27,10 @@ class AppProvider extends React.Component
      	(user) =>
 		{
 			//user={email: "kwon.younggu@gamil.com", iat: 1679877172, exp: 1681086772}
-			console.log("user: ", user);
+			//console.log("user: ", user);
 			this.setState({chatGptUser: user})
 		},
-		onUpdateChatGptId:
+		onUpdateChatGptIds:
 		(messageId, conversationId) =>
 		{
 			this.setState({messageId, conversationId});
@@ -38,12 +39,15 @@ class AppProvider extends React.Component
      	(user) =>
 		{
 			//user={email: "kwon.younggu@gamil.com", iat: 1679877172, exp: 1681086772}
-			console.log("AppUser: ", user);
+			//console.log("AppUser: ", user);
 			this.setState({appUser: user})
 		},	 
 		
   };
 
+  componentDidMount() 
+  {
+  }
   render() 
   {
 	    const {state, actions} = this;

@@ -19,3 +19,4 @@ web-build/
 /to-do.txt
 /google-services.json
 /firebase.js
+/.env
