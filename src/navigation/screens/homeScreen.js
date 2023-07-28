@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from '../../firebase/accounts/login';
 import Register from '../../firebase/accounts/register';
@@ -8,13 +8,44 @@ import MyPage from '../../firebase/accounts/myPage';
 import { appHome, appLoginScreenName, appRegisterScreenName, appForgotPasswordScreenName, myPageScreenName } from '../../constants';
 
 import {Configuration, OpenAIApi} from 'openai';
-import { OPENAI_API_KEY, OPENAI_ORGANIZATION_ID } from '@env';
+import { OPENAI_API_KEY, OPENAI_ORGANIZATION_ID, OPENAI_API_URL } from '@env';
+import axios from 'axios';
+
 const Stack = createNativeStackNavigator();
 
 const FinalHome = ({navigation}) =>
 {
 	const [msg, setMsg] = React.useState();
+	const [data, setData] = React.useState([]);
+	const [textInput, setTextInput] = React.useState('');
+
 	
+	const handleSend = async () =>
+	{
+		const prompt = textInput;
+		const response = await axios.post
+		(
+			`${OPENAI_API_URL}`,
+			{
+				prompt: prompt,
+			    max_tokens: 1024,
+				temperature: 0.5
+			},
+			{
+				headers: 
+				{
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${OPENAI_API_KEY}`
+				}
+			}
+		);
+		
+		const text = response.data.choices[0].text;
+		setData([...data, {type: 'user', 'text': textInput}, {type: 'bot', 'text': text}]);
+		setTextInput('');
+	}
+	
+	/*
 	React.useEffect
 	(
 		()=>
@@ -42,9 +73,49 @@ const FinalHome = ({navigation}) =>
 			)
 		},[]
 	);
-
+	*/
 	return (
-		<View><Text>Final Home{msg}</Text></View>	
+		<View style={styles.container}>
+			<Text style={styles.title}>AI ChatBot</Text>
+			<FlatList
+				data={data}
+				keyExtractor={(item, index) => index.toString()}
+				style={styles.body}
+				renderItem=
+				{
+					(item) =>
+					(
+						<View style={{flexDirection: 'row', padding: 10}}>
+							<Text style=
+								  {
+									  {
+										  fontWeight: 'bold',
+										  color: item.type === 'user' ? 'green' : 'red'
+									  }
+								  }
+							>
+							{
+								item.type === 'user' ? 'Niza' : 'Bot'
+							}
+							</Text>
+							<Text style={styles.bot}>{item.text}</Text>
+						</View>
+					)
+				}
+			/>
+			<TextInput
+				style={styles.input}
+				value={textInput}
+				onChangeText={(text) => setTextInput(text)}
+				placeholder='Ask me anything'
+			/>
+			<TouchableOpacity
+				style={styles.buttonSend}
+				onPress={handleSend}
+			>
+				<Text style={styles.buttonText}>Let's go</Text>
+			</TouchableOpacity>
+		</View>	
 	);
 }
 export default function HomeScreen({navigation})
@@ -62,3 +133,44 @@ export default function HomeScreen({navigation})
         </Stack.Navigator>
     );
 }
+
+const styles = StyleSheet.create
+(
+	{
+		container:
+		{
+			flex: 1,
+			backgroundColor: '#fffcc9',
+			alignItems: 'center'
+		},
+		title:
+		{
+			fontSize: 28,
+			fontWeight: 'bold',
+			marginBottom: 20,
+			marginTop: 70
+		},
+		body:
+		{
+			backgroundColor: '#fffcc9',
+			width: '100%',
+			margin: 10
+		},
+		bot:
+		{
+			fontSize: 16
+		},
+		input:
+		{
+			
+		},
+		buttonText:
+		{
+			
+		},
+		buttonSend:
+		{
+			
+		}
+	}
+)
