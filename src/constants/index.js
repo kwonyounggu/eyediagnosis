@@ -2,10 +2,8 @@
  * https://www.dignited.com/108801/5-sites-to-access-or-use-chatgpt-4-gpt-4-for-free/
  */
 //see https://platform.openai.com/docs/api-reference/authentication
-export const OPENAI_API_KEY = '---';
-
 //https://platform.openai.com/account/org-settings
-export const OrganizationID = '---';
+
 
 export const SQL_QUERY_LIMIT = 10;
 
