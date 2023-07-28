@@ -8,7 +8,7 @@ import MyPage from '../../firebase/accounts/myPage';
 import { appHome, appLoginScreenName, appRegisterScreenName, appForgotPasswordScreenName, myPageScreenName } from '../../constants';
 
 import {Configuration, OpenAIApi} from 'openai';
-import { OPENAI_API_KEY, OPENAI_ORGANIZATION_ID, OPENAI_API_URL } from '@env';
+import { OPENAI_API_DOOR, OPENAI_ORGANIZATION_ID, OPENAI_API_URL } from '@env';
 import axios from 'axios';
 
 const Stack = createNativeStackNavigator();
@@ -35,7 +35,7 @@ const FinalHome = ({navigation}) =>
 				headers: 
 				{
 					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${OPENAI_API_KEY}`
+					'Authorization': `Bearer ${OPENAI_API_DOOR}`
 				}
 			}
 		);
@@ -54,7 +54,7 @@ const FinalHome = ({navigation}) =>
 			(
 				{
 				    organization: `${OPENAI_ORGANIZATION_ID}`,
-				    apiKey: `${OPENAI_API_KEY}`
+				    apiKey: `${OPENAI_API_DOOR}`
 				}
 			);
 			const openai = new OpenAIApi(configuration);
