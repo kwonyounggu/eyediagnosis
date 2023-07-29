@@ -1,3 +1,4 @@
+import 'react-native-url-polyfill/auto';
 import MainContainer from './src/navigation/mainContainer';
 import { AppProvider } from './src/contexts/appProvider';
 import {ChatGptProvider} from './src/chatGpt'

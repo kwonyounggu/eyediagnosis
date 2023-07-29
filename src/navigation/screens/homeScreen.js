@@ -8,7 +8,7 @@ import MyPage from '../../firebase/accounts/myPage';
 import { appHome, appLoginScreenName, appRegisterScreenName, appForgotPasswordScreenName, myPageScreenName } from '../../constants';
 
 import {Configuration, OpenAIApi} from 'openai';
-import { OPENAI_API_DOOR, OPENAI_ORGANIZATION_ID, OPENAI_API_URL } from '@env';
+import { GPTAI_API_KEY, OPENAI_ORGANIZATION_ID, OPENAI_API_URL } from '@env';
 import axios from 'axios';
 
 const Stack = createNativeStackNavigator();
@@ -35,7 +35,7 @@ const FinalHome = ({navigation}) =>
 				headers: 
 				{
 					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${OPENAI_API_DOOR}`
+					'Authorization': `Bearer ${GPTAI_API_KEY}`
 				}
 			}
 		);
@@ -45,22 +45,23 @@ const FinalHome = ({navigation}) =>
 		setTextInput('');
 	}
 	
-	/*
+	
 	React.useEffect
 	(
 		()=>
 		{
+			console.log("key: ", GPTAI_API_KEY);
+			console.log("oid: ", OPENAI_ORGANIZATION_ID);
 			const configuration = new Configuration
 			(
 				{
-				    organization: `${OPENAI_ORGANIZATION_ID}`,
-				    apiKey: `${OPENAI_API_DOOR}`
+				    apiKey: `${GPTAI_API_KEY}`
 				}
 			);
 			const openai = new OpenAIApi(configuration);
-			openai.listEngines().then
+			/*openai.retrieveModel("text-davinci-003").then
 			(
-				(response)=>setMsg(response)
+				(response)=>console.log("from openai: ", response)
 			)
 			.catch
 			(
@@ -70,10 +71,30 @@ const FinalHome = ({navigation}) =>
 					console.error(e);
 					setMsg("error: ", e);
 				}
+			)*/
+			
+			openai.createChatCompletion
+			(
+				{
+					model: "gpt-3.5-turbo",
+	  				messages: 
+	  				[
+						  { role: "system", "content": "You are an eye doctor."}, 
+						  { role: "user", content: "I am 61 years old male and have diabeties and va 20/30"}
+					],
+				}
+			)
+			.then
+			(
+				(response) => console.log(">>>", response.data.choices[0].message)
+			)
+			.catch
+			(
+				(e)=>console.error(e)
 			)
 		},[]
 	);
-	*/
+	
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>AI ChatBot</Text>
