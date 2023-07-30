@@ -35,12 +35,43 @@ export default function EyeWikiScreen({route, navigation})
     		loadDataCallback(); console.log("here in useEffect");
   		}, [loadDataCallback]
   	);*/
+  	const webViewRef = React.useRef(null);
   	
+  	
+  	React.useEffect
+  	(
+		() =>
+		{
+			console.log("[INFO]: it's time for put a word in search input");
+			//if (url === 'https://eyewiki.aao.org') webViewRef?.current.injectJavaScript(javascript);
+			if (!loading && url.toLowerCase().endsWith('eyewiki.aao.org')) webViewRef?.current.injectJavaScript(javascript);
+		}, [url]
+	);
 
+	const javascript = 
+    `console.log('injectJavaScript');
+    document.getElementById('searchInput').style.backgroundColor = 'red';
+    document.getElementById('searchInput').value = 'green';
+    true;`;
+    
+    
+    const handleLoadEnd = React.useCallback(() => {
+        console.log("handleLoadEnd..");
+        //webViewRef.current?.injectJavaScript(javascript);
+        //if (url.toLowerCase().endsWith('eyewiki.aao.org')) webViewRef?.current.injectJavaScript(javascript);
+    },[])
   	//See https://stackoverflow.com/questions/45256826/react-native-webview-loading-indicator
     return (
         	<View style={{flex: 1}}>
-            	<WebView source={{uri: url}} onLoad={()=>setLoading(false)} />
+            	<WebView 
+            		ref={webViewRef}
+            		javaScriptEnabled={true}
+            		source={{uri: url}} 
+            		onLoad={()=>setLoading(false)} 
+					onLoadEnd={handleLoadEnd}
+            		onMessage={(e)=>{console.log(e)}}
+            		
+            	/>
             	{
 					loading && 
 					<ActivityIndicator style={styles.loading} size="large" />

@@ -27,8 +27,10 @@ const ReplyMessageBar = ({ clearReply, message }) =>
 	      <View style={styles.messageContainer}>
 	        <Text numberOfLines={1} ellipsizeMode='tail' >
 	        {
-				message.document ? message.fileName :
-				message.image ? 'Photo' : message?.text
+				//message.document ? message.fileName :
+				//message.image ? 'Photo' : message?.text
+				(message.document || message.image) ? 
+				message.fileName : message?.text
 			}
 			</Text>
 	      </View>

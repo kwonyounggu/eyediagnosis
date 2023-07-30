@@ -120,8 +120,10 @@ const CustomMessageText = (props) =>
 	                  }
                  >
                   {
-					  props.currentMessage?.replyMessage?.document ? props.currentMessage?.replyMessage?.fileName :
-					  props.currentMessage?.replyMessage?.image ? 'Photo' : props.currentMessage?.replyMessage?.text
+					  //props.currentMessage?.replyMessage?.document ? props.currentMessage?.replyMessage?.fileName :
+					  //props.currentMessage?.replyMessage?.image ? 'Photo' : props.currentMessage?.replyMessage?.text
+					  (props.currentMessage?.replyMessage?.document || props.currentMessage?.replyMessage?.image) ? 
+					   props.currentMessage?.replyMessage?.fileName : props.currentMessage?.replyMessage?.text
                   }
                 </Text>
               </View>

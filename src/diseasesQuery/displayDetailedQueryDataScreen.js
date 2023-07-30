@@ -110,11 +110,27 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 							  		    {
 											  (url, match) =>
 											  {
-												 //console.log("url: ", url);
+												 console.log("url: ", url, " match: ", match);
 												 //console.log("match: ", match); 
 												 //navigation.navigate(eyeWikiName, "https://eyewiki.aao.org/Age-Related_Macular_De");
 												 navigation.navigate(eyeWikiName, {url});
 											  }
+										}
+										matchers=
+										{
+											[
+												{
+													pattern: /\d{1,2}\.\s[A-Za-z '\p{L}()]*:/gmu,
+													style:
+													{
+														color: 'blue'
+													},
+													onPress: (match)=>
+													{
+														console.log("disease: ", match.getMatchedText());
+													}
+												}
+											]
 										}
 							  />
 					

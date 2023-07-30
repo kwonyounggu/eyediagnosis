@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform, LogBox } from 'react-native';
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Text, Platform, LogBox, useWindowDimensions } from 'react-native';
 //import { Avatar } from 'react-native-elements';
 import { AppContext } from '../../contexts/appProvider';
 import { auth, db, app } from '../../firebase/firebase';
@@ -87,6 +87,8 @@ export default function ChattingScreen({navigation})
 			          name: auth?.currentUser?.displayName,
 			          avatar: auth?.currentUser?.photoURL
 		         };
+		         
+	const replyBackMsgWidth = Math.round(useWindowDimensions().width/2);
 
 	const getFileInfo = async (fileURI) => 
 	{
@@ -94,6 +96,13 @@ export default function ChattingScreen({navigation})
 	   return fileInfo;
 	}
 	
+	const makeFileName = (fileType) =>
+	{
+		const today = new Date();
+		const names = user.name.split(' ');
+		return fileType + '_' + names[0].charAt(0).toLowerCase() +
+			   names[1].charAt(0).toLowerCase() + '_' + today.getHours() + '_' + today.getMinutes() + '_' + today.getSeconds();
+	}
 	//ExponentImagePicker.launchCameraAsync' has been rejected
 	//https://github.com/expo/expo/issues/19512
 	//About permission
@@ -122,7 +131,12 @@ export default function ChattingScreen({navigation})
 					(
 						(result) =>
 						{
-							if (!result.canceled) checkFileAndUpload(result);
+							if (!result.canceled) 
+							{
+								//what about Video later?
+								result.assets[0].fileName = makeFileName('Photo');
+								checkFileAndUpload(result);
+							}
 						}
 					)
 					.catch
@@ -148,7 +162,11 @@ export default function ChattingScreen({navigation})
 			            	quality: 1
 						}
 					);
-					if (!result.canceled) checkFileAndUpload(result);
+					if (!result.canceled) 
+					{
+						result.assets[0].fileName = makeFileName('Photo');
+						checkFileAndUpload(result);
+					}
 				}
 				catch (e)
 				{
@@ -189,7 +207,7 @@ export default function ChattingScreen({navigation})
 		.then
 		(
 			(fileInfo) =>
-			{   
+			{   //console.log("fileInfo: ", fileInfo); if (1>0) return;
 				if (fileInfo.size > FILE_SIZE_MAX)
 					alert("File size must be smaller than " + FILE_SIZE_MAX_S + "!");
 				else uploadToStorage(result);
@@ -240,7 +258,8 @@ export default function ChattingScreen({navigation})
 					        {
 								case 'video': fbMessage = {...imageMessage[0], video: url}; break;
 								case 'image': fbMessage = {...imageMessage[0], image: url}; break;
-								case 'pdf': fbMessage = 
+								case 'pdf': fbMessage = {...imageMessage[0], document: url}; break;
+								case 'pdfOrg': fbMessage = 
 											{
 												_id: imageMessage[0]._id,
 												createdAt: imageMessage[0].createdAt,
@@ -340,8 +359,7 @@ export default function ChattingScreen({navigation})
 								{
 						            borderRadius: 14,
 						            height: 150,
-						            width: 200,
-						            marginBottom: -5
+						            width: 200
 						        }
 						    }
 					    	source={{uri: props.currentMessage.image}} /> 
@@ -608,7 +626,7 @@ export default function ChattingScreen({navigation})
 									style=
 									{
 										{
-											width: '50%',
+											width: replyBackMsgWidth,
 											resizeMode: 'contain'
 										}
 									} 

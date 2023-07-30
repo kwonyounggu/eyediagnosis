@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from '../../firebase/accounts/login';
 import Register from '../../firebase/accounts/register';
@@ -13,129 +13,116 @@ import axios from 'axios';
 
 const Stack = createNativeStackNavigator();
 
+const configuration = new Configuration
+(
+	{
+	    apiKey: `${GPTAI_API_KEY}`
+	}
+);
+const openai = new OpenAIApi(configuration);
+			
 const FinalHome = ({navigation}) =>
 {
 	const [msg, setMsg] = React.useState();
 	const [data, setData] = React.useState([]);
 	const [textInput, setTextInput] = React.useState('');
+	const [querying, setQuerying] = React.useState(false);
 
 	
-	const handleSend = async () =>
+	const handleSend = () =>
 	{
-		const prompt = textInput;
-		const response = await axios.post
-		(
-			`${OPENAI_API_URL}`,
-			{
-				prompt: prompt,
-			    max_tokens: 1024,
-				temperature: 0.5
-			},
-			{
-				headers: 
-				{
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${GPTAI_API_KEY}`
-				}
-			}
-		);
-		
-		const text = response.data.choices[0].text;
-		setData([...data, {type: 'user', 'text': textInput}, {type: 'bot', 'text': text}]);
-		setTextInput('');
-	}
-	
-	
-	React.useEffect
-	(
-		()=>
-		{
-			console.log("key: ", GPTAI_API_KEY);
-			console.log("oid: ", OPENAI_ORGANIZATION_ID);
-			const configuration = new Configuration
-			(
-				{
-				    apiKey: `${GPTAI_API_KEY}`
-				}
-			);
-			const openai = new OpenAIApi(configuration);
-			/*openai.retrieveModel("text-davinci-003").then
-			(
-				(response)=>console.log("from openai: ", response)
-			)
-			.catch
-			(
-				
-				(e)=>
-				{
-					console.error(e);
-					setMsg("error: ", e);
-				}
-			)*/
-			
-			openai.createChatCompletion
+		if (textInput.length === 0) return;
+
+		setQuerying(true);
+		let text = 'default';
+		openai.createChatCompletion
 			(
 				{
 					model: "gpt-3.5-turbo",
 	  				messages: 
 	  				[
 						  { role: "system", "content": "You are an eye doctor."}, 
-						  { role: "user", content: "I am 61 years old male and have diabeties and va 20/30"}
+						  { role: "user", content: `${textInput}`}
 					],
 				}
 			)
 			.then
 			(
-				(response) => console.log(">>>", response.data.choices[0].message)
+				(response) => 
+				{
+					console.log(">>>", response.data.choices[0].message.content);
+					text = response.data.choices[0].message.content;
+					//throw 'testing error';
+					
+				}
 			)
 			.catch
 			(
-				(e)=>console.error(e)
+				(e)=>
+				{
+					console.error(e);
+					text = e;					
+				}
+					
 			)
-		},[]
-	);
+			.finally
+			(
+				() =>
+				{
+					setData([...data, {'type': 'user', 'text': `${textInput}`}, {'type': 'bot', 'text': text}]);
+					setTextInput('');
+					setQuerying(false);
+				}
+			)
+	}
 	
 	return (
 		<View style={styles.container}>
-			<Text style={styles.title}>AI ChatBot</Text>
+			<Text style={styles.title}>I am an AI Eye Doctor</Text>
 			<FlatList
 				data={data}
 				keyExtractor={(item, index) => index.toString()}
 				style={styles.body}
 				renderItem=
 				{
-					(item) =>
-					(
-						<View style={{flexDirection: 'row', padding: 10}}>
+					({item}) =>
+					{   //console.log("item: ", item);
+						return <View style={{flexDirection: 'column'}}>
 							<Text style=
 								  {
 									  {
 										  fontWeight: 'bold',
-										  color: item.type === 'user' ? 'green' : 'red'
+										  color: (item['type'] === 'user') ? 'green' : 'red'
 									  }
 								  }
 							>
 							{
-								item.type === 'user' ? 'Niza' : 'Bot'
+								(item.type === 'user') ? 'User: ' : 'Bot: '
 							}
 							</Text>
 							<Text style={styles.bot}>{item.text}</Text>
 						</View>
-					)
+					}
 				}
 			/>
 			<TextInput
 				style={styles.input}
 				value={textInput}
 				onChangeText={(text) => setTextInput(text)}
-				placeholder='Ask me anything'
+				placeholder='Ask me only a question a day'
+				returnKeyType='next'
 			/>
 			<TouchableOpacity
 				style={styles.buttonSend}
 				onPress={handleSend}
 			>
-				<Text style={styles.buttonText}>Let's go</Text>
+				<Text style={styles.buttonText}>Press me</Text>
 			</TouchableOpacity>
+			{
+				querying && <View style={styles.querying}>
+                            <ActivityIndicator size='large' />
+                        </View>
+			}
 		</View>	
 	);
 }
@@ -162,36 +149,50 @@ const styles = StyleSheet.create
 		{
 			flex: 1,
 			backgroundColor: '#fffcc9',
-			alignItems: 'center'
+			alignItems: 'center',
+			padding: 10		
 		},
 		title:
 		{
 			fontSize: 28,
 			fontWeight: 'bold',
 			marginBottom: 20,
-			marginTop: 70
+			marginTop: 40
 		},
 		body:
 		{
 			backgroundColor: '#fffcc9',
-			width: '100%',
-			margin: 10
+			margin: 0
 		},
 		bot:
 		{
-			fontSize: 16
+			fontSize: 16,
+			paddingBottom: 10
 		},
 		input:
 		{
-			
+			borderWidth: 1,
+			padding : 10,
+			marginBottom: 5
 		},
 		buttonText:
 		{
-			
+			padding: 10
 		},
 		buttonSend:
 		{
-			
-		}
+			marginBottom: 15,
+			backgroundColor: 'orange'
+		},
+		querying:
+        {
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
 	}
 )
