@@ -3,7 +3,7 @@ import {Text, ScrollView} from 'react-native';
 import {ActivityIndicator, Card, Paragraph, IconButton} from 'react-native-paper';
 import { ABC } from '../common/utils';
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
-import {listSavedDataName, eyeWikiName} from '../constants';
+import {listSavedDataName, eyeWikiName, EYE_WIKI_HOME} from '../constants';
 import Autolink from 'react-native-autolink';
 
 export default function DisplayDetailedQueryDataScreen({route, navigation})
@@ -120,14 +120,16 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 										{
 											[
 												{
-													pattern: /\d{1,2}\.\s[A-Za-z '\p{L}()]*:/gmu,
+													pattern: /\d{1,2}\.\s[A-Za-z '\-\p{L}()]*:/gmu,
 													style:
 													{
 														color: 'blue'
 													},
 													onPress: (match)=>
 													{
-														console.log("disease: ", match.getMatchedText());
+														const dieaseName = match.getMatchedText().replace(/^[0-9]+\.\s/, '').replace(':', '');
+														//console.log("disease: ", dieaseName);
+														navigation.navigate(eyeWikiName, {url: EYE_WIKI_HOME, searchWords: dieaseName.trim()});
 													}
 												}
 											]

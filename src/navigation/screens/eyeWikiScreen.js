@@ -9,8 +9,11 @@ export default function EyeWikiScreen({route, navigation})
 {
 	//console.log("INFO in EyeWikiScreen: ", React.useContext(AppContext));
 	console.log("INFO in eyeWikiScreen.js, url: ", route.params);
-	const {url} = route.params;
+
+	const [url, setUrl] = React.useState(route.params.url);
+	const [searchWords, setSearchWords] = React.useState(route.params.url);
 	const [loading, setLoading] = React.useState(true);
+	//const [injectNow, setInjectNow] = React.useState(false);
 	/*const loadDataCallback = React.useCallback
 	(
 		async () => 
@@ -42,24 +45,30 @@ export default function EyeWikiScreen({route, navigation})
   	(
 		() =>
 		{
-			console.log("[INFO]: it's time for put a word in search input");
-			//if (url === 'https://eyewiki.aao.org') webViewRef?.current.injectJavaScript(javascript);
-			if (!loading && url.toLowerCase().endsWith('eyewiki.aao.org')) webViewRef?.current.injectJavaScript(javascript);
-		}, [url]
+			console.log("[INFO]: url = ", url);
+			console.log("[INFO]: searchWords = ", searchWords);	
+			if (searchWords) handleLoadEnd();	
+		}, [url, searchWords]
 	);
 
 	const javascript = 
     `console.log('injectJavaScript');
-    document.getElementById('searchInput').style.backgroundColor = 'red';
-    document.getElementById('searchInput').value = 'green';
+    document.getElementById('searchInput').value = ${searchWords};
     true;`;
     
     
-    const handleLoadEnd = React.useCallback(() => {
-        console.log("handleLoadEnd..");
-        //webViewRef.current?.injectJavaScript(javascript);
-        //if (url.toLowerCase().endsWith('eyewiki.aao.org')) webViewRef?.current.injectJavaScript(javascript);
-    },[])
+    const handleLoadEnd = React.useCallback
+    (
+		() => 
+		{
+	        console.log("handleLoadEnd..");
+	        if (searchWords && url.toLowerCase().endsWith('eyewiki.aao.org')) 
+			{
+				console.log("[INFO]: it's time for put a word in search input with [", searchWords, "]");
+				webViewRef?.current.injectJavaScript(javascript);
+			}
+    	},[]
+    )
   	//See https://stackoverflow.com/questions/45256826/react-native-webview-loading-indicator
     return (
         	<View style={{flex: 1}}>
@@ -70,7 +79,7 @@ export default function EyeWikiScreen({route, navigation})
             		onLoad={()=>setLoading(false)} 
 					onLoadEnd={handleLoadEnd}
             		onMessage={(e)=>{console.log(e)}}
-            		
+            		setSupportMultipleWindows={false}
             	/>
             	{
 					loading && 
