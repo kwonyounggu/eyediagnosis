@@ -11,7 +11,7 @@ import {clone} from 'lodash';
 import {AppContext} from '../contexts/appProvider';
 
 import chatGptQueryTable from '../database/sqlite/chatGptQuery';
-import {eyeWikiName} from '../constants';
+import {eyeWikiName, EYE_WIKI_HOME} from '../constants';
 
 //import { queryData } from '../common/testData';
 
@@ -171,6 +171,24 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
 												 navigation.navigate(eyeWikiName, {url});
 											  }
 										  }
+										  matchers=
+										 {
+											[
+												{
+													pattern: /\d{1,2}\.\s[A-Za-z '\-\p{L}()]*:/gmu,
+													style:
+													{
+														color: 'blue'
+													},
+													onPress: (match)=>
+													{
+														const dieaseName = match.getMatchedText().replace(/^[0-9]+\.\s/, '').replace(':', '');
+														//console.log("disease: ", dieaseName);
+														navigation.navigate(eyeWikiName, {url: EYE_WIKI_HOME, searchWords: dieaseName.trim()});
+													}
+												}
+											]
+										}
 							  />
                               </View> 
                 }

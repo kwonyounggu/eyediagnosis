@@ -106,21 +106,13 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
 					loading ? <ActivityIndicator size='large' /> :
 							  <Autolink text={ABC.toAscii(chatGptResponse)} 
 							  		    component={Paragraph} 
-							  		    onPress=
-							  		    {
-											  (url, match) =>
-											  {
-												 console.log("url: ", url, " match: ", match);
-												 //console.log("match: ", match); 
-												 //navigation.navigate(eyeWikiName, "https://eyewiki.aao.org/Age-Related_Macular_De");
-												 navigation.navigate(eyeWikiName, {url});
-											  }
-										}
+							  		    url={false}
+
 										matchers=
 										{
 											[
 												{
-													pattern: /\d{1,2}\.\s[A-Za-z '\-\p{L}()]*:/gmu,
+													pattern: /^\d{1,2}\.\s[A-Za-z '\-\p{L}()]*:/gmu,
 													style:
 													{
 														color: 'blue'

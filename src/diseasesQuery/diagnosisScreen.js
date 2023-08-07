@@ -61,8 +61,8 @@ function createQueryString (params, messageId, conversationId)
 
     let queryStringDisplayable = queryString;
 
-    queryString += " In addition, please summarize each disease according to eyewiki.aao.org and" +
-                   " include its direct href link address at the bottom of the whole page separately altogether."
+    //queryString += " In addition, please summarize each disease according to eyewiki.aao.org and" +
+    //               " include its direct href link address at the bottom of the whole page separately altogether."
 
     return {queryString, queryStringDisplayable, patient: params, messageId, conversationId};
 }
@@ -328,7 +328,7 @@ const DiagnosisScreen = (props) =>
 						{
 							headerStyle: 
 							{
-					            backgroundColor: '#f4511e'
+					            backgroundColor: '#4e5180'
 					        },
 							headerTintColor: '#fff',
 					        headerTitleStyle: 

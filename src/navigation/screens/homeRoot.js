@@ -204,7 +204,7 @@ export default function HomeRoot({navigation})
 						{	swipeEnabled: false,					
 							headerStyle: 
 							{
-					            backgroundColor: '#f4511e'
+					            backgroundColor: '#4e5180'
 					        },
 							headerTintColor: '#fff',
 					        headerTitleStyle: 

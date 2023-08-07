@@ -99,6 +99,7 @@ const CustomMessageText = (props) =>
 			                    //color: 'white',
 			                    paddingHorizontal: 10,
 			                    paddingTop: 5,
+			                    fontSize: 12,
 			                    fontWeight: '700'
 	                  		}
 	                  }

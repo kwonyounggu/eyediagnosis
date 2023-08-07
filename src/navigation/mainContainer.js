@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppState } from 'react-native';
+import { AppState, View, Text } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -15,7 +15,7 @@ import { AppContext } from '../contexts/appProvider';
 import _ from 'lodash';
 import { useChatGpt } from '../chatGpt';
 import * as SecureStore from 'expo-secure-store';
-import {homeRootName, homeName, diseasesName, pharmacyName, settingsName, chattingName, eyeWikiName, forumName, EYE_WIKI_HOME, appHome} from '../constants'
+import {homeRootName, homeName, diseasesName, pharmacyName, eyeWikiName, EYE_WIKI_HOME, appHome} from '../constants'
 
 
 const Tab = createBottomTabNavigator();
@@ -33,20 +33,25 @@ async function getTokenFromDisk()
   return SecureStore.getItemAsync(SESSION_TIME_KEY);
 }
 
-function ToEyeWikiHome()
+function EyeWikiHome()
 {
-	const navigation = useNavigation();
 	return (
-				<Button icon='home' 
-						onPress={()=>navigation.navigate(eyeWikiName, {url: EYE_WIKI_HOME})}
-						style={{margin: 4}}
-						contentStyle={{flexDirection: 'row-reverse'}}
-				>
-						{eyeWikiName}
-				</Button>
+				<View>
+					<Text style={{color: 'white', fontSize: 20, fontWeight: 'bold'}}>	{eyeWikiName} </Text>
+				</View>
 	);
 }
 
+//eyerounds.org
+function EyeRoundsHome()
+{
+	const navigation = useNavigation();
+	return (
+				<View>
+					<Text style={{color: 'white', fontSize: 18, fontWeight: 'normal'}}>	EyeRounds &gt; </Text>
+				</View>
+	);
+}
 //See https://stackoverflow.com/questions/68900300/react-navigation-opening-a-modal-from-the-tab-bar
 export default function MainContainer()
 {
@@ -123,7 +128,7 @@ export default function MainContainer()
                             headerShown: route.name !== diseasesName,
                             headerStyle: 
 										{
-								            backgroundColor: '#f4511e'
+								            backgroundColor: '#4e5180'
 								        },
           								headerTintColor: '#fff',
 								        headerTitleStyle: 
@@ -164,15 +169,16 @@ export default function MainContainer()
                 />
                 <Tab.Screen name={diseasesName} component={DiseaseQueryScreen} />
                 <Tab.Screen name={eyeWikiName} 
-                		    initialParams={{url: EYE_WIKI_HOME}} 
+                		    initialParams={{url: EYE_WIKI_HOME, searchWords:''}} 
                 		    component={EyeWikiScreen} 
                 		    options=
                 		    {
 								(navigation, route) =>
 								(
 									{
-										headerTitle: (props) =>(<ToEyeWikiHome />)
+										headerTitle: (_) => (<EyeWikiHome />),
 										
+										headerRight: (_) => (<EyeRoundsHome />)
 									}
 								)
 							}

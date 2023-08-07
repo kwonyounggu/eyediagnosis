@@ -62,7 +62,7 @@ import { imageViewerScreenName, pdfFileViewerScreenName } from '../../constants'
  * https://stackoverflow.com/questions/1108076/where-does-the-iphone-simulator-store-its-data?rq=3
  */
 
-const FILE_SIZE_MAX = 5120000; //4MB
+const FILE_SIZE_MAX = 10240000; //8MB
 const FILE_SIZE_MAX_S = ( FILE_SIZE_MAX >>> 20 ) + '.' + ( FILE_SIZE_MAX & (2*0x3FF ) ) + 'MB';
 //console.log("FILE_SIZE_MAX: ", FILE_SIZE_MAX_S);
 
@@ -158,7 +158,7 @@ export default function ChattingScreen({navigation})
 						{
 							mediaTypes: ImagePicker.MediaTypeOptions.Images,
 							allowsEditing: true,
-			            	//aspect: [4, 3],
+			            	aspect: [4, 3],
 			            	quality: 1
 						}
 					);
@@ -401,7 +401,12 @@ export default function ChattingScreen({navigation})
 			else return (<Bubble {...props} />); //left side image
 		else if (props.currentMessage.user._id !== user._id)  //left text 
 			return (<Bubble {...props} wrapperStyle={{left: {backgroundColor: '#e4e7eb'}}}/>);
-		else return (<Bubble {...props} />); //right text
+		else 
+			return (<Bubble {...props} 
+						wrapperStyle={{right: {backgroundColor: '#9195ac'}}}
+						textStyle={{right:  {color: '#f4f4f2'}}}
+					/>
+				); //right text
 	}
 	
 	const renderLoading = () => 

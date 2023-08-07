@@ -25,19 +25,19 @@ export default function ChattingHomeScreen({route, navigation})
 				{
 					headerRight: () =>
 					(
-			                <Menu visible={popupVisible} 
+			                <Menu visible={popupVisible}  
 		                	  	  contentStyle={styles.popupMenu}
 		                	      onDismiss={()=>setPopupVisible(false)}
 	                    		  anchor=
 	                    		  {
 									  <IconButton style={{margin: 0, padding: 0}} 
-									  			  icon='upload' color='#000' size={30} 
+									  			  icon='upload' iconColor={'#ffffff'} size={30} 
 									  			  onPress={()=>setPopupVisible(true)}
 									  />
 								  }
 	                    	>
-	                    		  <Menu.Item leadingIcon='camera' 
-	                    		  			 title='Camera'  
+	                    		  <Menu.Item leadingIcon='camera' titleStyle={{color: 'white'}}
+	                    		  			 title='Camera'
 	                    		  			 onPress=
 	                    		  			 {
 												   ()=>
@@ -48,7 +48,7 @@ export default function ChattingHomeScreen({route, navigation})
 											 }
 	                    		  />
 	                    		  <Divider />
-	                    		  <Menu.Item leadingIcon='image' 
+	                    		  <Menu.Item leadingIcon='image' titleStyle={{color: 'white'}}
 	                    		  			 title='Photos' 
 	                    		  			 onPress=
 	                    		  			 {
@@ -60,7 +60,7 @@ export default function ChattingHomeScreen({route, navigation})
 											 }
 	                    		  />	                    		  
 	                    		  <Divider />
-	                    		  <Menu.Item leadingIcon='file' 
+	                    		  <Menu.Item leadingIcon='file' titleStyle={{color: 'white'}}
 	                    		  			 title='Pdf' 
 	                    		  			 onPress=
 	                    		  			 {
@@ -143,21 +143,7 @@ const styles = StyleSheet.create
 		    borderRadius: 20,
 		    borderColor: 'white',
 		    borderWidth: 2,
-		    backgroundColor: '#f4511e'
+		    backgroundColor: '#4e5180'		    
 		}
     }
 );
-
-/**
- * <Menu.Item leadingIcon='video' 
-  			 title='Video' 
-  			 onPress=
-  			 {
-				   ()=>
-				   {
-					   setPopupVisible(false);
-					   navigationRef.current?.getCurrentRoute().params.handleMedia(ImagePicker.MediaTypeOptions.Videos);
-				   }
-			 }
-  />
- */
