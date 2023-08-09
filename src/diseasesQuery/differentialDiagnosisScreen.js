@@ -140,7 +140,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                 {
                     headerRight: () => !onSave && <IconButton 
                                             icon='archive' 
-                                            color='#000' 
+                                            iconColor={'#ffffff'} 
                                             size={25} 
                                             disabled={false}
                                             onPress={()=>setOnSave(true)}
@@ -161,21 +161,12 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
                               <View style={styles.queryResultContainer}>
                               	<Autolink text={queryResult} 
 							  		      component={Text} 
-							  		      onPress=
-							  		      {
-											  (url, match) =>
-											  {
-												 //console.log("url: ", url);
-												 //console.log("match: ", match); 
-												 //navigation.navigate(eyeWikiName, "https://eyewiki.aao.org/Age-Related_Macular_De");
-												 navigation.navigate(eyeWikiName, {url});
-											  }
-										  }
+							  		      url={false}							  		      
 										  matchers=
-										 {
+										  {
 											[
 												{
-													pattern: /\d{1,2}\.\s[A-Za-z '\-\p{L}()]*:/gmu,
+													pattern: /^\d{1,2}\.\s[A-Za-z '\-\p{L}()]*:/gmu,
 													style:
 													{
 														color: 'blue'
@@ -188,7 +179,7 @@ const DifferentialDiagnosisScreen = ({route, navigation}) =>
 													}
 												}
 											]
-										}
+										 }
 							  />
                               </View> 
                 }

@@ -51,7 +51,7 @@ function createQueryString (params, messageId, conversationId)
     console.log("params in createQueryString: ", params);
     
     let queryString = 
-        "What differential diagnosis would you make if a " + params.age + " year " + params.gender +" patient " +
+        "Say you are an eye doctor. What differential diagnosis would you make if a " + params.age + " year " + params.gender +" patient " +
         "shows up with symptoms of " + params.symptoms.join(", ");
     if (params.medicalHistory.length > 0)
         queryString += ", signs of " + params.signs.join(", ") +
@@ -339,7 +339,7 @@ const DiagnosisScreen = (props) =>
 					)
 				}
             >
-              <Stack.Group>
+              
                 <Stack.Screen 
                 	name={diagnosisName} 
                 	component={EyeDiagnosisInputScreen} 
@@ -348,26 +348,7 @@ const DiagnosisScreen = (props) =>
 						({navigation}) =>
 						(
 	                        {
-	                            headerRight: ()=> 
-	                            	<Menu visible={popupVisible} contentStyle={styles.popupMenu}
-	                            		  onDismiss={()=>setPopupVisible(false)}
-	                            		  anchor={<IconButton style={{margin: 0, padding: 0}} icon='dots-vertical' color='#000' size={30} onPress={()=>setPopupVisible(true)}/>}
-	                            	>
-	                            		  <Menu.Item leadingIcon='logout' title='Log out' onPress={flush} />
-	                            		  <Divider />
-	                            		  <Menu.Item leadingIcon='database-sync-outline' 
-	                            		  			 title='List Data' 
-	                            		  			 onPress=
-	                            		  			 {
-														   () =>
-														   {
-															   setPopupVisible(false); 
-															   return navigation.navigate(listSavedDataName);
-														   }
-													 } 
-										/>
-	                            	</Menu>
-	                            		           
+	                            headerRight: ()=> <IconButton style={{margin: 0, padding: 0}} icon='database-sync-outline' iconColor={'#ffffff'} size={30} onPress={() => navigation.navigate(listSavedDataName)}/>	                            	
 	                        }
                         )
                     }
@@ -377,9 +358,7 @@ const DiagnosisScreen = (props) =>
 						//https://aboutreact.com/react-native-image-icon-inside-navigation-bar/#:~:text=js-,%2F%2F%203%20Ways%20to%20Add%20Image%20Icon%20Inside%20Navigation%20Bar,navigation%7D)%20%3D%3E%20%7B%20React.
                         (props) => <DifferentialDiagnosisScreen {...props} />
                     }
-                </Stack.Screen> 
-              </Stack.Group>
-              <Stack.Group>  
+                </Stack.Screen>                 
                 <Stack.Screen 
                     name={listSavedDataName} 
                     options=
@@ -393,10 +372,7 @@ const DiagnosisScreen = (props) =>
                         (props) => <ListDataScreen {...props} />
                     }
                 </Stack.Screen>  
-               </Stack.Group>
-               <Stack.Group>
-                <Stack.Screen name={displayDetailedQueryDataName} component={DisplayDetailedQueryDataScreen} /> 
-               </Stack.Group>
+                <Stack.Screen name={displayDetailedQueryDataName} component={DisplayDetailedQueryDataScreen} />              
             </Stack.Navigator>
 
     );

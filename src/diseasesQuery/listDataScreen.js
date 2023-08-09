@@ -32,20 +32,6 @@ export default function ListDataScreen({navigation, route})
   
   const [noMoreData, setNoMoreData] = useState(false);
   
-  //let offset = 0;
- 
- /*
-  React.useEffect
-  (
-		() => 
-	    {
-			chatGptQueryTable.getNumberOfRows()
-						     .then((max) => setMaxRecords(max))
-						     .catch((e) => console.error(e));
-			
-	  	}, []
-  );
-  */
   React.useEffect
   (
 		() => 

@@ -62,7 +62,7 @@ export default function DisplayDetailedQueryDataScreen({route, navigation})
                 {
                     headerRight: () => <IconButton 
                                             icon='delete' 
-                                            color='#000' 
+                                            iconColor={'#ffffff'} 
                                             size={25} 
                                             disabled={false}
                                             onPress={deleteItem}
