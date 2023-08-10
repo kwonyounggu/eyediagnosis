@@ -4,7 +4,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import {Button} from 'react-native-paper';
+//import {Button} from 'react-native-paper';
 
 //Screens
 import DiseaseQueryScreen from './screens/diseaseQueryScreen';
@@ -15,7 +15,8 @@ import { AppContext } from '../contexts/appProvider';
 import _ from 'lodash';
 import { useChatGpt } from '../chatGpt';
 import * as SecureStore from 'expo-secure-store';
-import {homeRootName, homeName, diseasesName, pharmacyName, eyeWikiName, EYE_WIKI_HOME, appHome} from '../constants'
+import {homeRootName, homeName, diseasesName, pharmacyName, eyeWikiName, EYE_WIKI_HOME, appHome} from '../constants';
+//import { enableLayoutAnimations } from 'react-native-reanimated';
 
 
 const Tab = createBottomTabNavigator();

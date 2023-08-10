@@ -323,9 +323,7 @@ const DiagnosisScreen = (props) =>
             <Stack.Navigator initialRouteName={diagnosisName}
             	screenOptions=
             	{
-					({route})=>
-					(
-						{
+					{
 							headerStyle: 
 							{
 					            backgroundColor: '#4e5180'
@@ -336,7 +334,6 @@ const DiagnosisScreen = (props) =>
 					            fontWeight: 'bold'
 					        }
 						}
-					)
 				}
             >
               
@@ -353,31 +350,17 @@ const DiagnosisScreen = (props) =>
                         )
                     }
                 />
-                <Stack.Screen name={differentialDiagnosisName} > 
-                    {
-						//https://aboutreact.com/react-native-image-icon-inside-navigation-bar/#:~:text=js-,%2F%2F%203%20Ways%20to%20Add%20Image%20Icon%20Inside%20Navigation%20Bar,navigation%7D)%20%3D%3E%20%7B%20React.
-                        (props) => <DifferentialDiagnosisScreen {...props} />
-                    }
-                </Stack.Screen>                 
-                <Stack.Screen 
-                    name={listSavedDataName} 
-                    options=
-                    {
-                        {
-                            headerRight: ()=>{}
-                        }
-                    }
-                    > 
-                    {
-                        (props) => <ListDataScreen {...props} />
-                    }
-                </Stack.Screen>  
+                <Stack.Screen name={differentialDiagnosisName} component={DifferentialDiagnosisScreen} /> 
+                                  
+                <Stack.Screen name={listSavedDataName} component={ListDataScreen} /> 
+                    
                 <Stack.Screen name={displayDetailedQueryDataName} component={DisplayDetailedQueryDataScreen} />              
             </Stack.Navigator>
 
     );
 };
 
+/*
 const styles = StyleSheet.create
 (
     {
@@ -415,5 +398,5 @@ const styles = StyleSheet.create
 		}
     }
 );
-
+*/
 export default DiagnosisScreen;

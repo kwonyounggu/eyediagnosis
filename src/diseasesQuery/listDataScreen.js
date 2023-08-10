@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState} from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -177,7 +176,7 @@ export default function ListDataScreen({navigation, route})
 	        }
 	    }
       />
-      <StatusBar style="auto" />
+
     </View>
   );
 }

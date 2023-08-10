@@ -7,18 +7,16 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() 
 {
-	
-
-  return (
-    <AppProvider>   
-      <SafeAreaProvider>
-            <PaperProvider>
-                <ChatGptProvider streamedRequestTimeout={900000}>
-                    <MainContainer />
-                </ChatGptProvider>
-            </PaperProvider>
-        </SafeAreaProvider>
-    </AppProvider>
-  );
+	return (
+	    <AppProvider>   
+	      <SafeAreaProvider>
+	            <PaperProvider>
+	                <ChatGptProvider streamedRequestTimeout={900000}>
+	                    <MainContainer />
+	                </ChatGptProvider>
+	            </PaperProvider>
+	        </SafeAreaProvider>
+	    </AppProvider>
+	);
 }
 
