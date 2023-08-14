@@ -1,5 +1,6 @@
 import * as React from 'react';
-import {ActivityIndicator, View, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { AppContext } from '../../contexts/appProvider';
 import {WebView} from 'react-native-webview';
 import { EYE_WIKI_HOME } from '../../constants';

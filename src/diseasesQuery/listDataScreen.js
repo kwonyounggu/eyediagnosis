@@ -1,5 +1,6 @@
 import React, { useState} from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from "lodash";
 
@@ -142,7 +143,7 @@ export default function ListDataScreen({navigation, route})
   (
 	<View>
 		{ noMoreData ? <Text style={{textAlign: 'center'}}>No (More) Data</Text> :
-											 loading && <ActivityIndicator />
+											 loading && <ActivityIndicator size='large' />
 		}
 	</View>  
   );

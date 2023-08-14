@@ -51,7 +51,7 @@ function createQueryString (params, messageId, conversationId)
     console.log("params in createQueryString: ", params);
     
     let queryString = 
-        "Say you are an eye doctor. What differential diagnosis would you make if a " + params.age + " year " + params.gender +" patient " +
+        "Say you are an eye doctor. What differential diagnoses would you make if a " + params.age + " year " + params.gender +" patient " +
         "shows up with symptoms of " + params.symptoms.join(", ");
     if (params.medicalHistory.length > 0)
         queryString += ", signs of " + params.signs.join(", ") +
@@ -60,6 +60,8 @@ function createQueryString (params, messageId, conversationId)
         queryString += ", and signs of " + params.signs.join(", ") + "?"; 
 
     let queryStringDisplayable = queryString;
+
+	queryString += " Give me a list of differential diagnoses for the above scenario.";
 
     //queryString += " In addition, please summarize each disease according to eyewiki.aao.org and" +
     //               " include its direct href link address at the bottom of the whole page separately altogether."

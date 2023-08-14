@@ -7,7 +7,8 @@
 import React from 'react';
 //import { useChatGpt } from 'react-native-chatgpt';
 import { useChatGpt } from '../../chatGpt';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import Login from '../../common/login';
 //import Chat from './chat';
 import DiagnosisScreen from '../../diseasesQuery/diagnosisScreen';

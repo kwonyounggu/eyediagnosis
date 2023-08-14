@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from '../../firebase/accounts/login';
 import Register from '../../firebase/accounts/register';
@@ -9,7 +10,7 @@ import { appHome, appLoginScreenName, appRegisterScreenName, appForgotPasswordSc
 
 import {Configuration, OpenAIApi} from 'openai';
 import { GPTAI_API_KEY, OPENAI_ORGANIZATION_ID, OPENAI_API_URL } from '@env';
-import axios from 'axios';
+//import axios from 'axios';
 
 const Stack = createNativeStackNavigator();
 
